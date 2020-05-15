@@ -1,0 +1,26 @@
+.login-form{
+	width: 100%;
+	max-width: 300px;
+	margin: auto;
+	margin-top: 8em;
+	height: 100%;
+
+}
+
+#loginTitle{
+	padding-bottom: 0.75em;
+	font-weight: bolder;
+	font-size: 3em;
+}
+
+#loginButton{
+	width: 40%;
+	background-color: #4CAF50;
+	border-color: #4CAF50;
+}
+
+#pLabel{
+	margin-top: 1em;
+	text-decoration: underline;
+	cursor: pointer;
+}

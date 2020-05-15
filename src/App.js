@@ -1,26 +1,105 @@
-import React from 'react';
+import React, {Component} from 'react';
 import logo from './logo.svg';
+import Navbar from './Components/Navbar/Navbar';
+import Login from './Components/Login/Login';
+import Register from './Components/Register/Register';
+import PerSchedule from './Components/Schedules/PerSchedule';
+import PubSchedule from './Components/Schedules/PubSchedule';
+import CSchedule from './Components/Schedules/CSchedule';
+import Account from './Components/Account/Account';
+import AMessages from './Components/Messages/AMessages';
+import EMessages from './Components/Messages/EMessages';
+import Holidays from './Components/Settings/Holidays/Holidays';
+import CallTypes from './Components/Settings/CallTypes/CallTypes';
+import People from './Components/Settings/People/People';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+
+
+
+class App extends Component {
+  constructor(){
+    super();
+    this.state = {
+      isSignedIn: false,
+      route: 'login',
+      title: '',
+      user:{
+        id: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        colour: '',
+        isAdmin: false
+      }
+    }
+  }
+
+  /*
+  Different cases:
+  Login
+  register
+  Personal Schedule
+  Published Schedule
+  Call Schedule
+  Account Information
+  Admin Messages
+  Messages
+  Holidays
+  Call Types
+  People
+  */
+  
+
+  //used for rendering when signed in 
+  inRenderSwitch(route){
+    switch(route){
+      case 'Personal Schedule': 
+        return <PerSchedule/>
+      case 'Published Schedule': 
+        return <PubSchedule/>
+      case 'Call Schedule': 
+        return <CSchedule/>
+      case 'Account Information': 
+        return <Account/>
+      case 'Admin Messages': 
+        return <AMessages/>
+      case 'Messages': 
+        return <EMessages />
+      case 'Holidays': 
+        return <Holidays/>
+      case 'Call Types': 
+        return <CallTypes/>
+      case 'People': 
+        return <People/>
+    }
+  }
+
+  //Used for rendering when signed out
+  outRenderSwitch(route){
+    return route === 'login' ? <Login/> : <Register/>
+  }
+
+
+  render(){
+     const {title, route, isSignedIn} = this.state;
+     return (
+        <div className="App">
+          { (! isSignedIn)
+            ? this.outRenderSwitch(route)
+            : <div>
+                <Navbar/>
+                <h1>{route}</h1>
+                {this.inRenderSwitch(route)}
+
+            </div>
+          }
+
+        </div>
+      );
+  }
+
 }
 
 export default App;
