@@ -16,7 +16,7 @@ class Login extends React.Component{
 
 	render(){
 		return(
-			<div >
+			<div>
 				<div className='test shadow-2'>
 					<div className='mt-5 spacing'id='loginHeader'>
 						<img style={{paddingTop:'5px', height:90, width:90}} alt='Logo' src={Logo}/> 
@@ -41,7 +41,7 @@ class Login extends React.Component{
 						</Form>
 					</div>
 					<div className='shad spacing' id='loginFooter'>
-						<p>New User? <span onClick={() => console.log('register click')} className='label'>Register Now</span></p>
+						<p>New user? <span onClick={() => console.log('register click')} className='label'>Register Now</span></p>
 					</div>
 				</div>
 			</div>

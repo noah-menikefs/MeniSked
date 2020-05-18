@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import logo from './logo.svg';
-import Navbar from './Components/Navbar/Navbar';
+import Navigation from './Components/Navigation/Navigation';
 import Login from './Components/Login/Login';
-import Register from './Components/Register/Register';
+import Register from './Components/Login/Register';
 import PerSchedule from './Components/Schedules/PerSchedule';
 import PubSchedule from './Components/Schedules/PubSchedule';
 import CSchedule from './Components/Schedules/CSchedule';
@@ -22,8 +22,8 @@ class App extends Component {
   constructor(){
     super();
     this.state = {
-      isSignedIn: false,
-      route: 'login',
+      isSignedIn: true,
+      route: 'Personal Schedule',
       title: '',
       user:{
         id: '',
@@ -31,14 +31,14 @@ class App extends Component {
         lastName: '',
         email: '',
         colour: '',
-        isAdmin: false
+        isAdmin: true
       }
     }
   }
 
   /*
   Different cases:
-  Login
+  login
   register
   Personal Schedule
   Published Schedule
@@ -83,13 +83,14 @@ class App extends Component {
 
 
   render(){
-     const {title, route, isSignedIn} = this.state;
+     const {title, route, isSignedIn, user} = this.state;
+     const {isAdmin} = user;
      return (
         <div className="App">
           { (! isSignedIn)
             ? this.outRenderSwitch(route)
             : <div>
-                <Navbar/>
+                <Navigation testIsAdmin={isAdmin}/>
                 <h1>{route}</h1>
                 {this.inRenderSwitch(route)}
 
