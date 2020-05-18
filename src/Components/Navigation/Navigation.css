@@ -29,4 +29,17 @@
     .logo { display: inline-block; }
     .full-text.linky { display: none; }
     .full-text { display: none; }
+    #brandTitle{
+    	font-size: 30px;
+    	margin-top: 0.25em;
+    	padding-bottom: 0.15em;
+    }
+    #brand{
+    	width: 40px;
+    	height: 40px;
+    	margin-top: 0.25em;
+    }
+
+
+
 }

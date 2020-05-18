@@ -23,7 +23,7 @@ class App extends Component {
     super();
     this.state = {
       isSignedIn: true,
-      route: 'Personal Schedule',
+      route: 'Call Types',
       title: '',
       user:{
         id: '',
@@ -91,6 +91,7 @@ class App extends Component {
             ? this.outRenderSwitch(route)
             : <div>
                 <Navigation testIsAdmin={isAdmin}/>
+                <br/>
                 <h1>{route}</h1>
                 {this.inRenderSwitch(route)}
 

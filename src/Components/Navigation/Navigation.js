@@ -29,8 +29,8 @@ class Navigation extends React.Component {
     return (
       <Navbar id="myNav">
         <Navbar.Brand href="#" id=''>
-          <img alt="logo" src={Logo} width="50" height="50" className="d-inline-block align-top"/>
-          <h1 id="brandTitle"className="d-inline-block align-top">MeniSked</h1>
+          <img id='brand' alt="logo" src={Logo} width="50" height="50" className="d-inline-block align-top"/>
+          <h1 id="brandTitle" className="d-inline-block align-top">MeniSked</h1>
         </Navbar.Brand>
     			<div id="collapser">
       			<Nav className="">
