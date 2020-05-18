@@ -15,10 +15,10 @@ class Navigation extends React.Component {
   adminNavbar(isAdmin){
     if (isAdmin){
       return (
-        <NavDropdown title="Settings" id="collasible-nav-dropdown">
-          <NavDropdown.Item href="#">Holidays</NavDropdown.Item>
-          <NavDropdown.Item href="#">Call Types</NavDropdown.Item>
-          <NavDropdown.Item href="#">People</NavDropdown.Item>
+        <NavDropdown className="" title="Settings" id="collasible-nav-dropdown">
+          <NavDropdown.Item href="#h">Holidays</NavDropdown.Item>
+          <NavDropdown.Item href="#c">Call Types</NavDropdown.Item>
+          <NavDropdown.Item href="#pe">People</NavDropdown.Item>
         </NavDropdown>
       );
     }
@@ -27,24 +27,30 @@ class Navigation extends React.Component {
   render(){
     const {testIsAdmin} = this.props
     return (
-      <Navbar collapseOnSelect expand="md" bg="light" variant="light">
+      <Navbar id="myNav">
         <Navbar.Brand href="#" id=''>
           <img alt="logo" src={Logo} width="50" height="50" className="d-inline-block align-top"/>
           <h1 id="brandTitle"className="d-inline-block align-top">MeniSked</h1>
         </Navbar.Brand>
-   			<Navbar.Toggle aria-controls="responsive-navbar-nav" />
-    			<Navbar.Collapse className="justify-content-end" id="responsive-navbar-nav">
+    			<div id="collapser">
       			<Nav className="">
         				{this.adminNavbar(testIsAdmin)}
-                <NavDropdown title="Schedules" id="collasible-nav-dropdown">
-         					<NavDropdown.Item href="#">Personal</NavDropdown.Item>
-          				<NavDropdown.Item href="#">Call</NavDropdown.Item>
-         					<NavDropdown.Item href="#">Published</NavDropdown.Item>
-       			 	</NavDropdown>
-              <Nav.Link href="#">Messages</Nav.Link>
-              <Nav.Link href="#">Account</Nav.Link>
+                <NavDropdown className="full-text" title="Schedules" id="collasible-nav-dropdown">
+         					<NavDropdown.Item href="#p">Personal</NavDropdown.Item>
+          				<NavDropdown.Item href="#c">Call</NavDropdown.Item>
+         					<NavDropdown.Item href="#pu">Published</NavDropdown.Item>
+       			 	  </NavDropdown>
+                 <NavDropdown className="logo" title="Skeds" id="collasible-nav-dropdown">
+                  <NavDropdown.Item href="#p">Personal</NavDropdown.Item>
+                  <NavDropdown.Item href="#c">Call</NavDropdown.Item>
+                  <NavDropdown.Item href="#pu">Published</NavDropdown.Item>
+                </NavDropdown>
+                <Nav.Link className="full-text linky" href="#m">Messages</Nav.Link>
+                <img onClick={() => console.log("click")} alt="Messages" src="https://img.icons8.com/material-rounded/96/000000/important-mail.png" width="30" height="30" className="logo linky"/>
+                <Nav.Link className="full-text linky" href="#a">Account</Nav.Link>
+               <img onClick={() => console.log("click")} alt="Account" src="https://img.icons8.com/material-rounded/96/000000/user-male-circle.png" width="30" height="30" className="logo linky"/>
       			</Nav>
-    			</Navbar.Collapse>
+          </div>
   		</Navbar>
     );
   }
