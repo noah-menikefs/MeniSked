@@ -25,7 +25,7 @@ class Navigation extends React.Component {
   }
 
   render(){
-    const {testIsAdmin} = this.props
+    const {testIsAdmin} = this.props;
     return (
       <Navbar id="myNav">
         <Navbar.Brand href="#" id=''>

@@ -9,9 +9,9 @@ import CSchedule from './Components/Schedules/CSchedule';
 import Account from './Components/Account/Account';
 import AMessages from './Components/Messages/AMessages';
 import EMessages from './Components/Messages/EMessages';
-import Holidays from './Components/Settings/Holidays/Holidays';
-import CallTypes from './Components/Settings/CallTypes/CallTypes';
-import People from './Components/Settings/People/People';
+import Holidays from './Components/Settings/Holidays';
+import CallTypes from './Components/Settings/CallTypes';
+import People from './Components/Settings/People';
 import './App.css';
 
 
@@ -23,15 +23,15 @@ class App extends Component {
     super();
     this.state = {
       isSignedIn: true,
-      route: 'People',
+      route: 'Personal Schedule',
       title: '',
       user:{
         id: '',
         firstName: '',
-        lastName: '',
+        lastName: 'Ismail',
         email: '',
         colour: '',
-        isAdmin: true
+        isAdmin: false
       }
     }
   }
@@ -54,9 +54,10 @@ class App extends Component {
 
   //used for rendering when signed in 
   inRenderSwitch(route){
+    
     switch(route){
       case 'Personal Schedule': 
-        return <PerSchedule/>
+        return <PerSchedule user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
       case 'Published Schedule': 
         return <PubSchedule/>
       case 'Call Schedule': 

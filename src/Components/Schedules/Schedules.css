@@ -1,0 +1,9 @@
+.vis.top-child{
+	display: none;
+}
+
+.arrow.top-child{
+	margin-top: 0;
+	font-size: 8px;
+	padding: 0.1em 0.4em;
+}
