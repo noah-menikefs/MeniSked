@@ -32,14 +32,17 @@ class People extends React.Component{
 						<ul className="">
 							<li>
 								Alpha, Joe
+								<input className='inp' onInput={() => console.log("click")} type="checkbox" />
 								<Button onClick={() => console.log("click")} className="delete butn" size="sm" variant="danger">Delete</Button>
 							</li>
 							<li>
 								Burton, Tim
+								<input className='inp' onInput={() => console.log("click")} type="checkbox" />
 								<Button onClick={() => console.log("click")} className="delete butn" size="sm" variant="danger">Delete</Button>
 							</li>
 							<li>
 								Menikefs, Noah 
+								<input className='inp' onInput={() => console.log("click")} type="checkbox" />
 								<Button onClick={() => console.log("click")} className="delete butn" size="sm" variant="danger">Delete</Button>
 							</li>
 

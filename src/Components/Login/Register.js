@@ -1,6 +1,7 @@
 import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 import Logo from '../../logo512.png';
 import './Login.css';
 
@@ -13,10 +14,41 @@ class Register extends React.Component{
 			email: '',
 			password: '',
 			cPassword: '',
-			code: ''		}
+			code: '',
+			errorShow: false,
+			msg: ''
+
+		}
+	}
+
+	onEmailChange = (event) => {
+		this.setState({email: event.target.value})
+	}
+
+	onPasswordChange = (event) => {
+		this.setState({password: event.target.value})
+	}
+
+	onCPasswordChange = (event) => {
+		this.setState({cPassword: event.target.value})
+	}
+
+	toggleErrorShow = (type) => {
+		if (type === 'dp'){
+			this.setState({msg: 'The passwords you entered do not match.'})
+		}
+		this.setState({errorShow: !this.state.errorShow})
+	}
+
+	errDetect = () => {
+		if (this.state.password !== this.state.cPassword){
+			this.toggleErrorShow('dp');
+		}
+		return false;
 	}
 
 	render(){
+		const {errorShow, msg} = this.state;
 		return(
 			<div>
 				<div className='test shadow-2'>
@@ -25,7 +57,7 @@ class Register extends React.Component{
 						<h1 id='title'>MeniSked</h1>
 					</div>
 					<div className='justify-content-center'id='loginBody'>
-						<Form className="login-form">
+						<Form className="login-form" onsubmit={this.errDetect}>
 							<h1 id="loginTitle">Register</h1>
 							<Form.Group controlId="formBasicFName">
 								<Form.Control required type="text" placeholder="First Name" />
@@ -34,22 +66,37 @@ class Register extends React.Component{
 								<Form.Control required type="text" placeholder="Last Name" />
 							</Form.Group>
 							<Form.Group controlId="formBasicEmail">
-							    <Form.Control required type="email" placeholder="Email" />
+							    <Form.Control required onChange={this.onEmailChange} type="email" placeholder="Email" />
 							</Form.Group>
 							<Form.Group controlId="formBasicPassword">
-								<Form.Control required type="password" placeholder="Password" />
+								<Form.Control required onChange={this.onPasswordChange} required type="password" placeholder="Password" />
 							</Form.Group>
 							<Form.Group controlId="formBasicCPassword">
-								<Form.Control required type="password" placeholder="Confirm Password" />
+								<Form.Control required onChange={this.onCPasswordChange} required type="password" placeholder="Confirm Password" />
 							</Form.Group>
 							<Form.Group controlId="formBasicCode">
 								<Form.Control required type="text" placeholder="Department Code" />
 							</Form.Group>
-							<Button onClick={() => console.log('login click')} id='loginButton' variant="primary" type="submit">
+							<Button type="submit" id='loginButton' variant="primary" >
 								Register
 							</Button>
 						</Form>
 					</div>
+					<div className='modal'>
+					<Modal show={errorShow} onHide={this.toggleErrorShow}>
+        				<Modal.Header closeButton>
+          					<Modal.Title id='modalTitle'>Error</Modal.Title>
+       	 				</Modal.Header>
+        				<Modal.Body>
+        					{msg}
+        				</Modal.Body>
+        				<Modal.Footer>
+          					<Button variant="secondary" onClick={this.toggleErrorShow}>
+            					Close
+          					</Button>
+	        			</Modal.Footer>
+      				</Modal>
+				</div>
 					<div className='shad spacing' id='loginFooter'>
 						<p>Already a user? <span onClick={() => console.log('register click')} className='label'>Login</span></p>
 					</div>

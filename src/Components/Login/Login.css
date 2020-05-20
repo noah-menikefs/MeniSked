@@ -25,7 +25,7 @@
 	max-width: 300px;
 	margin: auto;
 	height: 100%;
-	padding: 1em 0em 2.5em 0em;
+	padding: 1em 0em 1.5em 0em;
 
 }
 
@@ -48,4 +48,12 @@
 
 #loginFooter{
 	margin-bottom: 1em;
+}
+
+#modalTitle{
+	max-height: 30px;
+}
+
+.err{
+	color: #D01C1FFF;
 }

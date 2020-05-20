@@ -23,7 +23,7 @@ class App extends Component {
     super();
     this.state = {
       isSignedIn: true,
-      route: 'Published Schedule',
+      route: 'Personal Schedule',
       title: '',
       user:{
         id: '',
@@ -38,8 +38,8 @@ class App extends Component {
 
   /*
   Different cases:
-  login
-  register
+  Login
+  Register
   Personal Schedule
   Published Schedule
   Call Schedule
@@ -79,7 +79,7 @@ class App extends Component {
 
   //Used for rendering when signed out
   outRenderSwitch(route){
-    return route === 'login' ? <Login/> : <Register/>
+    return route === 'Login' ? <Login/> : <Register/>
   }
 
 
