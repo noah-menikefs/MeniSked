@@ -1,9 +1,27 @@
+
 .vis.top-child{
 	display: none;
 }
 
 .arrow.top-child{
-	margin-top: 0;
-	font-size: 8px;
-	padding: 0.1em 0.4em;
+	font-size: 11px;
+	padding: 0 0.5em;
+	border: 0;
+	position: relative;
+	bottom: 5px;
+	margin: 0 0.1em;
+}
+
+.labels{
+	margin-top: 1em;
+	position: relative;
+	right: 5px;
+	top: 8px;
+}
+
+.top-child.selector{
+}
+
+.title{
+	margin-top: 1em;
 }

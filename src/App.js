@@ -23,7 +23,7 @@ class App extends Component {
     super();
     this.state = {
       isSignedIn: true,
-      route: 'Personal Schedule',
+      route: 'Published Schedule',
       title: '',
       user:{
         id: '',
@@ -31,7 +31,7 @@ class App extends Component {
         lastName: 'Ismail',
         email: '',
         colour: '',
-        isAdmin: false
+        isAdmin: true
       }
     }
   }
@@ -59,7 +59,7 @@ class App extends Component {
       case 'Personal Schedule': 
         return <PerSchedule user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
       case 'Published Schedule': 
-        return <PubSchedule/>
+        return <PubSchedule user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
       case 'Call Schedule': 
         return <CSchedule/>
       case 'Account Information': 
