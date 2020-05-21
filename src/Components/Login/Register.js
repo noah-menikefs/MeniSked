@@ -69,10 +69,10 @@ class Register extends React.Component{
 							    <Form.Control required onChange={this.onEmailChange} type="email" placeholder="Email" />
 							</Form.Group>
 							<Form.Group controlId="formBasicPassword">
-								<Form.Control required onChange={this.onPasswordChange} required type="password" placeholder="Password" />
+								<Form.Control required onChange={this.onPasswordChange} type="password" placeholder="Password" />
 							</Form.Group>
 							<Form.Group controlId="formBasicCPassword">
-								<Form.Control required onChange={this.onCPasswordChange} required type="password" placeholder="Confirm Password" />
+								<Form.Control required onChange={this.onCPasswordChange} type="password" placeholder="Confirm Password" />
 							</Form.Group>
 							<Form.Group controlId="formBasicCode">
 								<Form.Control required type="text" placeholder="Department Code" />

@@ -3,6 +3,7 @@ import Calendar from './Calendar/Calendar';
 import Button from 'react-bootstrap/button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Modal from 'react-bootstrap/Modal';
 
 import './Schedules.css';
 
@@ -15,12 +16,28 @@ class PubSchedule extends React.Component{
 	constructor(){
 		super();
 		this.state = {
-
+			show: false,
+			day: '',
+			month: 'January',
+			year: '2020'
 		}
 	}
 
 	onDayClick = (e,day) => {
-		alert(day);
+		this.toggleShow(day);
+	}
+
+	toggleShow = (day) => {
+		this.setState({show: !this.state.show})
+		this.setState({day: day})
+	}
+
+	yearChange = (e) => {
+		this.setState({year: e.target.value})
+	}
+
+	monthChange = (e) => {
+		this.setState({month: e.target.value})
 	}
 
 	adminSelect(isAdmin, user){
@@ -33,15 +50,15 @@ class PubSchedule extends React.Component{
 					<Col ><Button id="today" className="top-child"variant="primary">Today</Button></Col>
 				</Row>
 				<Row>
-					<Col ><select className="top-child month selector">
-	  					<option selected>January</option>
-	  					<option value="1">February</option>
-	  					<option value="2">March</option>
+					<Col ><select onChange={this.monthChange} className="top-child month selector">
+	  					<option value="January" selected>January</option>
+	  					<option value="February">February</option>
+	  					<option value="March">March</option>
 					</select></Col>
-					<Col ><select className="top-child year selector">
-	  					<option selected>2020</option>
-	  					<option value="1">2021</option>
-	  					<option value="2">2022</option>
+					<Col ><select onChange={this.yearChange} className="top-child year selector">
+	  					<option value="2020" selected>2020</option>
+	  					<option value="2021">2021</option>
+	  					<option value="2022">2022</option>
 					</select></Col>
 					<Col ><p></p></Col>
 				</Row>
@@ -65,6 +82,7 @@ class PubSchedule extends React.Component{
 	}
 
 	render(){
+		const {show, day, month, year} = this.state;
 		const {testIsAdmin, user} = this.props;
 		return(
 			<div className="screen">
@@ -77,6 +95,30 @@ class PubSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>
+				</div>
+
+				<div className='modal'>
+					<Modal show={show} onHide={this.toggleShow} >
+        				<Modal.Header closeButton>
+          					<Modal.Title id='modalTitle'>{month +' '+ day + ', ' + year}</Modal.Title>
+       	 				</Modal.Header>
+        				<Modal.Body>
+        					<ul className="">
+        						<li>Canada Day</li>
+        						<li>1st call day Abbass</li>
+        						<li>1st call night Ahn</li>
+        						<li>2nd call Holt</li>
+        						<li>Vacation Arat</li>
+        						<li>Request no call Menikefs</li>
+        						<li>No assignment Ismail</li>
+        					</ul>
+        				</Modal.Body>
+        				<Modal.Footer>
+          					<Button variant="secondary" onClick={this.toggleShow}>
+            					Close
+          					</Button>
+	        			</Modal.Footer>
+      				</Modal>
 				</div>
 
 			</div>

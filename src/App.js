@@ -23,7 +23,7 @@ class App extends Component {
     super();
     this.state = {
       isSignedIn: true,
-      route: 'Personal Schedule',
+      route: 'Holidays',
       title: '',
       user:{
         id: '',

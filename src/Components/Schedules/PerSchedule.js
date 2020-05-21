@@ -136,29 +136,29 @@ class PerSchedule extends React.Component{
 				</div>
 
 				<div className='modal'>
-					<Modal show={show} onHide={this.toggleShow}>
+					<Modal show={show} onHide={this.toggleShow} onSubmit={this.toggleShow}>
         				<Modal.Header closeButton>
           					<Modal.Title id='modalTitle'>Select Call Type</Modal.Title>
        	 				</Modal.Header>
         				<Form>
         					<Modal.Body>
-        					<Form.Group required controlId="formBasicRadio">
-      							<Form.Check type='radio' id={1} label={"1st Call Day"}/>
-      							<Form.Check type='radio' id={2} label={"1st Call Night"}/>
-      							<Form.Check type='radio' id={3} label={"1st Call"}/>
-      							<Form.Check type='radio' id={4} label={"2nd Call Day"}/>
-      							<Form.Check type='radio' id={5} label={"2nd Call Night"}/>
-      							<Form.Check type='radio' id={6} label={"2nd Call"}/>
-      							<Form.Check type='radio' id={7} label={"COVID am"}/>
-      							<Form.Check type='radio' id={8} label={"COVID pm"}/>
-      							<Form.Check type='radio' id={9} label={"COVID x 24"}/>
+        					<Form.Group controlId="formBasicRadio">
+      							<Form.Check required name="callType" type='radio' id={1} label={"1st Call Day"}/>
+      							<Form.Check name="callType" type='radio' id={2} label={"1st Call Night"}/>
+      							<Form.Check name="callType" type='radio' id={3} label={"1st Call"}/>
+      							<Form.Check name="callType" type='radio' id={4} label={"2nd Call Day"}/>
+      							<Form.Check name="callType" type='radio' id={5} label={"2nd Call Night"}/>
+      							<Form.Check name="callType" type='radio' id={6} label={"2nd Call"}/>
+      							<Form.Check name="callType" type='radio' id={7} label={"COVID am"}/>
+      							<Form.Check name="callType" type='radio' id={8} label={"COVID pm"}/>
+      							<Form.Check name="callType" type='radio' id={9} label={"COVID x 24"}/>
   							</Form.Group>
         				</Modal.Body>
         				<Modal.Footer>
-          					<Button variant="secondary" onClick={this.toggleShow}>
+          					<Button onClick={this.toggleShow} variant="secondary" >
             					Close
           					</Button>
-          					 <Button type="submit" variant="primary" onClick={this.toggleShow}>
+          					 <Button type="submit" variant="primary" >
             					Submit
           					</Button>
 	        			</Modal.Footer>
