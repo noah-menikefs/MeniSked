@@ -68,6 +68,19 @@ class PerSchedule extends React.Component{
 		this.props.onPrevMonth && this.props.onPrevMonth();
 	}
 
+	nextDoc = () => {
+
+	}
+	prevDoc =() => {
+
+	}
+	nextEntry = () => {
+
+	}
+	prevEntry =() => {
+
+	}
+
 	nextYear = () => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).add(1, "year");
@@ -149,11 +162,15 @@ class PerSchedule extends React.Component{
 
 	adminButton = (isAdmin) => {
 		if (isAdmin){
-			<Button className="arrow top-child" variant="secondary">&#9668;</Button>
-			<Button className="arrow top-child" variant="secondary">&#9658;</Button>
+			return (
+			<div>
+				<Button onClick={this.prevDoc} className="arrow top-child" variant="secondary">&#9668;</Button>
+				<Button onClick={this.nextDoc} className="arrow top-child" variant="secondary">&#9658;</Button>
+			</div>
+			);
 		}
 		else{
-			<p className="vis top-child"></p>
+			return <p className="vis top-child"></p>
 		}
 	}
 
@@ -204,11 +221,11 @@ class PerSchedule extends React.Component{
 				</Row>
 				<Row className="subheader">
 					<Col sm>
-						
+						{this.adminButton(testIsAdmin)}
 					</Col>
 					<Col sm>
-						<Button className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button className="arrow top-child"variant="secondary">&#9658;</Button>
+						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#9668;</Button>
+						<Button onClick={this.nextEntry} className="arrow top-child"variant="secondary">&#9658;</Button>
 					</Col>
 					<Col >
 						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
