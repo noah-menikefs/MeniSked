@@ -8,7 +8,7 @@ tr {
 }
 
 .calendar-container {
-    border: 2px solid skyblue;
+    border: 2px solid skyblue; 
 }
 
 .calendar {
@@ -19,7 +19,6 @@ tr {
 }
 
 .calendar-header {
-    border-bottom: 1px dashed skyblue;
     font-size: 1.6em;
 }
 
@@ -29,40 +28,37 @@ tr {
 }
 
 .day,
-.empty-slot,
+.emptySlot,
 .week-day {
     text-align: center;
     height: 40px;
+    width: 150px;
+    border: 1px solid black;
+}
+
+.day,
+.week-day {
+    padding: 5px;
 }
 
 .week-day {
-    font-size: 0.8em;
-}
-
-.day {
-    font-size: 0.8em;
-}
-
-.day {
-    cursor: pointer;
-    width: 24px;
+    font-size: 1em;
     height: 24px;
-    line-height: 24px;
+    padding: 0 5px;
 }
 
-.current-day {
-    background-color: #4285f4;
-    width: 28px;
-    height: 28px;
-    line-height: 28px;
-    border-radius: 2%;
-    color: white;
+.day {
+    text-align: right;
+    font-size: 0.8em;
+    cursor: pointer;
+    height: 125px;
 }
+
 .selected-day {
     background-color:yellow;
     width: 28px;
-    height: 28px;
-    line-height: 28px;
+    height: 125px;
+    line-height: 125px;
     border-radius: 2%;
     color: black;
 }
@@ -102,4 +98,9 @@ tr {
 
 .label-month {
     cursor: pointer;
+}
+
+.text{
+    position: relative;
+    bottom: 3.75em;
 }

@@ -187,8 +187,8 @@ class Calendar extends React.Component{
 		for (let d = 1; d <= this.daysInMonth(); d++){
 			let className = (d === this.currentDay() ? "day current-day" : "day");
 			daysInMonth.push(
-				<td key={d} className={className}>
-					<span onClick={(e) => {this.onDayClick(e,d)}}>{d}</span>
+				<td key={d} onClick={(e) => {this.onDayClick(e,d)}} className={className}>
+					<span className="text" >{d}</span>
 				</td>
 			);
 		}
