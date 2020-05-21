@@ -7,8 +7,7 @@ tr {
     margin: 0;
 }
 
-.calendar-container {
-    border: 2px solid skyblue; 
+.calendar-container { 
 }
 
 .calendar {
@@ -39,6 +38,10 @@ tr {
 .day,
 .week-day {
     padding: 5px;
+}
+
+.emptySlot{
+    background-color: #E8E8E8;
 }
 
 .week-day {
