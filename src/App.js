@@ -32,7 +32,24 @@ class App extends Component {
         email: '',
         colour: '',
         isAdmin: true
-      }
+      },
+      docs: [
+        "Ismail", 
+        "Menikefs", 
+        "Ahn", 
+        "Abbass"
+      ],
+      entries: [
+        "Request No Call",
+        "Vacation",
+        "Staycation",
+        "No Assignment",
+        "Not Available",
+        "Not Available Night",
+        "Assign Call Type"
+
+
+      ]
     }
   }
 
@@ -50,14 +67,12 @@ class App extends Component {
   Call Types
   People
   */
-  
-
   //used for rendering when signed in 
   inRenderSwitch(route){
     
     switch(route){
       case 'Personal Schedule': 
-        return <PerSchedule user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
+        return <PerSchedule entries={this.state.entries} docs={this.state.docs} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
       case 'Published Schedule': 
         return <PubSchedule user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
       case 'Call Schedule': 

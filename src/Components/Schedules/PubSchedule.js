@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
+import moment from 'moment';
 
 import './Schedules.css';
 
@@ -17,27 +18,91 @@ class PubSchedule extends React.Component{
 		super();
 		this.state = {
 			show: false,
-			day: '',
-			month: 'January',
-			year: '2020'
+			dateContext: moment(),
+			today: moment(),
 		}
 	}
 
 	onDayClick = (e,day) => {
+		let dateContext = Object.assign({}, this.state.dateContext);
+		dateContext = moment(dateContext).set("date", day);
+		this.setState({
+			dateContext: dateContext,
+		});
 		this.toggleShow(day);
 	}
 
 	toggleShow = (day) => {
-		this.setState({show: !this.state.show})
-		this.setState({day: day})
+		this.setState({show: !this.state.show});
 	}
 
-	yearChange = (e) => {
-		this.setState({year: e.target.value})
+	months = moment.months(); // List of each month
+	
+	
+	setMonth = (month) => {
+		let monthNo = this.months.indexOf(month);
+		let dateContext = Object.assign({}, this.state.dateContext)
+		dateContext = moment(dateContext).set("month", monthNo);
+		this.setState({
+			dateContext: dateContext,
+		});
 	}
 
-	monthChange = (e) => {
-		this.setState({month: e.target.value})
+	nextMonth = () => {
+		let dateContext = Object.assign({}, this.state.dateContext);
+		dateContext = moment(dateContext).add(1, "month");
+		this.setState({
+			dateContext: dateContext,
+		});
+		this.props.onNextMonth && this.props.onNextMonth();
+	}
+
+	prevMonth = () => {
+		let dateContext = Object.assign({}, this.state.dateContext);
+		dateContext = moment(dateContext).subtract(1, "month");
+		this.setState({
+			dateContext: dateContext,
+		});
+		this.props.onPrevMonth && this.props.onPrevMonth();
+	}
+
+	nextYear = () => {
+		let dateContext = Object.assign({}, this.state.dateContext);
+		dateContext = moment(dateContext).add(1, "year");
+		this.setState({
+			dateContext: dateContext
+		});
+		this.props.onNextYear && this.props.onNextYear();
+	}
+
+	prevYear = () => {
+		let dateContext = Object.assign({}, this.state.dateContext);
+		dateContext = moment(dateContext).subtract(1, "year");
+		this.setState({
+			dateContext: dateContext
+		});
+		this.props.onPrevYear && this.props.onPrevYear();
+	}
+
+	setYear = (year) => {
+		let dateContext = Object.assign({}, this.state.dateContext);
+		dateContext = moment(dateContext).set("year",year);
+		this.setState({
+			dateContext: dateContext
+		})
+	}
+
+	onMonthChange = (event) => {
+		this.setMonth(event.target.value);
+		this.setState({month: event.target.value})
+	}
+
+	onYearChange = (event) => {
+		this.setYear(event.target.value);
+	}
+	
+	reset = () => {
+		this.setState({dateContext: this.state.today});
 	}
 
 	adminSelect(isAdmin, user){
@@ -47,30 +112,38 @@ class PubSchedule extends React.Component{
 				<Row className="labels">
 					<Col sm><h5 className="labels-child">Month</h5></Col>
 					<Col sm><h5 className="labels-child">Year</h5></Col>
-					<Col ><Button id="today" className="top-child"variant="primary">Today</Button></Col>
+					<Col sm><Button onClick={this.reset} id="today" className="top-child" variant="primary">Today</Button></Col>
 				</Row>
 				<Row>
-					<Col ><select onChange={this.monthChange} className="top-child month selector">
-	  					<option value="January" selected>January</option>
+					<Col sm><select value={this.state.dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
+	  					<option value="January">January</option>
 	  					<option value="February">February</option>
 	  					<option value="March">March</option>
+	  					<option value="April">April</option>
+	  					<option value="May">May</option>
+	  					<option value="June">June</option>
+	  					<option value="July">July</option>
+	  					<option value="August">August</option>
+	  					<option value="September">September</option>
+	  					<option value="October">October</option>
+	  					<option value="November">November</option>
+	  					<option value="December">December</option>
 					</select></Col>
-					<Col ><select onChange={this.yearChange} className="top-child year selector">
-	  					<option value="2020" selected>2020</option>
+					<Col ><select value={this.state.dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
+	  					<option value="2020">2020</option>
 	  					<option value="2021">2021</option>
 	  					<option value="2022">2022</option>
 					</select></Col>
 					<Col ><p></p></Col>
 				</Row>
 				<Row className="subheader">
-	
-					<Col >
-						<Button className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button className="arrow top-child"variant="secondary">&#9658;</Button>
+					<Col sm>
+						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
+						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
 					</Col>
-					<Col >
-						<Button className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button className="arrow top-child"variant="secondary">&#9658;</Button>
+					<Col sm>
+						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
+						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
 					</Col>
 					<Col >
 						<p></p>
@@ -82,16 +155,18 @@ class PubSchedule extends React.Component{
 	}
 
 	render(){
-		const {show, day, month, year} = this.state;
+		const {show, dateContext, today} = this.state;
 		const {testIsAdmin, user} = this.props;
 		return(
 			<div className="screen">
-				<div className="">
-					<h2 className="title">June 2020</h2>
+				<Row className="curr">
+					<Col xl><h2>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h2></Col>
+				</Row>
+				<div>
 					{this.adminSelect(testIsAdmin, user)}
 				</div>
 				<div className="sked">
-					<Calendar style={style} width="90%" onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar dateContext={dateContext} today={today} style={style} width="90%" onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>
@@ -100,7 +175,7 @@ class PubSchedule extends React.Component{
 				<div className='modal'>
 					<Modal show={show} onHide={this.toggleShow} >
         				<Modal.Header closeButton>
-          					<Modal.Title id='modalTitle'>{month +' '+ day + ', ' + year}</Modal.Title>
+          					<Modal.Title id='modalTitle'>{dateContext.format("MMMM DD, YYYY")}</Modal.Title>
        	 				</Modal.Header>
         				<Modal.Body>
         					<ul className="">

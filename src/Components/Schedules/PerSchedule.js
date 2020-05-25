@@ -20,25 +20,20 @@ class PerSchedule extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			physician: 'Ismail',
-			entry: 'Request No Call',
+			physician: this.props.docs[0],
+			entry: this.props.entries[0],
 			show: false,
 			dateContext: moment(),
-			today: moment(),
-			showMonthPopup: false,
-			showYearPopup: false
+			today: moment()
 		}
 	}
 
 	onDayClick = (e,day) => {
-		console.log(this.state.entry);
 		if (this.state.entry === "Assign Call Type"){
 			this.toggleShow();
 		}
 	}
 
-	weekdays = moment.weekdays(); //List of weekdays
-	weekdaysShort = moment.weekdaysShort(); //List of shortened days
 	months = moment.months(); // List of each month
 
 	setMonth = (month) => {
@@ -69,16 +64,41 @@ class PerSchedule extends React.Component{
 	}
 
 	nextDoc = () => {
+		let newIndex = 0;
+		let index = this.props.docs.indexOf(this.state.physician);
+		if (index !== (this.props.docs.length - 1)){
+			newIndex = index + 1;
 
+		}
+		this.setState({physician: this.props.docs[newIndex]});
 	}
 	prevDoc =() => {
+		let newIndex = this.props.docs.length-1;
+		let index = this.props.docs.indexOf(this.state.physician);
+		if (index !== 0){
+			newIndex = index - 1;
 
+		}
+		this.setState({physician: this.props.docs[newIndex]});
 	}
 	nextEntry = () => {
+		let newIndex = 0;
+		let index = this.props.entries.indexOf(this.state.entry);
+		if (index !== (this.props.entries.length - 1)){
+			newIndex = index + 1;
 
+		}
+		this.setState({entry: this.props.entries[newIndex]});
 	}
-	prevEntry =() => {
 
+	prevEntry =() => {
+	let newIndex = this.props.entries.length-1;
+		let index = this.props.entries.indexOf(this.state.entry);
+		if (index !== 0){
+			newIndex = index - 1;
+
+		}
+		this.setState({entry: this.props.entries[newIndex]});
 	}
 
 	nextYear = () => {
@@ -99,25 +119,12 @@ class PerSchedule extends React.Component{
 		this.props.onPrevYear && this.props.onPrevYear();
 	}
 
-	onSelectChange = (e, data) => {
-		this.setMonth(data);
-		this.props.onMonthChange && this.props.onMonthChange();
-
-	}
-
 	setYear = (year) => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).set("year",year);
 		this.setState({
 			dateContext: dateContext
 		})
-	}
-
-	year = () => {
-		return this.state.dateContext.format('Y');
-	}
-	month = () => {
-		return this.state.dateContext.format('MMMM');
 	}
 
 	onPhysicianChange = (event) => {
@@ -139,25 +146,6 @@ class PerSchedule extends React.Component{
 
 	toggleShow = () => {
 		this.setState({show: !this.state.show})
-	}
-
-
-	adminSelect(isAdmin, user){
-		if (isAdmin){
-			return (
-				<select value={this.state.physician} onChange={this.onPhysicianChange} className="top-child doc selector">
-  					<option value="Ismail">Ismail</option>
-  					<option value="Menikefs">Menikefs</option>
-  					<option value="Miskew">Miskew</option>
- 				 	<option value="Weiss">Weiss</option>
-				</select>
-			);
-		}
-		else{
-			return (
-				<h6 className="top-child">{user.lastName}</h6>
-			);
-		}
 	}
 
 	adminButton = (isAdmin) => {
@@ -182,6 +170,31 @@ class PerSchedule extends React.Component{
 	render(){
 		const {show, dateContext, today} = this.state;
 		const {testIsAdmin, user} = this.props;
+
+		let docSelect = this.props.docs.map((doc) => {
+		return <option value={doc}>{doc}</option>
+		})
+
+		let adminSelect = (isAdmin, user) => {
+			if (isAdmin){
+				return (
+					<select value={this.state.physician} onChange={this.onPhysicianChange} className="top-child doc selector">
+  						{docSelect}
+					</select>
+				);
+			}
+			else{
+				return (
+					<h6 className="top-child">{user.lastName}</h6>
+				);
+			}
+		}
+
+		let entrySelect = this.props.entries.map((entry) => {
+			return <option value={entry}>{entry}</option>
+		})
+
+
 		return(
 			<div className="screen">
 				<Row className="labels">
@@ -192,11 +205,9 @@ class PerSchedule extends React.Component{
 					<Col ><Button onClick={this.reset} id="today" className="top-child"variant="primary">Today</Button></Col>
 				</Row>
 				<Row className="header">
-					<Col >{this.adminSelect(testIsAdmin, user)}</Col>
-					<Col ><select onChange={this.onEntryChange} className="top-child types selector">
-	  					<option value="Request No Call" selected>Request No Call</option>
-	  					<option value="Vacation">Vacation</option>
-	  					<option value="Assign Call Type">Assign Call Type</option>
+					<Col >{adminSelect(testIsAdmin, user)}</Col>
+					<Col ><select value={this.state.entry} onChange={this.onEntryChange} className="top-child types selector">
+						{entrySelect};
 					</select></Col>
 					<Col ><select value={dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
 	  					<option value="January">January</option>
