@@ -12,7 +12,8 @@ import './Schedules.css';
 
 const style = {
 	position: "relative",
-	margin: "10px auto"
+	margin: "10px auto",
+	width: "90%"
 }
 
 
@@ -194,6 +195,14 @@ class PerSchedule extends React.Component{
 			return <option value={entry}>{entry}</option>
 		})
 
+		let yearSelect = [];
+
+		let fYear = today.year();
+
+		for (let i = 2020; i <= fYear + 10; i++){
+			yearSelect.push(<option value={i}>{i}</option>)
+		}
+
 
 		return(
 			<div className="screen">
@@ -224,9 +233,7 @@ class PerSchedule extends React.Component{
 	  					<option value="December">December</option>
 					</select></Col>
 					<Col ><select value={dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
-	  					<option value="2020">2020</option>
-	  					<option value="2021">2021</option>
-	  					<option value="2022">2022</option>
+					{yearSelect};
 					</select></Col>
 					<Col sm><p className="vis labels-child"></p></Col>
 				</Row>
@@ -254,7 +261,7 @@ class PerSchedule extends React.Component{
 					<Col xl><h3>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h3></Col>
 				</Row>
 				<div className="sked">
-					<Calendar dateContext={dateContext} today={today} style={style} width="90%" onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>

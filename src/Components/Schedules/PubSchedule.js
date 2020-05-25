@@ -4,13 +4,15 @@ import Button from 'react-bootstrap/button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
 import moment from 'moment';
 
 import './Schedules.css';
 
 const style = {
 	position: "relative",
-	margin: "10px auto"
+	margin: "10px auto",
+	width: "90%"
 }
 
 class PubSchedule extends React.Component{
@@ -34,6 +36,10 @@ class PubSchedule extends React.Component{
 
 	toggleShow = (day) => {
 		this.setState({show: !this.state.show});
+	}
+
+	onDoubleClick = (e,day) => {
+		this.alert(day);
 	}
 
 	months = moment.months(); // List of each month
@@ -105,6 +111,20 @@ class PubSchedule extends React.Component{
 		this.setState({dateContext: this.state.today});
 	}
 
+	
+	yearSelect = () => {
+		let arr = [];
+		let fYear = this.state.today.year();
+		for (let i = 2020; i <= fYear + 10; i++){
+			arr.push(<option value={i}>{i}</option>)
+		}
+		return arr;
+	}
+
+	
+
+	
+
 	adminSelect(isAdmin, user){
 		if (isAdmin){
 			return (
@@ -130,9 +150,7 @@ class PubSchedule extends React.Component{
 	  					<option value="December">December</option>
 					</select></Col>
 					<Col ><select value={this.state.dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
-	  					<option value="2020">2020</option>
-	  					<option value="2021">2021</option>
-	  					<option value="2022">2022</option>
+	  					{this.yearSelect()};
 					</select></Col>
 					<Col ><p></p></Col>
 				</Row>
@@ -154,19 +172,35 @@ class PubSchedule extends React.Component{
 		}
 	}
 
+	adminNotes = () => {
+		if (this.props.testIsAdmin === true){
+			return (
+				<Form>
+        			<Form.Group>
+        				<Form.Control id="note-text" size="sm" type="text" placeholder="Add Note"/>
+        			</Form.Group>
+       				<Form.Group>
+     					<Button size="sm" variant="primary" type="submit">Submit Note</Button>
+   					</Form.Group>
+  				</Form>
+			)
+		}
+	}
+
 	render(){
 		const {show, dateContext, today} = this.state;
 		const {testIsAdmin, user} = this.props;
+
 		return(
 			<div className="screen">
-				<Row className="curr">
-					<Col xl><h2>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h2></Col>
-				</Row>
 				<div>
 					{this.adminSelect(testIsAdmin, user)}
 				</div>
+				<Row className="curr">
+					<Col xl><h2>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h2></Col>
+				</Row>
 				<div className="sked">
-					<Calendar dateContext={dateContext} today={today} style={style} width="90%" onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>
@@ -187,6 +221,7 @@ class PubSchedule extends React.Component{
         						<li>Request no call Menikefs</li>
         						<li>No assignment Ismail</li>
         					</ul>
+        				 {this.adminNotes()}
         				</Modal.Body>
         				<Modal.Footer>
           					<Button variant="secondary" onClick={this.toggleShow}>

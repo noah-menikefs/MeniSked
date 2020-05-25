@@ -53,6 +53,7 @@ class Login extends React.Component{
 
 	render(){
 		const {show, loginEmail, errorShow, msg} = this.state;
+		const {onRouteChange} = this.props;
 		return(
 			<div>
 				<div className='test shadow-2'>
@@ -79,7 +80,7 @@ class Login extends React.Component{
 						</Form>
 					</div>
 					<div className='shad spacing' id='loginFooter'>
-						<p>New user? <span onClick={() => console.log('register click')} className='label'>Register Now</span></p>
+						<p>New user? <span onClick={() => onRouteChange("Register", false)} className='label'>Register Now</span></p>
 					</div>
 				</div>
 				<div className='modal'>

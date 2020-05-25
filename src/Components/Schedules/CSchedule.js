@@ -3,6 +3,8 @@ import Calendar from './Calendar/Calendar';
 import Button from 'react-bootstrap/button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Modal from 'react-bootstrap/Modal';
+import Form from 'react-bootstrap/Form';
 import moment from 'moment';
 
 import './Schedules.css';
@@ -10,7 +12,8 @@ import './Schedules.css';
 
 const style = {
 	position: "relative",
-	margin: "10px auto"
+	margin: "10px auto",
+	width: "90%"
 }
 
 class CSchedule extends React.Component{
@@ -19,11 +22,25 @@ class CSchedule extends React.Component{
 		this.state = {
 			dateContext: moment(),
 			today: moment(),
+			show: false
 		}
 	}
 
 	onDayClick = (e,day) => {
-		alert(day);
+		let dateContext = Object.assign({}, this.state.dateContext);
+		dateContext = moment(dateContext).set("date", day);
+		this.setState({
+			dateContext: dateContext,
+		});
+		this.toggleShow(day);
+	}
+
+	toggleShow = (day) => {
+		this.setState({show: !this.state.show});
+	}
+
+	onDoubleClick = (e,day) => {
+		console.log('YEEEEE');
 	}
 
 	months = moment.months(); // List of each month
@@ -94,10 +111,31 @@ class CSchedule extends React.Component{
 		this.setState({dateContext: this.state.today});
 	}
 
+	adminNotes = () => {
+		if (this.props.testIsAdmin === true){
+			return (
+				<Form>
+        			<Form.Group>
+        				<Form.Control id="note-text" size="sm" type="text" placeholder="Add Note"/>
+        			</Form.Group>
+       				<Form.Group>
+     					<Button size="sm" variant="primary" type="submit">Submit Note</Button>
+   					</Form.Group>
+  				</Form>
+			)
+		}
+	}
 
 
 	render(){
-		const {dateContext, today} = this.state;
+		const {dateContext, today, show} = this.state;
+		let yearSelect = [];
+
+		let fYear = today.year();
+
+		for (let i = 2020; i <= fYear + 10; i++){
+			yearSelect.push(<option value={i}>{i}</option>)
+		}
 		return(
 			<div className="screen">
 				<Row className="labels">
@@ -122,9 +160,7 @@ class CSchedule extends React.Component{
 	  					<option value="December">December</option>
 					</select></Col>
 					<Col ><select value={dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
-	  					<option value="2020">2020</option>
-	  					<option value="2021">2021</option>
-	  					<option value="2022">2022</option>
+	  					{yearSelect};
 					</select></Col>
 					<Col sm><p className="vis top-child"></p></Col>
 
@@ -146,10 +182,34 @@ class CSchedule extends React.Component{
 					<Col xl><h3>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h3></Col>
 				</Row>
 				<div className="sked">
-					<Calendar dateContext={dateContext} today={today} style={style} width="90%" onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar onDoubleClick={(e,day) => this.onDoubleClick(e,day)} type="Call" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>
+				</div>
+				<div className='modal'>
+					<Modal show={show} onHide={this.toggleShow} >
+        				<Modal.Header closeButton>
+          					<Modal.Title id='modalTitle'>{dateContext.format("MMMM DD, YYYY")}</Modal.Title>
+       	 				</Modal.Header>
+        				<Modal.Body>
+        					<ul className="">
+        						<li>Canada Day</li>
+        						<li>1st call day Abbass</li>
+        						<li>1st call night Ahn</li>
+        						<li>2nd call Holt</li>
+        						<li>Vacation Arat</li>
+        						<li>Request no call Menikefs</li>
+        						<li>No assignment Ismail</li>
+        					</ul>
+        				{this.adminNotes()}
+        				</Modal.Body>
+        				<Modal.Footer>
+          					<Button variant="secondary" onClick={this.toggleShow}>
+            					Close
+          					</Button>
+	        			</Modal.Footer>
+      				</Modal>
 				</div>
 
 			</div>

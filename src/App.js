@@ -76,25 +76,31 @@ class App extends Component {
       case 'Published Schedule': 
         return <PubSchedule user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
       case 'Call Schedule': 
-        return <CSchedule/>
+        return <CSchedule testIsAdmin={this.state.user.isAdmin}/>
       case 'Account Information': 
-        return <Account/>
+        return <Account />
       case 'Admin Messages': 
-        return <AMessages/>
+        return <AMessages  />
       case 'Messages': 
         return <EMessages />
       case 'Holidays': 
-        return <Holidays/>
+        return <Holidays />
       case 'Call Types': 
-        return <CallTypes/>
+        return <CallTypes />
       case 'People': 
-        return <People/>
+        return <People />
     }
   }
 
+
   //Used for rendering when signed out
   outRenderSwitch(route){
-    return route === 'Login' ? <Login/> : <Register/>
+    return route === 'Login' ? <Login onRouteChange={this.onRouteChange}/> : <Register onRouteChange={this.onRouteChange}/>
+  }
+
+  onRouteChange = (route, isSignedIn = true) => {
+    this.setState({isSignedIn: isSignedIn})
+    this.setState({route: route});
   }
 
 
@@ -106,7 +112,7 @@ class App extends Component {
           { (! isSignedIn)
             ? this.outRenderSwitch(route)
             : <div>
-                <Navigation testIsAdmin={isAdmin}/>
+                <Navigation onRouteChange={this.onRouteChange} testIsAdmin={isAdmin}/>
                 <br/>
                 <h1>{route}</h1>
                 {this.inRenderSwitch(route)}

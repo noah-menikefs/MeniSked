@@ -10,11 +10,8 @@ class Calendar extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			width: props.width || "350px",
 			style: props.style || {},
-
 		}
-		this.state.style.width = this.state.width;
 	}
 
 
@@ -50,6 +47,52 @@ class Calendar extends React.Component{
 		this.props.onDayClick && this.props.onDayClick(e,day);
 	}
 
+	onDoubleClick = (e,day) => {
+		this.props.onDoubleClick && this.props.onDoubleClick(e,day);
+	}
+
+	dayType = () => {
+		if (this.props.type === "Personal"){
+			return (
+				<ul>
+					<li className="event">Party</li>
+					{ (true)
+						? <li className="all-day">Vacation</li>
+						: (
+							<div>
+								<li className="am">COVID am</li>
+								<li className="pm">Not Available Night</li>
+							</div>
+							)
+					}
+				</ul>
+			)
+		}
+		else if (this.props.type === "Call"){
+			return (
+				<ul>
+					<li className="event">Party</li>
+					<li className="call">1st Call Day <span className="name">Menikefs</span></li>
+					<li className="call">2nd Call Day <span className="name">Ismail</span></li>
+					<li className="call">COVID am <span className="name">Ahn</span></li>
+					<li className="notes">Note</li>
+				</ul>
+				)
+		}
+
+		else{
+			return (
+				<ul>
+					<li className="event">Party</li>
+					<li className="call">1st Call Day <span className="name">Menikefs</span></li>
+					<li className="call">2nd Call Day <span className="name">Ismail</span></li>
+					<li className="request">Vacation <span className="name">Ahn</span></li>
+					<li className="notes">Note</li>
+				</ul>
+			)
+		}
+	}
+
 	render(){
 
 		//Map the weekdays as <td>
@@ -71,6 +114,7 @@ class Calendar extends React.Component{
 			daysInMonth.push(
 				<td key={d} onClick={(e) => {this.onDayClick(e,d)}} className={className}>
 					<span className="text" >{d}</span>
+					{this.dayType()}
 				</td>
 			);
 		}
