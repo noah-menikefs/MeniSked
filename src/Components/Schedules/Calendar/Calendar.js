@@ -55,13 +55,13 @@ class Calendar extends React.Component{
 		if (this.props.type === "Personal"){
 			return (
 				<ul>
-					<li className="event">Party</li>
+					<li className="event"></li>
 					{ (true)
-						? <li className="all-day">Vacation</li>
+						? <li className="all-day"></li>
 						: (
 							<div>
-								<li className="am">COVID am</li>
-								<li className="pm">Not Available Night</li>
+								<li className="am"></li>
+								<li className="pm"></li>
 							</div>
 							)
 					}
@@ -71,11 +71,11 @@ class Calendar extends React.Component{
 		else if (this.props.type === "Call"){
 			return (
 				<ul>
-					<li className="event">Party</li>
-					<li className="call">1st Call Day <span className="name">Menikefs</span></li>
-					<li className="call">2nd Call Day <span className="name">Ismail</span></li>
-					<li className="call">COVID am <span className="name">Ahn</span></li>
-					<li className="notes">Note</li>
+					<li className="event"></li>
+					<li className="call"><span className="name"></span></li>
+					<li className="call"><span className="name"></span></li>
+					<li className="call"><span className="name"></span></li>
+					<li className="notes"></li>
 				</ul>
 				)
 		}
@@ -83,11 +83,11 @@ class Calendar extends React.Component{
 		else{
 			return (
 				<ul>
-					<li className="event">Party</li>
-					<li className="call">1st Call Day <span className="name">Menikefs</span></li>
-					<li className="call">2nd Call Day <span className="name">Ismail</span></li>
-					<li className="request">Vacation <span className="name">Ahn</span></li>
-					<li className="notes">Note</li>
+					<li className="event"></li>
+					<li className="call"><span className="name"></span></li>
+					<li className="call"><span className="name"></span></li>
+					<li className="request"><span className="name"></span></li>
+					<li className="notes"></li>
 				</ul>
 			)
 		}
