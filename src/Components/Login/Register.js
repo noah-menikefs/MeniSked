@@ -33,18 +33,50 @@ class Register extends React.Component{
 		this.setState({cPassword: event.target.value})
 	}
 
+	onCodeChange = (event) => {
+		this.setState({code: event.target.value})
+	}
+
+	onFNameChange = (event) => {
+		this.setState({firstName: event.target.value})
+	}
+
+	onLNameChange = (event) => {
+		this.setState({lastName: event.target.value})
+	}
+
+	onSubmitRegister = () => {
+		if (this.state.password !== this.state.cPassword){
+			this.toggleErrorShow('dp');
+			return false;
+		}
+		let isAdmin = false;
+		fetch('http://localhost:3000/register', {
+			method: 'post',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				email: this.state.email,
+				password: this.state.password,
+				firstName: this.state.firstName,
+				lastName: this.state.lastName,
+				department: this.state.code,
+				isAdmin: isAdmin
+			})
+		})
+			.then(response => response.json())
+			.then(user => {
+				if (user){
+					this.props.loadUser(user)
+					this.props.onRouteChange("Personal Schedule");
+				}
+			})
+	}
+
 	toggleErrorShow = (type) => {
 		if (type === 'dp'){
 			this.setState({msg: 'The passwords you entered do not match.'})
 		}
 		this.setState({errorShow: !this.state.errorShow})
-	}
-
-	errDetect = () => {
-		if (this.state.password !== this.state.cPassword){
-			this.toggleErrorShow('dp');
-		}
-		return false;
 	}
 
 	render(){
@@ -58,13 +90,13 @@ class Register extends React.Component{
 						<h1 id='title'>MeniSked</h1>
 					</div>
 					<div className='justify-content-center'id='loginBody'>
-						<Form className="login-form" onsubmit={this.errDetect}>
+						<Form className="login-form">
 							<h1 id="loginTitle">Register</h1>
 							<Form.Group controlId="formBasicFName">
-								<Form.Control required type="text" placeholder="First Name" />
+								<Form.Control required onChange={this.onFNameChange} type="text" placeholder="First Name" />
 							</Form.Group>
 							<Form.Group controlId="formBasicLName">
-								<Form.Control required type="text" placeholder="Last Name" />
+								<Form.Control required onChange={this.onLNameChange} type="text" placeholder="Last Name" />
 							</Form.Group>
 							<Form.Group controlId="formBasicEmail">
 							    <Form.Control required onChange={this.onEmailChange} type="email" placeholder="Email" />
@@ -76,11 +108,11 @@ class Register extends React.Component{
 								<Form.Control required onChange={this.onCPasswordChange} type="password" placeholder="Confirm Password" />
 							</Form.Group>
 							<Form.Group controlId="formBasicCode">
-								<Form.Control required type="text" placeholder="Department Code" />
+								<Form.Control required onChange={this.onCodeChange} type="text" placeholder="Department Code" />
 							</Form.Group>
-							<Button type="submit" id='loginButton' variant="primary" >
+							<Button onClick={this.onSubmitRegister} type="submit" id='loginButton' variant="primary" >
 								Register
-							</Button>
+							</Button> 
 						</Form>
 					</div>
 					<div className='modal'>

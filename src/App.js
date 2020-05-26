@@ -22,8 +22,8 @@ class App extends Component {
   constructor(){
     super();
     this.state = {
-      isSignedIn: true,
-      route: 'Personal Schedule',
+      isSignedIn: false,
+      route: 'Login',
       title: '',
       user:{
         id: '',
@@ -31,13 +31,15 @@ class App extends Component {
         lastName: 'Ismail',
         email: '',
         colour: '',
+        department: '',
         isAdmin: true
       },
       docs: [
         "Ismail", 
         "Menikefs", 
         "Ahn", 
-        "Abbass"
+        "Abbass",
+        "Smith"
       ],
       entries: [
         "Request No Call",
@@ -52,6 +54,19 @@ class App extends Component {
       ]
     }
   }
+
+  loadUser = (data) => {
+    this.setState({user: {
+      id: data.id,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      colour: data.colour,
+      department: data.department,
+      isAdmin: data.isAdmin
+    }})
+  }
+
 
   /*
   Different cases:
@@ -95,7 +110,7 @@ class App extends Component {
 
   //Used for rendering when signed out
   outRenderSwitch(route){
-    return route === 'Login' ? <Login onRouteChange={this.onRouteChange}/> : <Register onRouteChange={this.onRouteChange}/>
+    return route === 'Login' ? <Login loadUser={this.loadUser} onRouteChange={this.onRouteChange}/> : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
   }
 
   onRouteChange = (route, isSignedIn = true) => {

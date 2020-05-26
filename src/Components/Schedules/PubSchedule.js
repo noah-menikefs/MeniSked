@@ -73,21 +73,25 @@ class PubSchedule extends React.Component{
 	}
 
 	nextYear = () => {
-		let dateContext = Object.assign({}, this.state.dateContext);
-		dateContext = moment(dateContext).add(1, "year");
-		this.setState({
-			dateContext: dateContext
-		});
-		this.props.onNextYear && this.props.onNextYear();
+		if ((this.state.dateContext.year() + 1) <= (this.state.today.year() + 10)){
+			let dateContext = Object.assign({}, this.state.dateContext);
+			dateContext = moment(dateContext).add(1, "year");
+			this.setState({
+				dateContext: dateContext
+			});
+			this.props.onNextYear && this.props.onNextYear();
+		}
 	}
 
 	prevYear = () => {
-		let dateContext = Object.assign({}, this.state.dateContext);
-		dateContext = moment(dateContext).subtract(1, "year");
-		this.setState({
-			dateContext: dateContext
-		});
-		this.props.onPrevYear && this.props.onPrevYear();
+		if ((this.state.dateContext.year() - 1) >= 2020) {
+			let dateContext = Object.assign({}, this.state.dateContext);
+			dateContext = moment(dateContext).subtract(1, "year");
+			this.setState({
+				dateContext: dateContext
+			});
+			this.props.onPrevYear && this.props.onPrevYear();
+		}
 	}
 
 	setYear = (year) => {

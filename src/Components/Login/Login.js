@@ -25,6 +25,23 @@ class Login extends React.Component{
 		this.setState({loginPassword: event.target.value})
 	}
 
+	onSubmitLogin = () => {
+		fetch('http://localhost:3000/login', {
+			method: 'post',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				email: this.state.loginEmail,
+				password: this.state.loginPassword
+			})
+		})
+			.then(response => response.json())
+			.then(user => {
+				if (user.id){
+					this.props.loadUser(user);
+					this.props.onRouteChange("Personal Schedule");
+				}
+			})
+	}
 
 	toggleShow = () => {
 		this.setState({show: !this.state.show})
@@ -49,6 +66,8 @@ class Login extends React.Component{
 			this.toggleErrorShow('fp');
 		}
 	}
+
+
 	
 
 	render(){
@@ -71,7 +90,7 @@ class Login extends React.Component{
 							<Form.Group controlId="formBasicPassword">
 								<Form.Control onChange={this.onPasswordChange} type="password" placeholder="Password" />
 							</Form.Group>
-							<Button onClick={() => console.log('login click')} id='loginButton' variant="primary" type="submit">
+							<Button onClick={this.onSubmitLogin} id='loginButton' variant="primary" type="submit">
 								Login
 							</Button>
 							<Form.Group>
