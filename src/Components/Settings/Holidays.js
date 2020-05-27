@@ -69,19 +69,16 @@ class Holidays extends React.Component{
 						<ul className="">
 							<li id="New Year's Day">
 								New Year's Day 
-								<input className='inp' onInput={() => console.log("click")} type="checkbox" id="l1" name="NYD" value="NYD"/>
 								<Button onClick={this.toggleRShow} className="edit butn" size="sm" variant="secondary">Edit</Button>
 								<Button onClick={() => console.log("click")} className="delete butn" size="sm" variant="danger">Delete</Button>
 							</li>
 							<li id="MLK Day">
 								MLK Day 
-								<input className='inp' onInput={() => console.log("click")} type="checkbox" id="l2" name="MLK" value="MLK"/>
 								<Button onClick={this.toggleRShow} className="edit butn" size="sm" variant="secondary">Edit</Button>
 								<Button onClick={() => console.log("click")} className="delete butn" size="sm" variant="danger">Delete</Button>
 							</li>
 							<li id="Christmas Day">
 								Christmas Day 
-								<input className='inp' onInput={() => console.log("click")} type="checkbox" id="l3" name="christmas" value="christmas"/>
 								<Button onClick={this.toggleRShow} className="edit butn" size="sm" variant="secondary">Edit</Button>
 								<Button onClick={() => console.log("click")} className="delete butn" size="sm" variant="danger">Delete</Button>
 							</li>
@@ -168,6 +165,9 @@ class Holidays extends React.Component{
 							    	<option>5</option>
 							    </Form.Control>
 							</Form.Group>
+							<Form.Group id="activeCheck" controlId="formBasicCheckbox">
+						    	<Form.Check type="checkbox" label="Active"/>
+						 	 </Form.Group>
         				</Modal.Body>
         				<Modal.Footer>
           					<Button onClick={this.toggleRShow} variant="secondary" >

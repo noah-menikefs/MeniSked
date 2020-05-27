@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import logo from './logo.svg';
 import Navigation from './Components/Navigation/Navigation';
 import Login from './Components/Login/Login';
 import Register from './Components/Login/Register';
@@ -24,7 +23,7 @@ class App extends Component {
     this.state = {
       isSignedIn: false,
       route: 'Login',
-      title: '',
+      // title: '',
       user:{
         id: '',
         firstName: '',
@@ -32,7 +31,8 @@ class App extends Component {
         email: '',
         colour: '',
         department: '',
-        isAdmin: true
+        isAdmin: true,
+        isActive: true
       },
       docs: [
         "Ismail", 
@@ -63,7 +63,8 @@ class App extends Component {
       email: data.email,
       colour: data.colour,
       department: data.department,
-      isAdmin: data.isAdmin
+      isAdmin: data.isAdmin,
+      isActive: data.isActive
     }})
   }
 
@@ -104,6 +105,8 @@ class App extends Component {
         return <CallTypes />
       case 'People': 
         return <People />
+      default:
+        return <PerSchedule entries={this.state.entries} docs={this.state.docs} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
     }
   }
 
@@ -114,13 +117,15 @@ class App extends Component {
   }
 
   onRouteChange = (route, isSignedIn = true) => {
-    this.setState({isSignedIn: isSignedIn})
-    this.setState({route: route});
+    this.setState({
+      isSignedIn: isSignedIn,
+      route: route
+    });
   }
 
 
   render(){
-     const {title, route, isSignedIn, user} = this.state;
+     const {route, isSignedIn, user} = this.state;
      const {isAdmin} = user;
      return (
         <div className="App">
@@ -132,7 +137,7 @@ class App extends Component {
                 <h1>{route}</h1>
                 {this.inRenderSwitch(route)}
 
-            </div>
+              </div>
           }
 
         </div>

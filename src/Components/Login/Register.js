@@ -60,7 +60,7 @@ class Register extends React.Component{
 				firstName: this.state.firstName,
 				lastName: this.state.lastName,
 				department: this.state.code,
-				isAdmin: isAdmin
+				isAdmin: isAdmin,
 			})
 		})
 			.then(response => response.json())

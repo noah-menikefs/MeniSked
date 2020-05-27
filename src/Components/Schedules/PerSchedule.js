@@ -177,7 +177,7 @@ class PerSchedule extends React.Component{
 		const {testIsAdmin, user} = this.props;
 
 		let docSelect = this.props.docs.map((doc) => {
-		return <option value={doc}>{doc}</option>
+		return <option key={doc} value={doc}>{doc}</option>
 		})
 
 		let adminSelect = (isAdmin, user) => {
@@ -196,7 +196,7 @@ class PerSchedule extends React.Component{
 		}
 
 		let entrySelect = this.props.entries.map((entry) => {
-			return <option value={entry}>{entry}</option>
+			return <option key={entry} value={entry}>{entry}</option>
 		})
 
 		let yearSelect = [];
@@ -204,7 +204,7 @@ class PerSchedule extends React.Component{
 		let fYear = today.year();
 
 		for (let i = 2020; i <= fYear + 10; i++){
-			yearSelect.push(<option value={i}>{i}</option>)
+			yearSelect.push(<option key={i} value={i}>{i}</option>)
 		}
 
 
