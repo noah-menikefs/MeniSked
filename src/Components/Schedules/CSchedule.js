@@ -21,7 +21,6 @@ class CSchedule extends React.Component{
 		super();
 		this.state = {
 			dateContext: moment(),
-			today: moment(),
 			show: false
 		}
 	}
@@ -73,7 +72,7 @@ class CSchedule extends React.Component{
 	}
 
 	nextYear = () => {
-		if ((this.state.dateContext.year() + 1) <= (this.state.today.year() + 10)){
+		if ((this.state.dateContext.year() + 1) <= (this.props.today.year() + 10)){
 			let dateContext = Object.assign({}, this.state.dateContext);
 			dateContext = moment(dateContext).add(1, "year");
 			this.setState({
@@ -112,7 +111,7 @@ class CSchedule extends React.Component{
 	}
 	
 	reset = () => {
-		this.setState({dateContext: this.state.today});
+		this.setState({dateContext: this.props.today});
 	}
 
 	adminNotes = () => {
@@ -132,7 +131,8 @@ class CSchedule extends React.Component{
 
 
 	render(){
-		const {dateContext, today, show} = this.state;
+		const {dateContext, show} = this.state;
+		const {today} = this.props;
 		let yearSelect = [];
 
 		let fYear = today.year();
@@ -164,7 +164,7 @@ class CSchedule extends React.Component{
 	  					<option value="December">December</option>
 					</select></Col>
 					<Col ><select value={dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
-	  					{yearSelect};
+	  					{yearSelect}
 					</select></Col>
 					<Col sm><p className="vis top-child"></p></Col>
 

@@ -106,8 +106,6 @@ class Calendar extends React.Component{
 			blanks.push(<td key={i*80} className="emptySlot">{" "}</td>);	
 		}
 
-		console.log("blanks: ", blanks);
-
 		let daysInMonth = [];
 		for (let d = 1; d <= this.daysInMonth(); d++){
 			let className = (d === this.currentDay() ? "day current-day" : "day");
@@ -127,8 +125,6 @@ class Calendar extends React.Component{
 			len++;
 			extraBlanks.push(<td key={len} className="emptySlot">{" "}</td>)
 		}
-
-		console.log("days: ", daysInMonth);
 
 		var totalSlots = [...blanks, ...daysInMonth, ...extraBlanks];
 		let rows = [];

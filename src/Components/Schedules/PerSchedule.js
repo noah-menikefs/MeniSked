@@ -24,8 +24,7 @@ class PerSchedule extends React.Component{
 			physician: this.props.docs[0],
 			entry: this.props.entries[0],
 			show: false,
-			dateContext: moment(),
-			today: moment()
+			dateContext: moment()
 		}
 	}
 
@@ -103,7 +102,7 @@ class PerSchedule extends React.Component{
 	}
 
 	nextYear = () => {
-		if ((this.state.dateContext.year() + 1) <= (this.state.today.year() + 10)){
+		if ((this.state.dateContext.year() + 1) <= (this.props.today.year() + 10)){
 			let dateContext = Object.assign({}, this.state.dateContext);
 			dateContext = moment(dateContext).add(1, "year");
 			this.setState({
@@ -168,13 +167,13 @@ class PerSchedule extends React.Component{
 	}
 
 	reset = () => {
-		this.setState({dateContext: this.state.today});
+		this.setState({dateContext: this.props.today});
 	}
 
 
 	render(){
-		const {show, dateContext, today} = this.state;
-		const {testIsAdmin, user} = this.props;
+		const {show, dateContext} = this.state;
+		const {testIsAdmin, user, today} = this.props;
 
 		let docSelect = this.props.docs.map((doc) => {
 		return <option key={doc} value={doc}>{doc}</option>
@@ -220,7 +219,7 @@ class PerSchedule extends React.Component{
 				<Row className="header">
 					<Col >{adminSelect(testIsAdmin, user)}</Col>
 					<Col ><select value={this.state.entry} onChange={this.onEntryChange} className="top-child types selector">
-						{entrySelect};
+						{entrySelect}
 					</select></Col>
 					<Col ><select value={dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
 	  					<option value="January">January</option>
@@ -237,7 +236,7 @@ class PerSchedule extends React.Component{
 	  					<option value="December">December</option>
 					</select></Col>
 					<Col ><select value={dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
-					{yearSelect};
+					{yearSelect}
 					</select></Col>
 					<Col sm><p className="vis labels-child"></p></Col>
 				</Row>

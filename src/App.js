@@ -11,6 +11,7 @@ import EMessages from './Components/Messages/EMessages';
 import Holidays from './Components/Settings/Holidays';
 import CallTypes from './Components/Settings/CallTypes';
 import People from './Components/Settings/People';
+import moment from 'moment';
 import './App.css';
 
 
@@ -21,6 +22,7 @@ class App extends Component {
   constructor(){
     super();
     this.state = {
+      today: moment(),
       isSignedIn: false,
       route: 'Login',
       // title: '',
@@ -49,8 +51,6 @@ class App extends Component {
         "Not Available",
         "Not Available Night",
         "Assign Call Type"
-
-
       ]
     }
   }
@@ -88,11 +88,11 @@ class App extends Component {
     
     switch(route){
       case 'Personal Schedule': 
-        return <PerSchedule entries={this.state.entries} docs={this.state.docs} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
+        return <PerSchedule today={this.state.today} entries={this.state.entries} docs={this.state.docs} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
       case 'Published Schedule': 
-        return <PubSchedule user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
+        return <PubSchedule today={this.state.today} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
       case 'Call Schedule': 
-        return <CSchedule testIsAdmin={this.state.user.isAdmin}/>
+        return <CSchedule today={this.state.today} testIsAdmin={this.state.user.isAdmin}/>
       case 'Account Information': 
         return <Account />
       case 'Admin Messages': 
@@ -100,7 +100,7 @@ class App extends Component {
       case 'Messages': 
         return <EMessages />
       case 'Holidays': 
-        return <Holidays />
+        return <Holidays today={this.state.today}/>
       case 'Call Types': 
         return <CallTypes />
       case 'People': 

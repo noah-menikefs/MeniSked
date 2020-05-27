@@ -20,8 +20,7 @@ class PubSchedule extends React.Component{
 		super();
 		this.state = {
 			show: false,
-			dateContext: moment(),
-			today: moment(),
+			dateContext: moment()
 		}
 	}
 
@@ -73,7 +72,7 @@ class PubSchedule extends React.Component{
 	}
 
 	nextYear = () => {
-		if ((this.state.dateContext.year() + 1) <= (this.state.today.year() + 10)){
+		if ((this.state.dateContext.year() + 1) <= (this.props.today.year() + 10)){
 			let dateContext = Object.assign({}, this.state.dateContext);
 			dateContext = moment(dateContext).add(1, "year");
 			this.setState({
@@ -112,13 +111,13 @@ class PubSchedule extends React.Component{
 	}
 	
 	reset = () => {
-		this.setState({dateContext: this.state.today});
+		this.setState({dateContext: this.props.today});
 	}
 
 	
 	yearSelect = () => {
 		let arr = [];
-		let fYear = this.state.today.year();
+		let fYear = this.props.today.year();
 		for (let i = 2020; i <= fYear + 10; i++){
 			arr.push(<option value={i}>{i}</option>)
 		}
@@ -154,7 +153,7 @@ class PubSchedule extends React.Component{
 	  					<option value="December">December</option>
 					</select></Col>
 					<Col ><select value={this.state.dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
-	  					{this.yearSelect()};
+	  					{this.yearSelect()}
 					</select></Col>
 					<Col ><p></p></Col>
 				</Row>
@@ -192,8 +191,8 @@ class PubSchedule extends React.Component{
 	}
 
 	render(){
-		const {show, dateContext, today} = this.state;
-		const {testIsAdmin, user} = this.props;
+		const {show, dateContext} = this.state;
+		const {testIsAdmin, user, today} = this.props;
 
 		return(
 			<div className="screen">
