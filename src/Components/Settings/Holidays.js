@@ -10,12 +10,8 @@ class Holidays extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			rHolidayList: [
-
-			],
-			nrHolidayList: [
-
-			],
+			rHolidayList: [],
+			nrHolidayList: [],
 			newNRshow: false,
 			newRshow: false,
 			sShow: false,
@@ -214,7 +210,7 @@ class Holidays extends React.Component{
 
 	toggleRShow = (e) => {
 		
-		if (typeof e !== 'undefined'){
+		if (e && e.target.parentNode.id){
 			if (e.target.className.includes('add')){
 				this.setState({add: true});
 			}
@@ -233,12 +229,28 @@ class Holidays extends React.Component{
 				
 			}
 		}
+		else{
+			this.setState({
+				name: '',
+				month: 'January',
+				day: 1,
+				isActive: false
+			})
+		}
 		this.setState({newRshow: !this.state.newRshow});
 	}
 
 	toggleSShow = (e) => {
-		if (typeof e !== 'undefined'){
+		if (e && e.target.parentNode.id){
 			this.setState({name: e.target.parentNode.id});
+		}
+		else{
+			this.setState({
+				name: '',
+				month: 'January',
+				day: 1,
+				dateContext: this.props.today
+			});
 		}
 		this.setState({sShow: !this.state.sShow});
 	}
@@ -293,7 +305,7 @@ class Holidays extends React.Component{
 			<div className="body">
 				<div className="left">
 					
-					<div className="top">
+					<div id="t" className="top">
 						<h4 className="subtitle">Recurring Holidays</h4>
 						<Button className="add" onClick={this.toggleRShow} variant="primary">Add Recurring Holiday</Button>
 					</div>
@@ -317,11 +329,11 @@ class Holidays extends React.Component{
 					</Scroll>
 				</div>
 				<div className='modal'>
-					<Modal show={newNRshow} onHide={this.toggleNRShow} onSubmit={this.onNewNRHoliday}>
+					<Modal show={newNRshow} onHide={this.toggleNRShow} >
         				<Modal.Header closeButton>
           					<Modal.Title id='modalTitle'>Add Non-recurring Holiday</Modal.Title>
        	 				</Modal.Header>
-        				<Form>
+        				<Form onSubmit={this.onNewNRHoliday}>
         					<Modal.Body>
         					<Form.Group >
       							 <Form.Control onChange={this.onNameChange} required type="text" placeholder="Name" />
@@ -339,11 +351,11 @@ class Holidays extends React.Component{
       				</Modal>
 				</div>
 				<div className='modal'>
-					<Modal show={newRshow} onHide={this.toggleRShow} onSubmit={this.addOrEdit}>
+					<Modal show={newRshow} onHide={this.toggleRShow} >
         				<Modal.Header closeButton>
           					<Modal.Title id='modalTitle'>Add/Edit Recurring Holiday</Modal.Title>
        	 				</Modal.Header>
-        				<Form>
+        				<Form onSubmit={this.addOrEdit}>
         					<Modal.Body>
         					<Form.Group >
       							 {this.addModal()}
@@ -418,11 +430,11 @@ class Holidays extends React.Component{
       				</Modal>
 				</div>
 				<div className='modal'>
-					<Modal show={sShow} onHide={this.toggleSShow} onSubmit={this.onSkedHoliday}>
+					<Modal show={sShow} onHide={this.toggleSShow} >
         				<Modal.Header closeButton>
           					<Modal.Title id='modalTitle'>Schedule Holiday</Modal.Title>
        	 				</Modal.Header>
-        				<Form>
+        				<Form onSubmit={this.onSkedHoliday}>
         					<Modal.Body>
         					<Form.Group>
         						<h3>{name}</h3>

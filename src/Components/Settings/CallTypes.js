@@ -8,10 +8,7 @@ class CallTypes extends React.Component{
 	constructor(){
 		super();
 		this.state = {
-			callList: [
-
-
-			],
+			callList: [],
 			callName: '',
 			priority: 1,
 			isActive: false,
@@ -164,7 +161,11 @@ class CallTypes extends React.Component{
 		}
 
 		let prioritySelect = [];
-		for (let n = 1; n <= callList.length+1; n++){
+		let max = 1;
+		if (!this.state.add){
+			max = 0;
+		}
+		for (let n = 1; n <= callList.length+max; n++){
 			prioritySelect.push(<option value={n} key={n}>{n}</option>);
 		}
 

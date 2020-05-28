@@ -138,7 +138,7 @@ class CSchedule extends React.Component{
 		let fYear = today.year();
 
 		for (let i = 2020; i <= fYear + 10; i++){
-			yearSelect.push(<option value={i}>{i}</option>)
+			yearSelect.push(<option key={i} value={i}>{i}</option>)
 		}
 		return(
 			<div className="screen">

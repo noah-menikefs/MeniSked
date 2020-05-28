@@ -25,7 +25,6 @@ class App extends Component {
       today: moment(),
       isSignedIn: false,
       route: 'Login',
-      // title: '',
       user:{
         id: '',
         firstName: '',
@@ -36,13 +35,6 @@ class App extends Component {
         isAdmin: true,
         isActive: true
       },
-      docs: [
-        "Ismail", 
-        "Menikefs", 
-        "Ahn", 
-        "Abbass",
-        "Smith"
-      ],
       entries: [
         "Request No Call",
         "Vacation",
@@ -67,7 +59,6 @@ class App extends Component {
       isActive: data.isActive
     }})
   }
-
 
   /*
   Different cases:
@@ -103,7 +94,7 @@ class App extends Component {
       case 'Call Types': 
         return <CallTypes />
       case 'People': 
-        return <People />
+        return <People department={this.state.user.department}/>
       default:
         return <PerSchedule entries={this.state.entries} docs={this.state.docs} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
     }

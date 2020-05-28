@@ -21,12 +21,23 @@ class PerSchedule extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			physician: this.props.docs[0],
+			activeDocs: [],
+			docIndex: 0,
 			entry: this.props.entries[0],
 			show: false,
 			dateContext: moment()
 		}
 	}
+
+	componentDidMount = () => {
+   		this.loadActiveDocs();
+  	}
+
+  	loadActiveDocs = () => {
+    	fetch('http://localhost:3000/sked/docs')
+      		.then(response => response.json())
+      		.then(docs => this.setState({activeDocs: docs}));
+  	}
 
 	onDayClick = (e,day) => {
 		if (this.state.entry === "Assign Call Type"){
@@ -64,22 +75,22 @@ class PerSchedule extends React.Component{
 	}
 
 	nextDoc = () => {
-		let newIndex = 0;
-		let index = this.props.docs.indexOf(this.state.physician);
-		if (index !== (this.props.docs.length - 1)){
-			newIndex = index + 1;
-
+		let i = this.state.docIndex;
+		if (i !== (this.state.activeDocs.length - 1)){
+			this.setState({docIndex: (i+1)});
 		}
-		this.setState({physician: this.props.docs[newIndex]});
+		else{
+			this.setState({docIndex: 0});
+		}
 	}
-	prevDoc =() => {
-		let newIndex = this.props.docs.length-1;
-		let index = this.props.docs.indexOf(this.state.physician);
-		if (index !== 0){
-			newIndex = index - 1;
-
+	prevDoc = () => {
+		let i = this.state.docIndex;
+		if (i !== 0){
+			this.setState({docIndex: (i-1)});
 		}
-		this.setState({physician: this.props.docs[newIndex]});
+		else{
+			this.setState({docIndex: (this.state.activeDocs.length - 1)});
+		}
 	}
 	nextEntry = () => {
 		let newIndex = 0;
@@ -132,7 +143,19 @@ class PerSchedule extends React.Component{
 	}
 
 	onPhysicianChange = (event) => {
-		this.setState({physician: event.target.value})
+		if (event.target.key){
+			this.setState({docIndex: event.target.key})
+		}
+		else{
+			let index = -1;
+			for (let i = 0; i < this.state.activeDocs.length; i++){
+				if (this.state.activeDocs[i].lastName === event.target.value){
+					index = i;
+					break;
+				}
+			}
+			this.setState({docIndex: index})
+		}
 	}
 
 	onEntryChange = (event) => {
@@ -172,17 +195,17 @@ class PerSchedule extends React.Component{
 
 
 	render(){
-		const {show, dateContext} = this.state;
+		const {show, dateContext, activeDocs, docIndex} = this.state;
 		const {testIsAdmin, user, today} = this.props;
 
-		let docSelect = this.props.docs.map((doc) => {
-		return <option key={doc} value={doc}>{doc}</option>
+		let docSelect = activeDocs.map((doc,i) => {
+			return <option key={i} value={doc.lastName}>{doc.lastName}</option>
 		})
 
 		let adminSelect = (isAdmin, user) => {
-			if (isAdmin){
+			if (isAdmin && activeDocs.length!==0){
 				return (
-					<select value={this.state.physician} onChange={this.onPhysicianChange} className="top-child doc selector">
+					<select value={activeDocs[docIndex].lastName} onChange={this.onPhysicianChange} className="top-child doc selector">
   						{docSelect}
 					</select>
 				);
