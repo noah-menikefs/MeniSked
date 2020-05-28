@@ -85,9 +85,8 @@ class App extends Component {
   */
   //used for rendering when signed in 
   inRenderSwitch(route){
-    
     switch(route){
-      case 'Personal Schedule': 
+      case "Personal Schedule": 
         return <PerSchedule today={this.state.today} entries={this.state.entries} docs={this.state.docs} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
       case 'Published Schedule': 
         return <PubSchedule today={this.state.today} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
@@ -128,6 +127,7 @@ class App extends Component {
      const {route, isSignedIn, user} = this.state;
      const {isAdmin} = user;
      return (
+        <div>
         <div className="App">
           { (! isSignedIn)
             ? this.outRenderSwitch(route)
@@ -140,6 +140,7 @@ class App extends Component {
               </div>
           }
 
+        </div>
         </div>
       );
   }

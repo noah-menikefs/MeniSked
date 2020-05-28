@@ -119,7 +119,7 @@ class PubSchedule extends React.Component{
 		let arr = [];
 		let fYear = this.props.today.year();
 		for (let i = 2020; i <= fYear + 10; i++){
-			arr.push(<option value={i}>{i}</option>)
+			arr.push(<option key={i} value={i}>{i}</option>)
 		}
 		return arr;
 	}

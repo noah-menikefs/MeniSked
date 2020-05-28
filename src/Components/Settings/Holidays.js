@@ -65,7 +65,7 @@ class Holidays extends React.Component{
 				name: this.state.name,
 				isActive: this.state.isActive,
 				month: this.state.month,
-				day: this.state.day
+				day: parseInt(this.state.day,10)
 
 			})
 		})
@@ -103,7 +103,7 @@ class Holidays extends React.Component{
 				name: this.state.name,
 				isActive: this.state.isActive,
 				month: this.state.month,
-				day: this.state.day
+				day: parseInt(this.state.day,10)
 
 			})
 		})
@@ -129,6 +129,43 @@ class Holidays extends React.Component{
 					this.loadrHolidays();
 				}
 			})
+	}
+
+	onDeleteNRHoliday = (e) => {
+		fetch('http://localhost:3000/holiday/nr', {
+			method: 'delete',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				name: e.target.parentNode.id
+			})
+		})
+			.then(response => response.json())
+			.then(holiday => {
+				if (holiday){
+					this.loadnrHolidays();
+				}
+			})
+	}
+
+	onSkedHoliday = (e) => {
+		fetch('http://localhost:3000/holiday/snr', {
+			method: 'post',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				name: this.state.name,
+				year: this.state.dateContext.format('Y'),
+				month: this.state.dateContext.format('MMMM'),
+				day: parseInt(this.state.day,10)
+			})
+		})
+			.then(response => response.json())
+			.then(holiday => {
+				if (holiday){
+					this.loadnrHolidays();
+				}
+			})
+		this.toggleSShow();
+
 	}
 
 	onNameChange = (event) => {
@@ -247,7 +284,7 @@ class Holidays extends React.Component{
 				<li key={nrHolidayList[n].name} id={nrHolidayList[n].name}>
 					{nrHolidayList[n].name}
 					<Button key={n} onClick={this.toggleSShow} className="sked butn" size="sm" variant="secondary">Schedule</Button>
-					<Button key={-n-1} onClick={() => console.log("click")} className="delete butn" size="sm" variant="danger">Delete</Button>
+					<Button key={-n-1} onClick={this.onDeleteNRHoliday} className="delete butn" size="sm" variant="danger">Delete</Button>
 				</li>
 			)
 		}
@@ -381,7 +418,7 @@ class Holidays extends React.Component{
       				</Modal>
 				</div>
 				<div className='modal'>
-					<Modal show={sShow} onHide={this.toggleSShow} onSubmit={this.toggleSShow}>
+					<Modal show={sShow} onHide={this.toggleSShow} onSubmit={this.onSkedHoliday}>
         				<Modal.Header closeButton>
           					<Modal.Title id='modalTitle'>Schedule Holiday</Modal.Title>
        	 				</Modal.Header>
@@ -415,7 +452,7 @@ class Holidays extends React.Component{
 							</Form.Group>
 							<Form.Group >
 								<Form.Label>Day of the Month</Form.Label>
-							    <Form.Control as="select">
+							    <Form.Control onChange={this.onDayChange} as="select">
 							    	{daySelect}
 							    </Form.Control>
 							</Form.Group>
