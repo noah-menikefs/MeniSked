@@ -25,7 +25,7 @@ class Login extends React.Component{
 		this.setState({loginPassword: event.target.value})
 	}
 
-	onSubmitLogin = () => {
+	onSLogin = () => {
 		fetch('http://localhost:3000/login', {
 			method: 'post',
 			headers: {'Content-Type': 'application/json'},
@@ -36,7 +36,7 @@ class Login extends React.Component{
 		})
 			.then(response => response.json())
 			.then(user => {
-				if (user.id){
+				if (user.lastName){
 					this.props.onRouteChange("Personal Schedule");
 					this.props.loadUser(user);
 				}
@@ -81,7 +81,7 @@ class Login extends React.Component{
 						<h1 id='title'>MeniSked</h1>
 					</div>
 					<div className='justify-content-center'id='loginBody'>
-						<Form className="login-form">
+						<Form className="login-form" /*onSubmit={this.onSLogin}*/ >
 							<h1 id="loginTitle">Login</h1>
 							<Form.Group controlId="formBasicEmail">
 							    <Form.Control onChange={this.onEmailChange} required type="email" placeholder="Email" />
@@ -90,7 +90,7 @@ class Login extends React.Component{
 							<Form.Group controlId="formBasicPassword">
 								<Form.Control onChange={this.onPasswordChange} type="password" placeholder="Password" />
 							</Form.Group>
-							<Button onClick={this.onSubmitLogin} id='loginButton' variant="primary" type="submit">
+							<Button onClick={this.onSLogin} /*type="submit"*/ id='loginButton' variant="primary">
 								Login
 							</Button>
 							<Form.Group>

@@ -22,15 +22,21 @@ class PerSchedule extends React.Component{
 		super(props);
 		this.state = {
 			activeDocs: [],
+			entries: [],
 			docIndex: 0,
-			entry: this.props.entries[0],
+			entryIndex: 0,
 			show: false,
-			dateContext: moment()
+			dateContext: moment(),
+			callList: [],
+			radio: -1,
+			day: 0
 		}
 	}
 
 	componentDidMount = () => {
    		this.loadActiveDocs();
+   		this.loadEntries();
+   		this.loadCallTypes();
   	}
 
   	loadActiveDocs = () => {
@@ -39,10 +45,61 @@ class PerSchedule extends React.Component{
       		.then(docs => this.setState({activeDocs: docs}));
   	}
 
+  	loadEntries = () => {
+  		fetch('http://localhost:3000/sked/entries')
+      		.then(response => response.json())
+      		.then(entries => this.setState({entries: entries}));
+  	}
+
+  	loadCallTypes = () => {
+		fetch('http://localhost:3000/callTypes')
+			.then(response => response.json())
+			.then(calls => this.setState({callList: calls.sort(function(a, b){return a.priority - b.priority})}));
+	}
+
+	loadPersonalSked = (user) => {
+		let activeDocs = [...this.state.activeDocs];
+		for (let i = 0; i < activeDocs.length; i++){
+			if (user.id === activeDocs[i].id){
+				let currentUser = Object.assign({}, activeDocs[i]);
+				currentUser.workSked = [...user.workSked];
+				activeDocs[i] = currentUser;
+				this.setState({activeDocs: activeDocs});
+			}
+		}
+	}
+
 	onDayClick = (e,day) => {
-		if (this.state.entry === "Assign Call Type"){
+		if (this.state.entries[this.state.entryIndex].name === "Assign Specific Call"){
+			this.setState({day:day})
 			this.toggleShow();
 		}
+	}
+
+	assignCall = () => {
+		if (this.props.testIsAdmin && this.state.radio !== -1){
+			fetch('http://localhost:3000/sked/assign', {
+				method: 'post',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					docId: this.state.activeDocs[this.state.docIndex].id,
+					typeId: parseInt(this.state.radio,10),
+					date: (this.state.dateContext.format('MM')+'/'+this.state.day+'/'+this.state.dateContext.format('YYYY'))
+
+				})
+			})
+			.then(response => response.json())
+			.then(user => {
+				if (user.lastName){
+					this.loadPersonalSked(user);
+				}
+			})
+		}
+		this.setState({
+				day:0,
+				radio:-1
+			})
+		this.toggleShow();
 	}
 
 	months = moment.months(); // List of each month
@@ -93,23 +150,24 @@ class PerSchedule extends React.Component{
 		}
 	}
 	nextEntry = () => {
-		let newIndex = 0;
-		let index = this.props.entries.indexOf(this.state.entry);
-		if (index !== (this.props.entries.length - 1)){
-			newIndex = index + 1;
-
+		let i = this.state.entryIndex;
+		if (i !== (this.state.entries.length - 1)){
+			this.setState({entryIndex: (i+1)});
 		}
-		this.setState({entry: this.props.entries[newIndex]});
+		else{
+			this.setState({entryIndex: 0});
+		}
 	}
 
 	prevEntry =() => {
-	let newIndex = this.props.entries.length-1;
-		let index = this.props.entries.indexOf(this.state.entry);
-		if (index !== 0){
-			newIndex = index - 1;
+		let i = this.state.entryIndex;
+		if (i !== 0){
+			this.setState({entryIndex: (i-1)});
 
 		}
-		this.setState({entry: this.props.entries[newIndex]});
+		else{
+			this.setState({entryIndex: (this.state.entries.length - 1)});
+		}
 	}
 
 	nextYear = () => {
@@ -159,7 +217,14 @@ class PerSchedule extends React.Component{
 	}
 
 	onEntryChange = (event) => {
-		this.setState({entry: event.target.value})
+		let index = -1;
+		for (let i = 0; i < this.state.entries.length; i++){
+			if (this.state.entries[i].name === event.target.value){
+				index = i;
+				break;
+			}
+		}
+		this.setState({entryIndex: index})
 	}
 
 	onMonthChange = (event) => {
@@ -169,6 +234,12 @@ class PerSchedule extends React.Component{
 
 	onYearChange = (event) => {
 		this.setYear(event.target.value);
+	}
+
+	radioChange = (event) => {
+		
+		this.setState({radio: event.target.id})
+
 	}
 
 	toggleShow = () => {
@@ -195,7 +266,7 @@ class PerSchedule extends React.Component{
 
 
 	render(){
-		const {show, dateContext, activeDocs, docIndex} = this.state;
+		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList} = this.state;
 		const {testIsAdmin, user, today} = this.props;
 
 		let docSelect = activeDocs.map((doc,i) => {
@@ -217,9 +288,22 @@ class PerSchedule extends React.Component{
 			}
 		}
 
-		let entrySelect = this.props.entries.map((entry) => {
-			return <option key={entry} value={entry}>{entry}</option>
+		let entrySelect = entries.map((entry, i) => {
+				return <option key={i} value={entry.name}>{entry.name}</option>
 		})
+
+		let eSelect = () => {
+			if (entries.length !== 0){
+				return (
+					<select value={entries[entryIndex].name} onChange={this.onEntryChange} className="top-child types selector">
+						{entrySelect}
+					</select>
+				);
+			}
+			else{
+				return <p>Entries</p>
+			}
+		}
 
 		let yearSelect = [];
 
@@ -227,6 +311,13 @@ class PerSchedule extends React.Component{
 
 		for (let i = 2020; i <= fYear + 10; i++){
 			yearSelect.push(<option key={i} value={i}>{i}</option>)
+		}
+
+		let radioSelect = [];
+		for (let j = 0; j < callList.length; j++){
+			radioSelect.push(
+				<Form.Check required key={j} name="callType" type='radio' id={callList[j].id} label={callList[j].name}/>
+			)
 		}
 
 
@@ -241,9 +332,7 @@ class PerSchedule extends React.Component{
 				</Row>
 				<Row className="header">
 					<Col >{adminSelect(testIsAdmin, user)}</Col>
-					<Col ><select value={this.state.entry} onChange={this.onEntryChange} className="top-child types selector">
-						{entrySelect}
-					</select></Col>
+					<Col >{eSelect()}</Col>
 					<Col ><select value={dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
 	  					<option value="January">January</option>
 	  					<option value="February">February</option>
@@ -294,29 +383,21 @@ class PerSchedule extends React.Component{
 				</div>
 
 				<div className='modal'>
-					<Modal show={show} onHide={this.toggleShow} onSubmit={this.toggleShow}>
+					<Modal show={show} onHide={this.toggleShow}>
         				<Modal.Header closeButton>
           					<Modal.Title id='modalTitle'>Select Call Type</Modal.Title>
        	 				</Modal.Header>
         				<Form>
         					<Modal.Body>
-        					<Form.Group controlId="formBasicRadio">
-      							<Form.Check required name="callType" type='radio' id={1} label={"1st Call Day"}/>
-      							<Form.Check name="callType" type='radio' id={2} label={"1st Call Night"}/>
-      							<Form.Check name="callType" type='radio' id={3} label={"1st Call"}/>
-      							<Form.Check name="callType" type='radio' id={4} label={"2nd Call Day"}/>
-      							<Form.Check name="callType" type='radio' id={5} label={"2nd Call Night"}/>
-      							<Form.Check name="callType" type='radio' id={6} label={"2nd Call"}/>
-      							<Form.Check name="callType" type='radio' id={7} label={"COVID am"}/>
-      							<Form.Check name="callType" type='radio' id={8} label={"COVID pm"}/>
-      							<Form.Check name="callType" type='radio' id={9} label={"COVID x 24"}/>
+        					<Form.Group onChange={this.radioChange} controlId="formBasicRadio">
+      							{radioSelect}
   							</Form.Group>
         				</Modal.Body>
         				<Modal.Footer>
           					<Button onClick={this.toggleShow} variant="secondary" >
             					Close
           					</Button>
-          					 <Button type="submit" variant="primary" >
+          					 <Button onClick={this.assignCall} variant="primary" >
             					Submit
           					</Button>
 	        			</Modal.Footer>

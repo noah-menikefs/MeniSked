@@ -33,7 +33,8 @@ class App extends Component {
         colour: '',
         department: '',
         isAdmin: true,
-        isActive: true
+        isActive: true,
+        workSked: []
       },
       entries: [
         "Request No Call",
@@ -56,9 +57,11 @@ class App extends Component {
       colour: data.colour,
       department: data.department,
       isAdmin: data.isAdmin,
-      isActive: data.isActive
+      isActive: data.isActive,
+      workSked: data.workSked
     }})
   }
+
 
   /*
   Different cases:

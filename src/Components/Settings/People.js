@@ -158,7 +158,7 @@ class People extends React.Component{
 					<div className="top">
 						<h4 className="subtitle">Add User</h4>
 					</div>
-					<Form id="callForm" onSubmit={this.addCall}>
+					<Form id="callForm" >
 						<div id="box" style={{border:'2px solid black', height: '400px'}}>
 							<Form.Group id="name">
 								<Form.Control required value={fName} type="text" onChange={this.onFNameChange} placeholder="First Name" />
@@ -177,7 +177,7 @@ class People extends React.Component{
   							</Form.Group>
 						</div>
 						<div className="bottom">
-							<Button id='callSub' variant="primary" type="submit">
+							<Button id='callSub' variant="primary" onClick={this.addCall}>
 								Submit
 							</Button>
 						</div>
@@ -186,7 +186,7 @@ class People extends React.Component{
 
 				</div>
 				<div className='modal'>
-					<Modal show={dShow} onHide={this.toggleDShow} onSubmit={this.deletePerson}>
+					<Modal show={dShow} onHide={this.toggleDShow} >
         				<Modal.Header closeButton>
           					<Modal.Title id='modalTitle'>Confirm Deletion</Modal.Title>
        	 				</Modal.Header>
@@ -200,7 +200,7 @@ class People extends React.Component{
           					<Button onClick={this.toggleDShow} variant="secondary" >
             					Cancel
           					</Button>
-          					 <Button type="submit" variant="primary" >
+          					 <Button onClick={this.deletePerson} variant="primary" >
             					Submit
           					</Button>
 	        			</Modal.Footer>

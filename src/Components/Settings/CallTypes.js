@@ -187,7 +187,7 @@ class CallTypes extends React.Component{
 					<div className="top">
 						<h4 className="subtitle">Add/Edit Calls</h4>
 					</div>
-					<Form id="callForm" onSubmit={this.addOrEdit}>
+					<Form id="callForm" >
 						<div id="box" style={{border:'2px solid black', height: '200px'}}>
 							<Form.Group id="name">
 								<Form.Control required value={callName} onChange={this.onNameChange} type="text" placeholder="Name" />
@@ -206,7 +206,7 @@ class CallTypes extends React.Component{
 							<Button onClick={this.onCancel} id='callSub' variant="secondary" type="cancel">
 								Cancel
 							</Button>
-							<Button id='callSub' variant="primary" type="submit">
+							<Button id='callSub' variant="primary" onClick={this.addOrEdit}>
 								Submit
 							</Button>
 						</div>

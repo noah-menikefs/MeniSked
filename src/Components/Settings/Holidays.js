@@ -333,7 +333,7 @@ class Holidays extends React.Component{
         				<Modal.Header closeButton>
           					<Modal.Title id='modalTitle'>Add Non-recurring Holiday</Modal.Title>
        	 				</Modal.Header>
-        				<Form onSubmit={this.onNewNRHoliday}>
+        				<Form >
         					<Modal.Body>
         					<Form.Group >
       							 <Form.Control onChange={this.onNameChange} required type="text" placeholder="Name" />
@@ -343,7 +343,7 @@ class Holidays extends React.Component{
           					<Button onClick={this.toggleNRShow} variant="secondary" >
             					Cancel
           					</Button>
-          					 <Button type="submit" variant="primary" >
+          					 <Button onClick={this.onNewNRHoliday} variant="primary" >
             					Submit
           					</Button>
 	        			</Modal.Footer>
@@ -355,7 +355,7 @@ class Holidays extends React.Component{
         				<Modal.Header closeButton>
           					<Modal.Title id='modalTitle'>Add/Edit Recurring Holiday</Modal.Title>
        	 				</Modal.Header>
-        				<Form onSubmit={this.addOrEdit}>
+        				<Form >
         					<Modal.Body>
         					<Form.Group >
       							 {this.addModal()}
@@ -422,7 +422,7 @@ class Holidays extends React.Component{
           					<Button onClick={this.toggleRShow} variant="secondary" >
             					Cancel
           					</Button>
-          					 <Button type="submit" variant="primary">
+          					 <Button onClick={this.addOrEdit} variant="primary">
             					Submit
           					</Button>
 	        			</Modal.Footer>
@@ -434,7 +434,7 @@ class Holidays extends React.Component{
         				<Modal.Header closeButton>
           					<Modal.Title id='modalTitle'>Schedule Holiday</Modal.Title>
        	 				</Modal.Header>
-        				<Form onSubmit={this.onSkedHoliday}>
+        				<Form >
         					<Modal.Body>
         					<Form.Group>
         						<h3>{name}</h3>
@@ -473,7 +473,7 @@ class Holidays extends React.Component{
           					<Button onClick={this.toggleSShow} variant="secondary" >
             					Cancel
           					</Button>
-          					 <Button type="submit" variant="primary">
+          					 <Button onClick={this.onSkedHoliday}variant="primary">
             					Submit
           					</Button>
 	        			</Modal.Footer>
