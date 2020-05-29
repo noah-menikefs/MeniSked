@@ -37,7 +37,7 @@ tr {
 
 .day,
 .week-day {
-    padding: 0 5px 5px 5px;
+    padding: 0 0 5px 0;
 }
 
 .emptySlot{
@@ -117,5 +117,15 @@ td > ul{
 }
 
 .text{
+    padding-right: 5px; 
+}
 
+td > hr {
+    display: block;
+    background-color: #fff;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #000000;
+    margin: 0;
+    padding: 0;
 }

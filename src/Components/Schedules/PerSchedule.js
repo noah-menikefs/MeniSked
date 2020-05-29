@@ -70,21 +70,26 @@ class PerSchedule extends React.Component{
 	}
 
 	onDayClick = (e,day) => {
-		if (this.state.entries[this.state.entryIndex].name === "Assign Specific Call"){
+		const id = this.state.entries[this.state.entryIndex].id;
+		if (id === 6){
 			this.setState({day:day})
 			this.toggleShow();
 		}
+		else{
+			console.log(id);
+			this.assignCall(id, day);
+		}
 	}
 
-	assignCall = () => {
-		if (this.props.testIsAdmin && this.state.radio !== -1){
+	assignCall = (typeId, day = this.state.day) => {
+		if (this.props.testIsAdmin && (typeId !== -1)){
 			fetch('http://localhost:3000/sked/assign', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
 					docId: this.state.activeDocs[this.state.docIndex].id,
-					typeId: parseInt(this.state.radio,10),
-					date: (this.state.dateContext.format('MM')+'/'+this.state.day+'/'+this.state.dateContext.format('YYYY'))
+					typeId: parseInt(typeId,10),
+					date: (this.state.dateContext.format('MM')+'/'+day+'/'+this.state.dateContext.format('YYYY'))
 
 				})
 			})
@@ -94,12 +99,15 @@ class PerSchedule extends React.Component{
 					this.loadPersonalSked(user);
 				}
 			})
+			if (this.state.radio !== -1){
+				this.toggleShow();
+			}
 		}
 		this.setState({
 				day:0,
-				radio:-1
+				radio:-1,
+				typeId:-1
 			})
-		this.toggleShow();
 	}
 
 	months = moment.months(); // List of each month
@@ -397,7 +405,7 @@ class PerSchedule extends React.Component{
           					<Button onClick={this.toggleShow} variant="secondary" >
             					Close
           					</Button>
-          					 <Button onClick={this.assignCall} variant="primary" >
+          					 <Button onClick={() => this.assignCall(this.state.radio)} variant="primary" >
             					Submit
           					</Button>
 	        			</Modal.Footer>

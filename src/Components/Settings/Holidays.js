@@ -54,41 +54,45 @@ class Holidays extends React.Component{
 	}
 
 	onNewRHoliday = () => {
-		fetch('http://localhost:3000/holiday/r', {
-			method: 'post',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				name: this.state.name,
-				isActive: this.state.isActive,
-				month: this.state.month,
-				day: parseInt(this.state.day,10)
+		if (this.state.name.length > 0){
+			fetch('http://localhost:3000/holiday/r', {
+				method: 'post',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					name: this.state.name,
+					isActive: this.state.isActive,
+					month: this.state.month,
+					day: parseInt(this.state.day,10)
 
+				})
 			})
-		})
-			.then(response => response.json())
-			.then(holiday => {
-				if (holiday){
-					this.loadrHolidays();
-				}
-			})
-		this.toggleRShow();
+				.then(response => response.json())
+				.then(holiday => {
+					if (holiday){
+						this.loadrHolidays();
+					}
+				})
+			this.toggleRShow();
+		}
 	}
 
 	onNewNRHoliday = () => {
-		fetch('http://localhost:3000/holiday/nr', {
-			method: 'post',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				name: this.state.name,
+		if (this.state.name.length > 0){
+			fetch('http://localhost:3000/holiday/nr', {
+				method: 'post',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					name: this.state.name,
+				})
 			})
-		})
-			.then(response => response.json())
-			.then(holiday => {
-				if (holiday){
-					this.loadnrHolidays();
-				}
-			})
-		this.toggleNRShow();
+				.then(response => response.json())
+				.then(holiday => {
+					if (holiday){
+						this.loadnrHolidays();
+					}
+				})
+			this.toggleNRShow();
+		}
 	}
 
 	onEditRHoliday = () => {

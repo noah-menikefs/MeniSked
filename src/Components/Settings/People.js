@@ -33,32 +33,36 @@ class People extends React.Component{
 			.then(users => this.setState({peopleList: users}));
 	}
 
-	addCall = () => {
-		fetch('http://localhost:3000/people', {
-			method: 'post',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				firstName: this.state.fName,
-				lastName: this.state.lName,
-				email: this.state.email,
-				password: this.state.tPassword,
-				msg: this.state.message,
-				department: this.props.department.replace(" Admin",'')
+	addPerson = () => {
+		const {fName, lName, email, tPassword, message} = this.state;
+		console.log(message);
+		if (!(fName.length <= 0 || lName.length <= 0 || email.length <= 0 || tPassword.length <= 0 || message.length <= 0)){	
+			fetch('http://localhost:3000/people', {
+				method: 'post',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					firstName: this.state.fName,
+					lastName: this.state.lName,
+					email: this.state.email,
+					password: this.state.tPassword,
+					msg: this.state.message,
+					department: this.props.department.replace(" Admin",'')
+				})
 			})
-		})
-			.then(response => response.json())
-			.then(person => {
-				if (person){
-					this.loadAllUsers();
-				}
+				.then(response => response.json())
+				.then(person => {
+					if (person){
+						this.loadAllUsers();
+					}
+				})
+			this.setState({
+				fName: '',
+				lName: '',
+				email: '',
+				tPassword: '',
+				message: ''
 			})
-		this.setState({
-			fName: '',
-			lName: '',
-			email: '',
-			tPassword: '',
-			message: ''
-		})
+		}
 	}
 
 	activeChange = (e) => {
@@ -177,7 +181,7 @@ class People extends React.Component{
   							</Form.Group>
 						</div>
 						<div className="bottom">
-							<Button id='callSub' variant="primary" onClick={this.addCall}>
+							<Button id='callSub' variant="primary" onClick={this.addPerson}>
 								Submit
 							</Button>
 						</div>

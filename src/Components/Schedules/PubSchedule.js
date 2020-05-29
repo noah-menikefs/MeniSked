@@ -20,7 +20,8 @@ class PubSchedule extends React.Component{
 		super();
 		this.state = {
 			show: false,
-			dateContext: moment()
+			dateContext: moment(),
+			note: ''
 		}
 	}
 
@@ -103,11 +104,19 @@ class PubSchedule extends React.Component{
 
 	onMonthChange = (event) => {
 		this.setMonth(event.target.value);
-		this.setState({month: event.target.value})
+		this.setState({month: event.target.value});
 	}
 
 	onYearChange = (event) => {
 		this.setYear(event.target.value);
+	}
+
+	onNotesSubmit = () => {
+
+	}
+
+	onNoteChange = (event) => {
+		this.setState({note: event.target.value})
 	}
 	
 	reset = () => {
@@ -179,11 +188,18 @@ class PubSchedule extends React.Component{
 		if (this.props.testIsAdmin === true){
 			return (
 				<Form>
+					<hr/>
         			<Form.Group>
-        				<Form.Control id="note-text" size="sm" type="text" placeholder="Add Note"/>
+        				<Form.Control onChange={this.onNoteChange} id="note-text" size="sm" type="text" placeholder="Add Note"/>
+        			</Form.Group>
+        			<Form.Label id="typeON">Type of Note:</Form.Label>
+        			<Form.Group>
+      					<Form.Check name="noteType" inline label="Numbers" type="radio" id='1'/>
+     					<Form.Check inline name="noteType" label="Visible" type="radio" id='2'/>
+     					<Form.Check inline name="noteType" label="Invisible" type="radio" id='3'/>
         			</Form.Group>
        				<Form.Group>
-     					<Button size="sm" variant="primary" type="submit">Submit Note</Button>
+     					<Button onClick={this.onNotesSubmit} size="sm" variant="primary">Submit Note</Button>
    					</Form.Group>
   				</Form>
 			)

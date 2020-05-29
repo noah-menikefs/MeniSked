@@ -17,7 +17,7 @@ class Navigation extends React.Component {
       return (
         <NavDropdown className="" title="Settings" id="collasible-nav-dropdown">
           <NavDropdown.Item onClick={() => this.props.onRouteChange("Holidays")} href="#h">Holidays</NavDropdown.Item>
-          <NavDropdown.Item onClick={() => this.props.onRouteChange("Call Types")} href="#c">Call Types</NavDropdown.Item>
+          <NavDropdown.Item onClick={() => this.props.onRouteChange("Call Types")} href="#ct">Call Types</NavDropdown.Item>
           <NavDropdown.Item onClick={() => this.props.onRouteChange("People")} href="#pe">People</NavDropdown.Item>
         </NavDropdown>
       );

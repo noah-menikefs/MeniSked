@@ -43,27 +43,29 @@ class CallTypes extends React.Component{
 	}
 
 	addCall = () => {
-		fetch('http://localhost:3000/callTypes', {
-			method: 'post',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				name: this.state.callName,
-				active: this.state.isActive,
-				priority: parseInt(this.state.priority, 10)
+		if (this.state.callName.length > 0){
+			fetch('http://localhost:3000/callTypes', {
+				method: 'post',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					name: this.state.callName,
+					active: this.state.isActive,
+					priority: parseInt(this.state.priority, 10)
 
+				})
 			})
-		})
-			.then(response => response.json())
-			.then(call => {
-				if (call){
-					this.loadCallTypes();
-				}
+				.then(response => response.json())
+				.then(call => {
+					if (call){
+						this.loadCallTypes();
+					}
+				})
+			this.setState({
+				callName: '',
+				priority: 1,
+				isActive: false
 			})
-		this.setState({
-			callName: '',
-			priority: 1,
-			isActive: false
-		})
+		}
 	}
 
 	deleteCall = (e) => {
@@ -83,29 +85,31 @@ class CallTypes extends React.Component{
 	}
 	
 	editCall = () => {
-		fetch('http://localhost:3000/callTypes', {
-			method: 'put',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				name: this.state.callName,
-				active: this.state.isActive,
-				priority: parseInt(this.state.priority, 10),
-				id: parseInt(this.state.id,10)
+		if (this.state.callName.length > 0){
+			fetch('http://localhost:3000/callTypes', {
+				method: 'put',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					name: this.state.callName,
+					active: this.state.isActive,
+					priority: parseInt(this.state.priority, 10),
+					id: parseInt(this.state.id,10)
+				})
 			})
-		})
-			.then(response => response.json())
-			.then(call => {
-				if (call){
-					this.loadCallTypes();
-				}
+				.then(response => response.json())
+				.then(call => {
+					if (call){
+						this.loadCallTypes();
+					}
+				})
+			this.setState({
+				callName: '',
+				priority: 1,
+				isActive: false,
+				add: true,
+				id: -1
 			})
-		this.setState({
-			callName: '',
-			priority: 1,
-			isActive: false,
-			add: true,
-			id: -1
-		})
+		}
 	}
 
 	onPriorityChange = (e) => {
@@ -203,7 +207,7 @@ class CallTypes extends React.Component{
 						 	 </Form.Group>
 						</div>
 						<div className="bottom">
-							<Button onClick={this.onCancel} id='callSub' variant="secondary" type="cancel">
+							<Button onClick={this.onCancel} id='callSub' variant="secondary">
 								Cancel
 							</Button>
 							<Button id='callSub' variant="primary" onClick={this.addOrEdit}>
