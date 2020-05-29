@@ -85,7 +85,7 @@ class App extends Component {
       case 'Published Schedule': 
         return <PubSchedule today={this.state.today} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
       case 'Call Schedule': 
-        return <CSchedule today={this.state.today} testIsAdmin={this.state.user.isAdmin}/>
+        return <CSchedule today={this.state.today} />
       case 'Account Information': 
         return <Account />
       case 'Admin Messages': 

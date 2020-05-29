@@ -4,7 +4,6 @@ import Button from 'react-bootstrap/button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
 import moment from 'moment';
 
 import './Schedules.css';
@@ -114,21 +113,6 @@ class CSchedule extends React.Component{
 		this.setState({dateContext: this.props.today});
 	}
 
-	adminNotes = () => {
-		if (this.props.testIsAdmin === true){
-			return (
-				<Form>
-        			<Form.Group>
-        				<Form.Control id="note-text" size="sm" type="text" placeholder="Add Note"/>
-        			</Form.Group>
-       				<Form.Group>
-     					<Button size="sm" variant="primary" type="submit">Submit Note</Button>
-   					</Form.Group>
-  				</Form>
-			)
-		}
-	}
-
 
 	render(){
 		const {dateContext, show} = this.state;
@@ -206,7 +190,6 @@ class CSchedule extends React.Component{
         						<li>Request no call Menikefs</li>
         						<li>No assignment Ismail</li>
         					</ul>
-        				{this.adminNotes()}
         				</Modal.Body>
         				<Modal.Footer>
           					<Button variant="secondary" onClick={this.toggleShow}>

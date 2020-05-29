@@ -75,7 +75,6 @@ class Calendar extends React.Component{
 					<li className="call"><span className="name"></span></li>
 					<li className="call"><span className="name"></span></li>
 					<li className="call"><span className="name"></span></li>
-					<li className="notes"></li>
 				</ul>
 				)
 		}
@@ -112,6 +111,7 @@ class Calendar extends React.Component{
 			daysInMonth.push(
 				<td key={d} onClick={(e) => {this.onDayClick(e,d)}} className={className}>
 					<span className="text" >{d}</span>
+					<hr/>
 					{this.dayType()}
 				</td>
 			);
