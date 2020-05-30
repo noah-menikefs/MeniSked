@@ -23,8 +23,8 @@ class App extends Component {
     super();
     this.state = {
       today: moment(),
-      isSignedIn: true,
-      route: 'Messages',
+      isSignedIn: false,
+      route: 'Login',
       user:{
         id: '',
         firstName: '',
