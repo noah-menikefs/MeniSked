@@ -10,9 +10,11 @@ class Calendar extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			style: props.style || {},
+			style: props.style || {}
 		}
 	}
+
+	
 
 
 	weekdays = moment.weekdays(); //List of weekdays
@@ -92,6 +94,16 @@ class Calendar extends React.Component{
 		}
 	}
 
+	holidayToday = (d) => {
+		const arr = [...this.props.holiDays]
+		for (let i = 0; i < arr.length; i++){
+			if (arr[i].day === d){
+				return <span id="holiday">{arr[i].name}</span>
+			}
+		}
+	}
+
+
 	render(){
 
 		//Map the weekdays as <td>
@@ -110,7 +122,10 @@ class Calendar extends React.Component{
 			let className = (d === this.currentDay() ? "day current-day" : "day");
 			daysInMonth.push(
 				<td key={d} onClick={(e) => {this.onDayClick(e,d)}} className={className}>
-					<span className="text" >{d}</span>
+					<div className="spacer">
+						{this.holidayToday(d)}
+						<span className="text" >{d}</span>
+					</div>
 					<hr/>
 					{this.dayType()}
 				</td>

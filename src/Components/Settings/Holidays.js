@@ -154,7 +154,7 @@ class Holidays extends React.Component{
 			body: JSON.stringify({
 				name: this.state.name,
 				year: this.state.dateContext.format('Y'),
-				month: this.state.dateContext.format('MMMM'),
+				month: this.state.dateContext.format('MM'),
 				day: parseInt(this.state.day,10)
 			})
 		})

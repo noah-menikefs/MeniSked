@@ -29,7 +29,10 @@ class PerSchedule extends React.Component{
 			dateContext: moment(),
 			callList: [],
 			radio: -1,
-			day: 0
+			day: 0,
+			rHolidayList: [],
+			nrHolidayList: [],
+			holiDays: []
 		}
 	}
 
@@ -37,7 +40,22 @@ class PerSchedule extends React.Component{
    		this.loadActiveDocs();
    		this.loadEntries();
    		this.loadCallTypes();
+   		this.loadrHolidays();
+   		this.loadnrHolidays();
+   		this.loadNewDays(moment());
   	}
+
+	loadrHolidays = () => {
+		fetch('http://localhost:3000/holiday/r')
+			.then(response => response.json())
+			.then(holidays => this.setState({rHolidayList: holidays}));
+	}
+
+	loadnrHolidays = () => {
+		fetch('http://localhost:3000/holiday/nr')
+			.then(response => response.json())
+			.then(holidays => this.setState({nrHolidayList: holidays}));
+	}
 
   	loadActiveDocs = () => {
     	fetch('http://localhost:3000/sked/docs')
@@ -55,6 +73,33 @@ class PerSchedule extends React.Component{
 		fetch('http://localhost:3000/callTypes')
 			.then(response => response.json())
 			.then(calls => this.setState({callList: calls.sort(function(a, b){return a.priority - b.priority})}));
+	}
+
+	loadNewDays = (dateContext) => {
+		let newArr = [];
+
+		this.state.nrHolidayList.forEach((nholiday => {
+			nholiday.eventSked.forEach((date => {
+				let dateArr = date.split("/");
+				if (dateArr[0] === dateContext.format('MM') && dateArr[2] === dateContext.format('YYYY')){
+					newArr.push({
+						day: parseInt(dateArr[1],10),
+						name: nholiday.name
+					});
+				}
+			}))
+		}))
+
+		this.state.rHolidayList.forEach((holiday => {
+			if (holiday.month === dateContext.format('MMMM')){
+				newArr.push({
+					day:holiday.day,
+					name: holiday.name
+				});
+			}
+		}))
+		console.log(newArr)
+		this.setState({holiDays: newArr});
 	}
 
 	loadPersonalSked = (user) => {
@@ -76,7 +121,6 @@ class PerSchedule extends React.Component{
 			this.toggleShow();
 		}
 		else{
-			console.log(id);
 			this.assignCall(id, day);
 		}
 	}
@@ -119,24 +163,32 @@ class PerSchedule extends React.Component{
 		this.setState({
 			dateContext: dateContext,
 		});
+		this.loadNewDays(dateContext);
 	}
 
 	nextMonth = () => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).add(1, "month");
-		this.setState({
-			dateContext: dateContext,
-		});
-		this.props.onNextMonth && this.props.onNextMonth();
+		if (dateContext.year() <= (this.props.today.year() + 10)){
+			this.setState({
+				dateContext: dateContext,
+			});
+			this.loadNewDays(dateContext);
+			this.props.onNextMonth && this.props.onNextMonth();
+		}
 	}
 
 	prevMonth = () => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).subtract(1, "month");
-		this.setState({
-			dateContext: dateContext,
-		});
-		this.props.onPrevMonth && this.props.onPrevMonth();
+		if (dateContext.year() >= 2020){
+			this.setState({
+				dateContext: dateContext,
+			});
+			this.loadNewDays(dateContext);
+			this.props.onPrevMonth && this.props.onPrevMonth();
+		}
+
 	}
 
 	nextDoc = () => {
@@ -185,6 +237,7 @@ class PerSchedule extends React.Component{
 			this.setState({
 				dateContext: dateContext
 			});
+			this.loadNewDays(dateContext);
 			this.props.onNextYear && this.props.onNextYear();
 		}
 	}
@@ -196,6 +249,7 @@ class PerSchedule extends React.Component{
 			this.setState({
 				dateContext: dateContext
 			});
+			this.loadNewDays(dateContext);
 			this.props.onPrevYear && this.props.onPrevYear();
 		}
 	}
@@ -206,6 +260,7 @@ class PerSchedule extends React.Component{
 		this.setState({
 			dateContext: dateContext
 		})
+		this.loadNewDays(dateContext);
 	}
 
 	onPhysicianChange = (event) => {
@@ -274,7 +329,7 @@ class PerSchedule extends React.Component{
 
 
 	render(){
-		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList} = this.state;
+		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList, holiDays} = this.state;
 		const {testIsAdmin, user, today} = this.props;
 
 		let docSelect = activeDocs.map((doc,i) => {
@@ -384,7 +439,7 @@ class PerSchedule extends React.Component{
 					<Col xl><h3>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h3></Col>
 				</Row>
 				<div className="sked">
-					<Calendar type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>

@@ -116,8 +116,9 @@ td > ul{
     cursor: pointer;
 }
 
-.text{
+div > .text{
     padding-right: 5px; 
+    margin-top: 0;
 }
 
 td > hr {
@@ -129,3 +130,18 @@ td > hr {
     margin: 0;
     padding: 0;
 }
+
+
+#holiday{
+    float: left;
+    padding-left: 5px;
+}
+
+/*
+td > .spacer{
+    justify-content: space-between;
+    text-align: right;
+}*/
+
+
+

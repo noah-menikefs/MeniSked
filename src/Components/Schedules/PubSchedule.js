@@ -19,11 +19,28 @@ class PubSchedule extends React.Component{
 	constructor(){
 		super();
 		this.state = {
+			allNotes: [],
+			vNotes: [],
 			show: false,
 			dateContext: moment(),
-			note: ''
+			note: '',
+			radio: 0
 		}
 	}
+
+	componentDidMount = () => {
+   		this.loadAllNotes();
+  	}
+
+  	loadAllNotes = () => {
+    	fetch('http://localhost:3000/sked/allNotes')
+      		.then(response => response.json())
+      		.then(notes => this.setState({
+      			allNotes: notes,
+      			vNotes: notes.filter((note => note.type === 2))
+      		}));
+
+  	}
 
 	onDayClick = (e,day) => {
 		let dateContext = Object.assign({}, this.state.dateContext);
@@ -111,8 +128,35 @@ class PubSchedule extends React.Component{
 		this.setYear(event.target.value);
 	}
 
-	onNotesSubmit = () => {
+	noteRadioChange = (event) => {
+		this.setState({radio: event.target.id});
+	}
 
+	onNotesSubmit = () => {
+		if (this.state.note.length > 0 && this.state.radio > 0){
+			fetch('http://localhost:3000/sked/notes', {
+				method: 'post',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					date: this.state.dateContext.format("MM/DD/YYYY"),
+					type: parseInt(this.state.radio,10),
+					msg: this.state.note
+
+				})
+			})
+			.then(response => response.json())
+			.then(note => {
+				if (note.id){
+					this.loadAllNotes();
+				}
+			})
+			this.setState({
+				radio:0,
+				note:''
+			})
+			this.toggleShow();
+		}
+		
 	}
 
 	onNoteChange = (event) => {
@@ -144,6 +188,7 @@ class PubSchedule extends React.Component{
 				<Row className="labels">
 					<Col sm><h5 className="labels-child">Month</h5></Col>
 					<Col sm><h5 className="labels-child">Year</h5></Col>
+					<Col sm><Button onClick={() => console.log('click')} className="top-child" variant="primary">Publish</Button></Col>
 					<Col sm><Button onClick={this.reset} id="today" className="top-child" variant="primary">Today</Button></Col>
 				</Row>
 				<Row>
@@ -165,6 +210,7 @@ class PubSchedule extends React.Component{
 	  					{this.yearSelect()}
 					</select></Col>
 					<Col ><p></p></Col>
+					<Col ><p></p></Col>
 				</Row>
 				<Row className="subheader">
 					<Col sm>
@@ -174,6 +220,9 @@ class PubSchedule extends React.Component{
 					<Col sm>
 						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
 						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
+					</Col>
+					<Col >
+						<p></p>
 					</Col>
 					<Col >
 						<p></p>
@@ -193,7 +242,7 @@ class PubSchedule extends React.Component{
         				<Form.Control onChange={this.onNoteChange} id="note-text" size="sm" type="text" placeholder="Add Note"/>
         			</Form.Group>
         			<Form.Label id="typeON">Type of Note:</Form.Label>
-        			<Form.Group>
+        			<Form.Group onChange={this.noteRadioChange}>
       					<Form.Check name="noteType" inline label="Numbers" type="radio" id='1'/>
      					<Form.Check inline name="noteType" label="Visible" type="radio" id='2'/>
      					<Form.Check inline name="noteType" label="Invisible" type="radio" id='3'/>
@@ -207,9 +256,8 @@ class PubSchedule extends React.Component{
 	}
 
 	render(){
-		const {show, dateContext} = this.state;
+		const {show, dateContext, allNotes, vNotes} = this.state;
 		const {testIsAdmin, user, today} = this.props;
-
 		return(
 			<div className="screen">
 				<div>
