@@ -32,7 +32,9 @@ class PerSchedule extends React.Component{
 			day: 0,
 			rHolidayList: [],
 			nrHolidayList: [],
-			holiDays: []
+			holiDays: [],
+			personalDays: [],
+			render: false
 		}
 	}
 
@@ -42,7 +44,6 @@ class PerSchedule extends React.Component{
    		this.loadCallTypes();
    		this.loadrHolidays();
    		this.loadnrHolidays();
-   		this.loadNewDays(moment());
   	}
 
 	loadrHolidays = () => {
@@ -60,7 +61,21 @@ class PerSchedule extends React.Component{
   	loadActiveDocs = () => {
     	fetch('http://localhost:3000/sked/docs')
       		.then(response => response.json())
-      		.then(docs => this.setState({activeDocs: docs}));
+      		.then(docs => {
+      			if (!this.state.render){
+      				const doctors = [...docs];
+      				for (let i = 0; i < doctors.length; i++){
+      					if (doctors[i].id === this.props.user.id){
+      						this.loadPersonalDays(i,doctors);
+      						this.setState({
+      							docIndex: i
+      						})
+      					}
+      				}
+      			}
+      			this.setState({activeDocs: docs})
+      		});
+
   	}
 
   	loadEntries = () => {
@@ -77,7 +92,6 @@ class PerSchedule extends React.Component{
 
 	loadNewDays = (dateContext) => {
 		let newArr = [];
-
 		this.state.nrHolidayList.forEach((nholiday => {
 			nholiday.eventSked.forEach((date => {
 				let dateArr = date.split("/");
@@ -98,8 +112,10 @@ class PerSchedule extends React.Component{
 				});
 			}
 		}))
-		console.log(newArr)
-		this.setState({holiDays: newArr});
+		this.setState({
+			holiDays: newArr,
+			render: true}
+		);
 	}
 
 	loadPersonalSked = (user) => {
@@ -112,6 +128,13 @@ class PerSchedule extends React.Component{
 				this.setState({activeDocs: activeDocs});
 			}
 		}
+	}
+
+	loadPersonalDays = (index, docs = this.state.activeDocs) => {
+		this.setState({
+			personalDays: [...docs[index].workSked]
+		})
+		
 	}
 
 	onDayClick = (e,day) => {
@@ -194,18 +217,22 @@ class PerSchedule extends React.Component{
 	nextDoc = () => {
 		let i = this.state.docIndex;
 		if (i !== (this.state.activeDocs.length - 1)){
+			this.loadPersonalDays(i+1);
 			this.setState({docIndex: (i+1)});
 		}
 		else{
+			this.loadPersonalDays(0);
 			this.setState({docIndex: 0});
 		}
 	}
 	prevDoc = () => {
 		let i = this.state.docIndex;
 		if (i !== 0){
+			this.loadPersonalDays(i-1);
 			this.setState({docIndex: (i-1)});
 		}
 		else{
+			this.loadPersonalDays(this.state.activeDocs.length - 1);
 			this.setState({docIndex: (this.state.activeDocs.length - 1)});
 		}
 	}
@@ -219,7 +246,7 @@ class PerSchedule extends React.Component{
 		}
 	}
 
-	prevEntry =() => {
+	prevEntry = () => {
 		let i = this.state.entryIndex;
 		if (i !== 0){
 			this.setState({entryIndex: (i-1)});
@@ -265,6 +292,7 @@ class PerSchedule extends React.Component{
 
 	onPhysicianChange = (event) => {
 		if (event.target.key){
+			this.loadPersonalDays(event.target.key);
 			this.setState({docIndex: event.target.key})
 		}
 		else{
@@ -275,6 +303,7 @@ class PerSchedule extends React.Component{
 					break;
 				}
 			}
+			this.loadPersonalDays(index);
 			this.setState({docIndex: index})
 		}
 	}
@@ -325,11 +354,12 @@ class PerSchedule extends React.Component{
 
 	reset = () => {
 		this.setState({dateContext: this.props.today});
+		this.loadNewDays(this.props.today);
 	}
 
 
 	render(){
-		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList, holiDays} = this.state;
+		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList, holiDays, nrHolidayList, render, personalDays} = this.state;
 		const {testIsAdmin, user, today} = this.props;
 
 		let docSelect = activeDocs.map((doc,i) => {
@@ -382,7 +412,6 @@ class PerSchedule extends React.Component{
 				<Form.Check required key={j} name="callType" type='radio' id={callList[j].id} label={callList[j].name}/>
 			)
 		}
-
 
 		return(
 			<div className="screen">
@@ -439,7 +468,11 @@ class PerSchedule extends React.Component{
 					<Col xl><h3>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h3></Col>
 				</Row>
 				<div className="sked">
-					<Calendar holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					{ (nrHolidayList.length > 0 && !render)
+						?this.loadNewDays(this.props.today)
+						: false
+					}
+					<Calendar entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>

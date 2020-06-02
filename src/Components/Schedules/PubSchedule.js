@@ -24,12 +24,18 @@ class PubSchedule extends React.Component{
 			show: false,
 			dateContext: moment(),
 			note: '',
-			radio: 0
+			radio: 0,
+			rHolidayList: [],
+			nrHolidayList: [],
+			holiDays: [],
+			render: false
 		}
 	}
 
 	componentDidMount = () => {
    		this.loadAllNotes();
+   		this.loadrHolidays();
+   		this.loadnrHolidays();
   	}
 
   	loadAllNotes = () => {
@@ -41,6 +47,47 @@ class PubSchedule extends React.Component{
       		}));
 
   	}
+
+  	loadrHolidays = () => {
+		fetch('http://localhost:3000/holiday/r')
+			.then(response => response.json())
+			.then(holidays => this.setState({rHolidayList: holidays}));
+	}
+
+	loadnrHolidays = () => {
+		fetch('http://localhost:3000/holiday/nr')
+			.then(response => response.json())
+			.then(holidays => this.setState({nrHolidayList: holidays}));
+	}
+
+	loadNewDays = (dateContext) => {
+		let newArr = [];
+		this.state.nrHolidayList.forEach((nholiday => {
+			nholiday.eventSked.forEach((date => {
+				let dateArr = date.split("/");
+				if (dateArr[0] === dateContext.format('MM') && dateArr[2] === dateContext.format('YYYY')){
+					newArr.push({
+						day: parseInt(dateArr[1],10),
+						name: nholiday.name
+					});
+				}
+			}))
+		}))
+
+		this.state.rHolidayList.forEach((holiday => {
+			if (holiday.month === dateContext.format('MMMM')){
+				newArr.push({
+					day:holiday.day,
+					name: holiday.name
+				});
+			}
+		}))
+		this.setState({
+			holiDays: newArr,
+			render: true}
+		);
+	}
+
 
 	onDayClick = (e,day) => {
 		let dateContext = Object.assign({}, this.state.dateContext);
@@ -69,24 +116,31 @@ class PubSchedule extends React.Component{
 		this.setState({
 			dateContext: dateContext,
 		});
+		this.loadNewDays(dateContext);
 	}
 
 	nextMonth = () => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).add(1, "month");
-		this.setState({
-			dateContext: dateContext,
-		});
-		this.props.onNextMonth && this.props.onNextMonth();
+		if (dateContext.year() <= (this.props.today.year() + 10)){
+			this.setState({
+				dateContext: dateContext,
+			});
+			this.loadNewDays(dateContext);
+			this.props.onNextMonth && this.props.onNextMonth();
+		}
 	}
 
 	prevMonth = () => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).subtract(1, "month");
-		this.setState({
-			dateContext: dateContext,
-		});
-		this.props.onPrevMonth && this.props.onPrevMonth();
+		if (dateContext.year() >= 2020){
+			this.setState({
+				dateContext: dateContext,
+			});
+			this.loadNewDays(dateContext);
+			this.props.onPrevMonth && this.props.onPrevMonth();
+		}
 	}
 
 	nextYear = () => {
@@ -96,6 +150,7 @@ class PubSchedule extends React.Component{
 			this.setState({
 				dateContext: dateContext
 			});
+			this.loadNewDays(dateContext);
 			this.props.onNextYear && this.props.onNextYear();
 		}
 	}
@@ -107,6 +162,7 @@ class PubSchedule extends React.Component{
 			this.setState({
 				dateContext: dateContext
 			});
+			this.loadNewDays(dateContext);
 			this.props.onPrevYear && this.props.onPrevYear();
 		}
 	}
@@ -117,6 +173,7 @@ class PubSchedule extends React.Component{
 		this.setState({
 			dateContext: dateContext
 		})
+		this.loadNewDays(dateContext);
 	}
 
 	onMonthChange = (event) => {
@@ -165,6 +222,7 @@ class PubSchedule extends React.Component{
 	
 	reset = () => {
 		this.setState({dateContext: this.props.today});
+		this.loadNewDays(this.props.today);
 	}
 
 	
@@ -176,10 +234,6 @@ class PubSchedule extends React.Component{
 		}
 		return arr;
 	}
-
-	
-
-	
 
 	adminSelect(isAdmin, user){
 		if (isAdmin){
@@ -256,7 +310,7 @@ class PubSchedule extends React.Component{
 	}
 
 	render(){
-		const {show, dateContext, allNotes, vNotes} = this.state;
+		const {show, dateContext, allNotes, vNotes, nrHolidayList, render, holiDays} = this.state;
 		const {testIsAdmin, user, today} = this.props;
 		return(
 			<div className="screen">
@@ -267,7 +321,11 @@ class PubSchedule extends React.Component{
 					<Col xl><h2>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h2></Col>
 				</Row>
 				<div className="sked">
-					<Calendar onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					{ (nrHolidayList.length > 0 && !render)
+						?this.loadNewDays(this.props.today)
+						: false
+					}
+					<Calendar holiDays={holiDays} onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>

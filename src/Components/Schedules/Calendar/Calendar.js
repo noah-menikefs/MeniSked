@@ -53,12 +53,13 @@ class Calendar extends React.Component{
 		this.props.onDoubleClick && this.props.onDoubleClick(e,day);
 	}
 
-	dayType = () => {
+	dayType = (d) => {
 		if (this.props.type === "Personal"){
 			return (
 				<ul>
 					<li className="event"></li>
-					{ (true)
+					{this.personalToday(d)}
+					{/*{ (true)
 						? <li className="all-day"></li>
 						: (
 							<div>
@@ -67,6 +68,7 @@ class Calendar extends React.Component{
 							</div>
 							)
 					}
+					*/}
 				</ul>
 			)
 		}
@@ -103,6 +105,29 @@ class Calendar extends React.Component{
 		}
 	}
 
+	personalToday = (d) => {
+		const arr = [...this.props.personalDays];
+		for (let i = 0; i < arr.length; i++){
+			const splitArr = arr[i].date.split('/');
+			if (splitArr[0] === this.props.dateContext.format('MM') && splitArr[1] == d && splitArr[2] === this.props.dateContext.format('YYYY')){	
+				return <li className="personal" id="personal">{this.idToName(arr[i].id)}</li>
+			}
+		}
+	}
+
+	idToName = (id) => {
+		for (let i = 0; i < this.props.entries.length; i++){
+			if (this.props.entries[i].id === id){
+				return this.props.entries[i].name;
+			}
+		}
+		for (let n = 0; n < this.props.callList.length; n++){
+			if (this.props.callList[n].id === id){
+				return this.props.callList[n].name;
+			}
+		}
+	}
+
 
 	render(){
 
@@ -127,7 +152,7 @@ class Calendar extends React.Component{
 						<span className="text" >{d}</span>
 					</div>
 					<hr/>
-					{this.dayType()}
+					{this.dayType(d)}
 				</td>
 			);
 		}
