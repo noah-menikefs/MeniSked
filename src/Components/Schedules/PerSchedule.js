@@ -49,7 +49,7 @@ class PerSchedule extends React.Component{
 	loadrHolidays = () => {
 		fetch('http://localhost:3000/holiday/r')
 			.then(response => response.json())
-			.then(holidays => this.setState({rHolidayList: holidays}));
+			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isActive === true))}));
 	}
 
 	loadnrHolidays = () => {
@@ -125,7 +125,10 @@ class PerSchedule extends React.Component{
 				let currentUser = Object.assign({}, activeDocs[i]);
 				currentUser.workSked = [...user.workSked];
 				activeDocs[i] = currentUser;
-				this.setState({activeDocs: activeDocs});
+				this.setState({
+					activeDocs: activeDocs,
+					personalDays: currentUser.workSked
+				});
 			}
 		}
 	}
@@ -144,37 +147,51 @@ class PerSchedule extends React.Component{
 			this.toggleShow();
 		}
 		else{
-			this.assignCall(id, day);
+			this.assignOrDelete(id, day);
 		}
 	}
 
-	assignCall = (typeId, day = this.state.day) => {
-		if (this.props.testIsAdmin && (typeId !== -1)){
-			fetch('http://localhost:3000/sked/assign', {
-				method: 'post',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					docId: this.state.activeDocs[this.state.docIndex].id,
-					typeId: parseInt(typeId,10),
-					date: (this.state.dateContext.format('MM')+'/'+day+'/'+this.state.dateContext.format('YYYY'))
-
-				})
+	assignCall = (typeID, method, date) => {
+		fetch('http://localhost:3000/sked/assign', {
+			method: method,
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				docId: this.state.activeDocs[this.state.docIndex].id,
+				typeId: typeID,
+				date: date
 			})
-			.then(response => response.json())
-			.then(user => {
-				if (user.lastName){
-					this.loadPersonalSked(user);
-				}
-			})
-			if (this.state.radio !== -1){
-				this.toggleShow();
+		})
+		.then(response => response.json())
+		.then(user => {
+			if (user.lastName){
+				this.loadPersonalSked(user);
 			}
+		})
+		if (this.state.radio !== -1){
+			this.toggleShow();
+		}
+	}
+		
+
+	assignOrDelete = (typeId, day = this.state.day) => {
+		if (this.props.testIsAdmin && (typeId !== -1)){
+			let method = 'post';
+			const date = this.state.dateContext.format('MM')+'/'+day+'/'+this.state.dateContext.format('YYYY');
+			const typeID = parseInt(typeId,10);
+			for (let i = 0;  i < this.state.personalDays.length; i++){
+				if (this.state.personalDays[i].date === date && typeID === this.state.personalDays[i].id){
+					
+					method = 'delete';
+					break;
+				}
+			}
+			this.assignCall(typeID, method, date);
 		}
 		this.setState({
 				day:0,
 				radio:-1,
 				typeId:-1
-			})
+		})
 	}
 
 	months = moment.months(); // List of each month
@@ -493,7 +510,7 @@ class PerSchedule extends React.Component{
           					<Button onClick={this.toggleShow} variant="secondary" >
             					Close
           					</Button>
-          					 <Button onClick={() => this.assignCall(this.state.radio)} variant="primary" >
+          					 <Button onClick={() => this.assignOrDelete(this.state.radio)} variant="primary" >
             					Submit
           					</Button>
 	        			</Modal.Footer>

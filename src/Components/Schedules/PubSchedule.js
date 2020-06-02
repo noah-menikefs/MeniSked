@@ -51,7 +51,7 @@ class PubSchedule extends React.Component{
   	loadrHolidays = () => {
 		fetch('http://localhost:3000/holiday/r')
 			.then(response => response.json())
-			.then(holidays => this.setState({rHolidayList: holidays}));
+			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isActive === true))}));
 	}
 
 	loadnrHolidays = () => {

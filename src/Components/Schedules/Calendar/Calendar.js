@@ -57,7 +57,6 @@ class Calendar extends React.Component{
 		if (this.props.type === "Personal"){
 			return (
 				<ul>
-					<li className="event"></li>
 					{this.personalToday(d)}
 					{/*{ (true)
 						? <li className="all-day"></li>
@@ -75,10 +74,7 @@ class Calendar extends React.Component{
 		else if (this.props.type === "Call"){
 			return (
 				<ul>
-					<li className="event"></li>
-					<li className="call"><span className="name"></span></li>
-					<li className="call"><span className="name"></span></li>
-					<li className="call"><span className="name"></span></li>
+					{this.callToday(d)}
 				</ul>
 				)
 		}
@@ -105,6 +101,16 @@ class Calendar extends React.Component{
 		}
 	}
 
+	callToday = (d) => {
+		const arr = [...this.props.callSked];
+		for (let i = 0; i < arr.length; i++){
+			const splitArr = arr[i].date.split('/');
+			if (splitArr[0] === this.props.dateContext.format('MM') && splitArr[1] == d && splitArr[2] === this.props.dateContext.format('YYYY')){	
+				return <li className="call" id="call">{this.idToName(arr[i].id) + ' ' + arr[i].name}</li>
+			}
+		}
+	}
+
 	personalToday = (d) => {
 		const arr = [...this.props.personalDays];
 		for (let i = 0; i < arr.length; i++){
@@ -116,14 +122,14 @@ class Calendar extends React.Component{
 	}
 
 	idToName = (id) => {
-		for (let i = 0; i < this.props.entries.length; i++){
-			if (this.props.entries[i].id === id){
-				return this.props.entries[i].name;
-			}
-		}
 		for (let n = 0; n < this.props.callList.length; n++){
 			if (this.props.callList[n].id === id){
 				return this.props.callList[n].name;
+			}
+		}
+		for (let i = 0; i < this.props.entries.length; i++){
+			if (this.props.entries[i].id === id){
+				return this.props.entries[i].name;
 			}
 		}
 	}

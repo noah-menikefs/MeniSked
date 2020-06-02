@@ -24,26 +24,56 @@ class CSchedule extends React.Component{
 			holiDays: [],
 			rHolidayList: [],
 			nrHolidayList: [],
-			render: false
+			render: false,
+			callSked:[],
+			callList: []
 		}
 	}
 
 	componentDidMount = () => {
    		this.loadrHolidays();
    		this.loadnrHolidays();
+   		this.loadCallTypes();
+   		this.loadCallSked();
   	}
 
+  	loadCallSked = () => {
+    	fetch('http://localhost:3000/people')
+      		.then(response => response.json())
+      		.then(docs => {
+      			let arr = [];
+      			for (let i = 0; i < docs.length; i++){
+      				for (let j = 0; j < docs[i].workSked.length; j++){
+      					if (docs[i].workSked[j].id >= 7 && docs[i].workSked[j].id <= 9){
+      						arr.push({
+      							id: docs[i].workSked[j].id,
+      							date: docs[i].workSked[j].date,
+      							name: docs[i].lastName
+      						})
+      					}
+      				}
+      			}
+      			this.setState({callSked: arr})
+      		});
+
+  	}
 
 	loadrHolidays = () => {
 		fetch('http://localhost:3000/holiday/r')
 			.then(response => response.json())
-			.then(holidays => this.setState({rHolidayList: holidays}));
+			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isActive === true))}));
 	}
 
 	loadnrHolidays = () => {
 		fetch('http://localhost:3000/holiday/nr')
 			.then(response => response.json())
 			.then(holidays => this.setState({nrHolidayList: holidays}));
+	}
+
+	loadCallTypes = () => {
+		fetch('http://localhost:3000/callTypes')
+			.then(response => response.json())
+			.then(calls => this.setState({callList: calls.sort(function(a, b){return a.priority - b.priority})}));
 	}
 
 	loadNewDays = (dateContext) => {
@@ -176,7 +206,7 @@ class CSchedule extends React.Component{
 
 
 	render(){
-		const {dateContext, show, holiDays, nrHolidayList, render} = this.state;
+		const {dateContext, show, holiDays, nrHolidayList, render, callSked, callList} = this.state;
 		const {today} = this.props;
 		let yearSelect = [];
 
@@ -235,7 +265,7 @@ class CSchedule extends React.Component{
 						?this.loadNewDays(this.props.today)
 						: false
 					}
-					<Calendar holiDays={holiDays} onDoubleClick={(e,day) => this.onDoubleClick(e,day)} type="Call" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar callList={callList} callSked={callSked} holiDays={holiDays} onDoubleClick={(e,day) => this.onDoubleClick(e,day)} type="Call" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>
