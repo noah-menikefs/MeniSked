@@ -1,0 +1,15 @@
+#accepted {
+	color: green;
+}
+
+#denied {
+	color: red;
+}
+
+.text {
+	text-align: center;
+}
+
+.counter {
+	text-align: right;
+}

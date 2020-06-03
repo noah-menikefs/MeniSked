@@ -25,7 +25,7 @@ class App extends Component {
     this.state = {
       today: moment(),
       isSignedIn: true,
-      route: 'Account Information',
+      route: 'Messages',
       user:{
         id: '',
         firstName: '',
