@@ -26,7 +26,8 @@ class CSchedule extends React.Component{
 			nrHolidayList: [],
 			render: false,
 			callSked:[],
-			callList: []
+			callList: [],
+			day: -1
 		}
 	}
 
@@ -125,7 +126,10 @@ class CSchedule extends React.Component{
 	}
 
 	toggleShow = (day) => {
-		this.setState({show: !this.state.show});
+		this.setState({
+			show: !this.state.show,
+			day: day
+		});
 	}
 
 	onDoubleClick = (e,day) => {
@@ -216,8 +220,16 @@ class CSchedule extends React.Component{
 	}
 
 
+	idToName = (id) => {
+		for (let n = 0; n < this.state.callList.length; n++){
+			if (this.state.callList[n].id === id){
+				return this.state.callList[n].name;
+			}
+		}
+	}
+
 	render(){
-		const {dateContext, show, holiDays, nrHolidayList, render, callSked, callList} = this.state;
+		const {dateContext, show, holiDays, nrHolidayList, render, callSked, callList, day} = this.state;
 		const {today} = this.props;
 		let yearSelect = [];
 
@@ -226,6 +238,15 @@ class CSchedule extends React.Component{
 		for (let i = 2020; i <= fYear + 10; i++){
 			yearSelect.push(<option key={i} value={i}>{i}</option>)
 		}
+
+		let modalList = [];
+		for (let i = 0; i < callSked.length; i++){
+			const splitArr = callSked[i].date.split('/');
+			if (splitArr[0] === dateContext.format('MM') && splitArr[1] == day && splitArr[2] === dateContext.format('YYYY')){
+				modalList.push(<li>{this.idToName(callSked[i].id) + ' '}<span style={{'background-color':callSked[i].colour}}>{callSked[i].name}</span></li>);
+			}
+		}
+
 		return(
 			<div className="screen">
 				<Row className="labels">
@@ -287,14 +308,8 @@ class CSchedule extends React.Component{
           					<Modal.Title id='modalTitle'>{dateContext.format("MMMM DD, YYYY")}</Modal.Title>
        	 				</Modal.Header>
         				<Modal.Body>
-        					<ul className="">
-        						<li>Canada Day</li>
-        						<li>1st call day Abbass</li>
-        						<li>1st call night Ahn</li>
-        						<li>2nd call Holt</li>
-        						<li>Vacation Arat</li>
-        						<li>Request no call Menikefs</li>
-        						<li>No assignment Ismail</li>
+        					<ul>
+        						{modalList}
         					</ul>
         				</Modal.Body>
         				<Modal.Footer>

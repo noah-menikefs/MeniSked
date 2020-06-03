@@ -29,3 +29,7 @@
 #typeON{
 	font-weight: bold;
 }
+
+#notes{
+	list-style-type: "- ";
+}

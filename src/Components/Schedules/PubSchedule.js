@@ -19,8 +19,9 @@ class PubSchedule extends React.Component{
 	constructor(){
 		super();
 		this.state = {
-			allNotes: [],
+			numNotes: [],
 			vNotes: [],
+			iNotes: [],
 			show: false,
 			dateContext: moment(),
 			note: '',
@@ -31,7 +32,8 @@ class PubSchedule extends React.Component{
 			render: false,
 			sked: [],
 			entryList: [],
-			callList: []
+			callList: [],
+			day: -1
 		}
 	}
 
@@ -91,8 +93,9 @@ class PubSchedule extends React.Component{
     	fetch('http://localhost:3000/sked/allNotes')
       		.then(response => response.json())
       		.then(notes => this.setState({
-      			allNotes: notes,
-      			vNotes: notes.filter((note => note.type === 2))
+      			numNotes: notes.filter((note => note.type === 1)),
+      			vNotes: notes.filter((note => note.type === 2)),
+      			iNotes: notes.filter((note => note.type === 3))
       		}));
 
   	}
@@ -143,6 +146,7 @@ class PubSchedule extends React.Component{
 		dateContext = moment(dateContext).set("date", day);
 		this.setState({
 			dateContext: dateContext,
+			day: day
 		});
 		this.toggleShow(day);
 	}
@@ -358,9 +362,48 @@ class PubSchedule extends React.Component{
 		}
 	}
 
+	idToName = (id) => {
+		for (let n = 0; n < this.state.callList.length; n++){
+				if (this.state.callList[n].id === id){
+					return this.state.callList[n].name;
+				}
+			}
+		for (let i = 0; i < this.state.entryList.length; i++){
+			if (this.state.entryList[i].id === id){
+				return this.state.entryList[i].name;
+			}
+		}
+	}
+
 	render(){
-		const {show, dateContext, allNotes, vNotes, nrHolidayList, render, holiDays, sked, entryList, callList} = this.state;
+		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, callList, day} = this.state;
 		const {testIsAdmin, user, today} = this.props;
+
+		let modalList = [];
+		for (let i = 0; i < sked.length; i++){
+			const splitArr = sked[i].date.split('/');
+			if (splitArr[0] === dateContext.format('MM') && splitArr[1] == day && splitArr[2] === dateContext.format('YYYY')){
+				modalList.push(<li>{this.idToName(sked[i].id) + ' '}<span style={{'background-color':sked[i].colour}}>{sked[i].name}</span></li>);
+			}
+		}
+
+		let noteList = [];
+		for (let i = 0; i < vNotes.length; i++){
+			const splitArr = vNotes[i].date.split('/');
+			if (splitArr[0] === dateContext.format('MM') && splitArr[1] == day && splitArr[2] === dateContext.format('YYYY')){
+				noteList.push(<li id="notes">{vNotes[i].msg}</li>);
+			}
+		}
+		if (testIsAdmin){
+			for (let i = 0; i < iNotes.length; i++){
+				const splitArr = iNotes[i].date.split('/');
+				if (splitArr[0] === dateContext.format('MM') && splitArr[1] == day && splitArr[2] === dateContext.format('YYYY')){
+					noteList.push(<li id="notes">{iNotes[i].msg}</li>);
+				}
+			}
+		}
+
+
 		return(
 			<div className="screen">
 				<div>
@@ -374,7 +417,7 @@ class PubSchedule extends React.Component{
 						?this.loadNewDays(this.props.today)
 						: false
 					}
-					<Calendar callList={callList} entries={entryList} sked={sked} holiDays={holiDays} onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar testIsAdmin={testIsAdmin} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} callList={callList} entries={entryList} sked={sked} holiDays={holiDays} onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>
@@ -386,14 +429,11 @@ class PubSchedule extends React.Component{
           					<Modal.Title id='modalTitle'>{dateContext.format("MMMM DD, YYYY")}</Modal.Title>
        	 				</Modal.Header>
         				<Modal.Body>
-        					<ul className="">
-        						<li>Canada Day</li>
-        						<li>1st call day Abbass</li>
-        						<li>1st call night Ahn</li>
-        						<li>2nd call Holt</li>
-        						<li>Vacation Arat</li>
-        						<li>Request no call Menikefs</li>
-        						<li>No assignment Ismail</li>
+        					<ul>
+        						{modalList}
+        					</ul>
+        					<ul>
+        						{noteList}
         					</ul>
         				 {this.adminNotes()}
         				</Modal.Body>
