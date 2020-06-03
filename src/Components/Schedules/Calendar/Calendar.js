@@ -58,16 +58,6 @@ class Calendar extends React.Component{
 			return (
 				<ul>
 					{this.personalToday(d)}
-					{/*{ (true)
-						? <li className="all-day"></li>
-						: (
-							<div>
-								<li className="am"></li>
-								<li className="pm"></li>
-							</div>
-							)
-					}
-					*/}
 				</ul>
 			)
 		}
@@ -82,11 +72,7 @@ class Calendar extends React.Component{
 		else{
 			return (
 				<ul>
-					<li className="event"></li>
-					<li className="call"><span className="name"></span></li>
-					<li className="call"><span className="name"></span></li>
-					<li className="request"><span className="name"></span></li>
-					<li className="notes"></li>
+					{this.workToday(d)}
 				</ul>
 			)
 		}
@@ -103,12 +89,14 @@ class Calendar extends React.Component{
 
 	callToday = (d) => {
 		const arr = [...this.props.callSked];
+		const list = [];
 		for (let i = 0; i < arr.length; i++){
 			const splitArr = arr[i].date.split('/');
 			if (splitArr[0] === this.props.dateContext.format('MM') && splitArr[1] == d && splitArr[2] === this.props.dateContext.format('YYYY')){	
-				return <li className="call" id="call">{this.idToName(arr[i].id) + ' ' + arr[i].name}</li>
+				list.push(<li className="call" id="call">{this.idToName(arr[i].id) + ' '}<span style={{'background-color':arr[i].colour}}>{arr[i].name}</span></li>);
 			}
 		}
+		return list;
 	}
 
 	personalToday = (d) => {
@@ -121,19 +109,30 @@ class Calendar extends React.Component{
 		}
 	}
 
-	idToName = (id) => {
-		for (let n = 0; n < this.props.callList.length; n++){
-			if (this.props.callList[n].id === id){
-				return this.props.callList[n].name;
+	workToday = (d) => {
+		const arr = [...this.props.sked];
+		const list = [];
+		for (let i = 0; i < arr.length; i++){
+			const splitArr = arr[i].date.split('/');
+			if (splitArr[0] === this.props.dateContext.format('MM') && splitArr[1] == d && splitArr[2] === this.props.dateContext.format('YYYY')){	
+				list.push(<li className="call" id="call">{this.idToName(arr[i].id) + ' '}<span style={{'background-color':arr[i].colour}}>{arr[i].name}</span></li>);
 			}
 		}
+		return list;
+	}
+
+	idToName = (id) => {
+		for (let n = 0; n < this.props.callList.length; n++){
+				if (this.props.callList[n].id === id){
+					return this.props.callList[n].name;
+				}
+			}
 		for (let i = 0; i < this.props.entries.length; i++){
 			if (this.props.entries[i].id === id){
 				return this.props.entries[i].name;
 			}
 		}
 	}
-
 
 	render(){
 

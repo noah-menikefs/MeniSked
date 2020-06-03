@@ -11,6 +11,7 @@ import EMessages from './Components/Messages/EMessages';
 import Holidays from './Components/Settings/Holidays';
 import CallTypes from './Components/Settings/CallTypes';
 import People from './Components/Settings/People';
+import Entries from './Components/Settings/Entries';
 import moment from 'moment';
 import './App.css';
 
@@ -76,6 +77,7 @@ class App extends Component {
   Holidays
   Call Types
   People
+  Entries
   */
   //used for rendering when signed in 
   inRenderSwitch(route){
@@ -98,6 +100,8 @@ class App extends Component {
         return <CallTypes />
       case 'People': 
         return <People department={this.state.user.department}/>
+        case 'Entries': 
+        return <Entries/>
       default:
         return <PerSchedule entries={this.state.entries} docs={this.state.docs} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
     }

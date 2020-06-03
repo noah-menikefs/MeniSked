@@ -28,7 +28,10 @@ class PubSchedule extends React.Component{
 			rHolidayList: [],
 			nrHolidayList: [],
 			holiDays: [],
-			render: false
+			render: false,
+			sked: [],
+			entryList: [],
+			callList: []
 		}
 	}
 
@@ -36,7 +39,53 @@ class PubSchedule extends React.Component{
    		this.loadAllNotes();
    		this.loadrHolidays();
    		this.loadnrHolidays();
+   		this.loadEntries();
+   		this.loadCallTypes();
+   		this.loadSked();
+   		
   	}
+
+  	loadSked = () => {
+    	fetch('http://localhost:3000/people')
+      		.then(response => response.json())
+      		.then(docs => {
+      			let arr = [];
+      			for (let i = 0; i < docs.length; i++){
+      				for (let j = 0; j < docs[i].workSked.length; j++){
+      					arr.push({
+      						id: docs[i].workSked[j].id,
+      						date: docs[i].workSked[j].date,
+      						name: docs[i].lastName,
+      						colour: docs[i].colour,
+      						priority: this.priorityCheck(docs[i].workSked[j].id)
+      					})
+      				}
+      			}
+      			arr.sort(function(a, b){return a.priority - b.priority})
+      			this.setState({sked: arr})
+      		});
+  	}
+
+  	priorityCheck = (id) => {
+		for (let n = 0; n < this.state.callList.length; n++){
+			if (this.state.callList[n].id === id){
+				return this.state.callList[n].priority;
+			}
+		}
+		return 50;
+  	}
+
+  	loadEntries = () => {
+  		fetch('http://localhost:3000/sked/entries')
+      		.then(response => response.json())
+      		.then(entries => this.setState({entryList: entries.filter((entry => entry.isActive === true))}));
+  	}
+
+  	loadCallTypes = () => {
+		fetch('http://localhost:3000/callTypes')
+			.then(response => response.json())
+			.then(calls => this.setState({callList: calls.sort(function(a, b){return a.priority - b.priority})}));
+	}
 
   	loadAllNotes = () => {
     	fetch('http://localhost:3000/sked/allNotes')
@@ -310,7 +359,7 @@ class PubSchedule extends React.Component{
 	}
 
 	render(){
-		const {show, dateContext, allNotes, vNotes, nrHolidayList, render, holiDays} = this.state;
+		const {show, dateContext, allNotes, vNotes, nrHolidayList, render, holiDays, sked, entryList, callList} = this.state;
 		const {testIsAdmin, user, today} = this.props;
 		return(
 			<div className="screen">
@@ -325,7 +374,7 @@ class PubSchedule extends React.Component{
 						?this.loadNewDays(this.props.today)
 						: false
 					}
-					<Calendar holiDays={holiDays} onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar callList={callList} entries={entryList} sked={sked} holiDays={holiDays} onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>

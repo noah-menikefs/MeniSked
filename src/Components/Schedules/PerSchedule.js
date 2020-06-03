@@ -81,7 +81,7 @@ class PerSchedule extends React.Component{
   	loadEntries = () => {
   		fetch('http://localhost:3000/sked/entries')
       		.then(response => response.json())
-      		.then(entries => this.setState({entries: entries}));
+      		.then(entries => this.setState({entries: entries.filter((entry => entry.isActive === true))}));
   	}
 
   	loadCallTypes = () => {

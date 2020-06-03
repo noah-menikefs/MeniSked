@@ -48,15 +48,26 @@ class CSchedule extends React.Component{
       						arr.push({
       							id: docs[i].workSked[j].id,
       							date: docs[i].workSked[j].date,
-      							name: docs[i].lastName
+      							name: docs[i].lastName,
+      							colour: docs[i].colour,
+      							priority: this.priorityCheck(docs[i].workSked[j].id)
       						})
       					}
       				}
       			}
+      			arr.sort(function(a, b){return a.priority - b.priority})
       			this.setState({callSked: arr})
       		});
-
   	}
+
+  	priorityCheck = (id) => {
+		for (let n = 0; n < this.state.callList.length; n++){
+			if (this.state.callList[n].id === id){
+				return this.state.callList[n].priority;
+			}
+		}
+  	}
+
 
 	loadrHolidays = () => {
 		fetch('http://localhost:3000/holiday/r')
