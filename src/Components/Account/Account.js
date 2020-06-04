@@ -34,10 +34,10 @@ class Account extends React.Component {
 					<h5 id='text'>New Password</h5>
 					<input type='password' value={this.state.nPassword}/>
 					<h5 id='text'>Confirm New Password</h5>
-					<input type='password' value={this.state.cNPassword}	/>
+					<input type='password' value={this.state.cNPassword}/>
 				</div>
 
-				<input type='submit' name='submit' id='submit'/>
+				<input class="btn btn-primary" type="submit" value="Submit" id='submit'/>
 
 			</div>
 
