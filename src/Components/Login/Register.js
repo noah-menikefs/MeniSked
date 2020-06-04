@@ -50,26 +50,40 @@ class Register extends React.Component{
 			this.toggleErrorShow('dp');
 			return false;
 		}
-		let isAdmin = false;
-		fetch('http://localhost:3000/register', {
-			method: 'post',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				email: this.state.email,
-				password: this.state.password,
-				firstName: this.state.firstName,
-				lastName: this.state.lastName,
-				department: this.state.code,
-				isAdmin: isAdmin,
+		else if (
+			this.state.firstName.length > 0 && 
+			this.state.lastName.length > 0 &&
+			this.props.validateEmail(this.state.email) &&
+			this.state.password.length > 0 &&
+			this.state.code.length > 0
+		){
+
+			let isAdmin = false;
+
+			if (this.state.code.includes("Admin")){
+				isAdmin = true;
+			}
+			
+			fetch('http://localhost:3000/register', {
+				method: 'post',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					email: this.state.email,
+					password: this.state.password,
+					firstName: this.state.firstName,
+					lastName: this.state.lastName,
+					department: this.state.code,
+					isAdmin: isAdmin,
+				})
 			})
-		})
-			.then(response => response.json())
-			.then(user => {
-				if (user){
-					this.props.loadUser(user)
-					this.props.onRouteChange("Personal Schedule");
-				}
-			})
+				.then(response => response.json())
+				.then(user => {
+					if (user){
+						this.props.loadUser(user)
+						this.props.onRouteChange("Personal Schedule");
+					}
+				})
+		}
 	}
 
 	toggleErrorShow = (type) => {

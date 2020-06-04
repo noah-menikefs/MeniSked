@@ -15,17 +15,13 @@ import Entries from './Components/Settings/Entries';
 import moment from 'moment';
 import './App.css';
 
-
-
-
-
 class App extends Component {
   constructor(){
     super();
     this.state = {
       today: moment(),
-      isSignedIn: true,
-      route: 'Account Information',
+      isSignedIn: false,
+      route: 'Login',
       user:{
         id: '',
         firstName: '',
@@ -110,7 +106,7 @@ class App extends Component {
 
   //Used for rendering when signed out
   outRenderSwitch(route){
-    return route === 'Login' ? <Login loadUser={this.loadUser} onRouteChange={this.onRouteChange}/> : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+    return route === 'Login' ? <Login validateEmail={this.validateEmail} loadUser={this.loadUser} onRouteChange={this.onRouteChange}/> : <Register validateEmail={this.validateEmail} loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
   }
 
   onRouteChange = (route, isSignedIn = true) => {
@@ -120,6 +116,33 @@ class App extends Component {
     });
   }
 
+
+  validateEmail = (str) => {
+    let first = '';
+    let second = '';
+    let third = '';
+    let index = -1;
+    let flag1 = false;
+    let flag2 = false;
+    for (let i = 0; i < str.length; i++){
+      if (!flag1 && str.charAt(i) === '@'){
+        first = str.substring(0,i);
+        index = i;
+        flag1 = true;
+      }
+      else if (flag1 && !flag2 && str.charAt(i) === '.'){
+        second = str.substring(index+1, i);
+        third = str.substring(i+1);
+        flag2 = true;
+        break;
+      }
+    }
+    if (first.length > 0 && second.length > 0 && third.length > 0){
+      return true;
+    }
+    return false;
+
+  }
 
   render(){
      const {route, isSignedIn, user} = this.state;

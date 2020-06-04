@@ -40,6 +40,9 @@ class Login extends React.Component{
 					this.props.onRouteChange("Personal Schedule");
 					this.props.loadUser(user);
 				}
+				else{
+					this.toggleErrorShow();
+				}
 			})
 	}
 
@@ -49,7 +52,7 @@ class Login extends React.Component{
 
 	toggleErrorShow = (type) => {
 		if (type === 'fp'){
-			this.setState({msg: 'Please input your email address.'})
+			this.setState({msg: 'Please input a correct email address.'})
 		}
 		else{
 			this.setState({msg: 'Sorry, the email address or password you entered does not match our records.'})
@@ -58,17 +61,25 @@ class Login extends React.Component{
 		this.setState({errorShow: !this.state.errorShow})
 	}
 
+	forgotPassword = () => {
+		fetch('http://localhost:3000/forgot', {
+			method: 'post',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				email: this.state.loginEmail
+			})
+		})
+	}
+
 	modalChoose = () => {
-		if (this.state.loginEmail.length > 0){
+		if (this.props.validateEmail(this.state.loginEmail)){
+			this.forgotPassword();
 			this.toggleShow();
 		}
 		else{
 			this.toggleErrorShow('fp');
 		}
-	}
-
-
-	
+	}	
 
 	render(){
 		const {show, loginEmail, errorShow, msg} = this.state;
