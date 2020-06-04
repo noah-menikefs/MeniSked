@@ -242,7 +242,7 @@ class CSchedule extends React.Component{
 		let modalList = [];
 		for (let i = 0; i < callSked.length; i++){
 			const splitArr = callSked[i].date.split('/');
-			if (splitArr[0] === dateContext.format('MM') && splitArr[1] == day && splitArr[2] === dateContext.format('YYYY')){
+			if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
 				modalList.push(<li>{this.idToName(callSked[i].id) + ' '}<span style={{'background-color':callSked[i].colour}}>{callSked[i].name}</span></li>);
 			}
 		}

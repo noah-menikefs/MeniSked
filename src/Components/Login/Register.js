@@ -50,6 +50,10 @@ class Register extends React.Component{
 			this.toggleErrorShow('dp');
 			return false;
 		}
+		if (this.state.code !== ('ST-JOES-A') && this.state.code !== ("ST-JOES-A Admin")){
+			this.toggleErrorShow('code');
+			return false;
+		}
 		else if (
 			this.state.firstName.length > 0 && 
 			this.state.lastName.length > 0 &&
@@ -59,7 +63,6 @@ class Register extends React.Component{
 		){
 
 			let isAdmin = false;
-
 			if (this.state.code.includes("Admin")){
 				isAdmin = true;
 			}
@@ -78,9 +81,12 @@ class Register extends React.Component{
 			})
 				.then(response => response.json())
 				.then(user => {
-					if (user){
+					if (user.lastName){
 						this.props.loadUser(user)
 						this.props.onRouteChange("Personal Schedule");
+					}
+					else if (user === 'user with this email already exists.'){
+						this.toggleErrorShow('email');
 					}
 				})
 		}
@@ -89,6 +95,12 @@ class Register extends React.Component{
 	toggleErrorShow = (type) => {
 		if (type === 'dp'){
 			this.setState({msg: 'The passwords you entered do not match.'})
+		}
+		else if (type === 'code'){
+			this.setState({msg: "The department code you entered does not match our records. Please contact your department's administrator to confirm the appropriate code."})
+		}
+		else if (type === 'email'){
+			this.setState({msg: 'A user with this email address already exists. Please use the login page to sign in.'})
 		}
 		this.setState({errorShow: !this.state.errorShow})
 	}
@@ -107,22 +119,22 @@ class Register extends React.Component{
 						<Form className="login-form">
 							<h1 id="loginTitle">Register</h1>
 							<Form.Group controlId="formBasicFName">
-								<Form.Control required onChange={this.onFNameChange} type="text" placeholder="First Name" />
+								<Form.Control required onChange={this.onFNameChange} type="text" autoComplete="off" placeholder="First Name" />
 							</Form.Group>
 							<Form.Group controlId="formBasicLName">
-								<Form.Control required onChange={this.onLNameChange} type="text" placeholder="Last Name" />
+								<Form.Control required onChange={this.onLNameChange} type="text" autoComplete="off" placeholder="Last Name" />
 							</Form.Group>
 							<Form.Group controlId="formBasicEmail">
-							    <Form.Control required onChange={this.onEmailChange} type="email" placeholder="Email" />
+							    <Form.Control required onChange={this.onEmailChange} type="email" autoComplete="off" placeholder="Email" />
 							</Form.Group>
 							<Form.Group controlId="formBasicPassword">
-								<Form.Control required onChange={this.onPasswordChange} type="password" placeholder="Password" />
+								<Form.Control required onChange={this.onPasswordChange} type="password" autoComplete="off" placeholder="Password" />
 							</Form.Group>
 							<Form.Group controlId="formBasicCPassword">
-								<Form.Control required onChange={this.onCPasswordChange} type="password" placeholder="Confirm Password" />
+								<Form.Control required onChange={this.onCPasswordChange} type="password" autoComplete="off" placeholder="Confirm Password" />
 							</Form.Group>
 							<Form.Group controlId="formBasicCode">
-								<Form.Control required onChange={this.onCodeChange} type="text" placeholder="Department Code" />
+								<Form.Control required onChange={this.onCodeChange} type="text" autoComplete="off" placeholder="Department Code" />
 							</Form.Group>
 							<Button onClick={this.onSubmitRegister} type="submit" id='loginButton' variant="primary" >
 								Register

@@ -54,6 +54,9 @@ class Login extends React.Component{
 		if (type === 'fp'){
 			this.setState({msg: 'Please input a correct email address.'})
 		}
+		else if (type === 'email'){
+			this.setState({msg: 'Sorry, the email address you entered does not match our records.'})
+		}
 		else{
 			this.setState({msg: 'Sorry, the email address or password you entered does not match our records.'})
 		}
@@ -68,6 +71,13 @@ class Login extends React.Component{
 			body: JSON.stringify({
 				email: this.state.loginEmail
 			})
+		})
+		.then(response => response.json())
+		.then(data => {
+			if (data === 'user not found'){
+				this.toggleShow();
+				this.toggleErrorShow('email');
+			}
 		})
 	}
 
@@ -95,11 +105,11 @@ class Login extends React.Component{
 						<Form className="login-form" /*onSubmit={this.onSLogin}*/ >
 							<h1 id="loginTitle">Login</h1>
 							<Form.Group controlId="formBasicEmail">
-							    <Form.Control onChange={this.onEmailChange} required type="email" placeholder="Email" />
+							    <Form.Control onChange={this.onEmailChange} required type="email" autoComplete="email" placeholder="Email" />
 							  </Form.Group>
 
 							<Form.Group controlId="formBasicPassword">
-								<Form.Control onChange={this.onPasswordChange} type="password" placeholder="Password" />
+								<Form.Control onChange={this.onPasswordChange} type="password" autoComplete="current-password" placeholder="Password" />
 							</Form.Group>
 							<Button onClick={this.onSLogin} /*type="submit"*/ id='loginButton' variant="primary">
 								Login

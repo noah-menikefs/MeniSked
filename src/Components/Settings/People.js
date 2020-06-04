@@ -16,10 +16,9 @@ class People extends React.Component{
 			fName: '',
 			lName: '',
 			email: '',
-			tPassword: '',
-			message: '',
 			dShow: false,
-			id: -1
+			id: -1,
+			eshow: false
 		}
 	}
 
@@ -34,9 +33,8 @@ class People extends React.Component{
 	}
 
 	addPerson = () => {
-		const {fName, lName, email, tPassword, message} = this.state;
-		console.log(message);
-		if (!(fName.length <= 0 || lName.length <= 0 || email.length <= 0 || tPassword.length <= 0 || message.length <= 0)){	
+		const {fName, lName, email} = this.state;
+		if (fName.length > 0 && lName.length > 0 && email.length > 0){	
 			fetch('http://localhost:3000/people', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
@@ -44,23 +42,22 @@ class People extends React.Component{
 					firstName: this.state.fName,
 					lastName: this.state.lName,
 					email: this.state.email,
-					password: this.state.tPassword,
-					msg: this.state.message,
 					department: this.props.department.replace(" Admin",'')
 				})
 			})
 				.then(response => response.json())
 				.then(person => {
-					if (person){
+					if (person.lastName){
 						this.loadAllUsers();
+					}
+					else if (person === 'a user with this email already exists.'){
+						this.toggleEShow();
 					}
 				})
 			this.setState({
 				fName: '',
 				lName: '',
-				email: '',
-				tPassword: '',
-				message: ''
+				email: ''
 			})
 		}
 	}
@@ -112,14 +109,6 @@ class People extends React.Component{
 		this.setState({email: e.target.value})
 	}
 
-	onPasswordChange = (e) => {
-		this.setState({tPassword: e.target.value})
-	}
-
-	onMsgChange = (e) => {
-		this.setState({message: e.target.value})
-	}
-
 	toggleDShow = (e) => {
 		if (e){
 			this.setState({id: parseInt(e.target.parentNode.id,10)})
@@ -130,8 +119,12 @@ class People extends React.Component{
 		this.setState({dShow: !this.state.dShow})
 	}
 
+	toggleEShow = (e) => {
+		this.setState({eShow:!this.state.eShow});
+	}
+
 	render(){
-		const {peopleList, fName, lName, email, tPassword, message, dShow} = this.state;
+		const {peopleList, fName, lName, email, dShow, eShow} = this.state;
 
 		let docList = [];
 		for (let j = 0; j < peopleList.length; j++){
@@ -163,21 +156,15 @@ class People extends React.Component{
 						<h4 className="subtitle">Add User</h4>
 					</div>
 					<Form id="callForm" >
-						<div id="box" style={{border:'2px solid black', height: '400px'}}>
+						<div id="box" style={{border:'2px solid black', height: '180px'}}>
 							<Form.Group id="name">
-								<Form.Control required value={fName} type="text" onChange={this.onFNameChange} placeholder="First Name" />
+								<Form.Control required value={fName} type="text" onChange={this.onFNameChange} autoComplete="off" placeholder="First Name" />
 							</Form.Group>
 							<Form.Group id="name">
-								<Form.Control required value={lName} type="text" onChange={this.onLNameChange} placeholder="Last Name" />
+								<Form.Control required value={lName} type="text" onChange={this.onLNameChange} autoComplete="off" placeholder="Last Name" />
 							</Form.Group>
 							<Form.Group id="email">
-    							<Form.Control required value={email} type="email" onChange={this.onEmailChange} placeholder="Email" />
-  							</Form.Group>
-  							<Form.Group id="pword">
-    							<Form.Control required value={tPassword} type="password" onChange={this.onPasswordChange} placeholder="Temporary Password" />
-						  </Form.Group>
-						  <Form.Group >
-    						<Form.Control id="message" as="textarea" value={message} onChange={this.onMsgChange} rows="6" placeholder="Message"/>
+    							<Form.Control required value={email} type="email" onChange={this.onEmailChange} autoComplete="off" placeholder="Email" />
   							</Form.Group>
 						</div>
 						<div className="bottom">
@@ -206,6 +193,25 @@ class People extends React.Component{
           					</Button>
           					 <Button onClick={this.deletePerson} variant="primary" >
             					Submit
+          					</Button>
+	        			</Modal.Footer>
+	        			</Form>
+      				</Modal>
+				</div>
+				<div className='modal'>
+					<Modal show={eShow} onHide={this.toggleEShow} >
+        				<Modal.Header closeButton>
+          					<Modal.Title id='modalTitle'>Error</Modal.Title>
+       	 				</Modal.Header>
+        				<Form>
+        					<Modal.Body>
+        					<Form.Group >
+      							 <Form.Label>A user with this email address already exists.</Form.Label>
+  							</Form.Group>
+        				</Modal.Body>
+        				<Modal.Footer>
+          					<Button onClick={this.toggleEShow} variant="secondary" >
+            					Cancel
           					</Button>
 	        			</Modal.Footer>
 	        			</Form>
