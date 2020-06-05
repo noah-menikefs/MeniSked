@@ -5,6 +5,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
+// import axios from 'axios';
+// import {saveAs} from 'file-saver';
 import moment from 'moment';
 
 
@@ -373,6 +375,23 @@ class PerSchedule extends React.Component{
 		this.loadNewDays(this.props.today);
 	}
 
+	createPDF = () => {
+		// const sObj = {
+		// 	name: 'JavaScript Mastery',
+		// 	receiptId: 8237238,
+		// 	price1: 20,
+		// 	price2: 22
+		// }
+		// axios.post('/create-pdf',sObj)
+		// 	.then(() => axios.get('fetch-pdf', {responseType: 'blob'}))
+		// 	.then((res) => {
+		// 		const pdfBlob = new Blob([res.data], {type: 'application/pdf'});
+
+		// 		saveAs(pdfBlob, 'newPdf.pdf');
+		// 	})
+	}
+
+	
 
 	render(){
 		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList, holiDays, nrHolidayList, render, personalDays} = this.state;
@@ -491,7 +510,7 @@ class PerSchedule extends React.Component{
 					<Calendar entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					<Col ><Button variant="primary">Download as PDF</Button></Col>
+					<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>
 				</div>
 
 				<div className='modal'>

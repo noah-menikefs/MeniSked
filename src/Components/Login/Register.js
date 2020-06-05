@@ -136,7 +136,7 @@ class Register extends React.Component{
 							<Form.Group controlId="formBasicCode">
 								<Form.Control required onChange={this.onCodeChange} type="text" autoComplete="off" placeholder="Department Code" />
 							</Form.Group>
-							<Button onClick={this.onSubmitRegister} type="submit" id='loginButton' variant="primary" >
+							<Button onClick={this.onSubmitRegister} id='loginButton' variant="primary" >
 								Register
 							</Button> 
 						</Form>
