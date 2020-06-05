@@ -43,16 +43,22 @@ class CSchedule extends React.Component{
       		.then(response => response.json())
       		.then(docs => {
       			let arr = [];
+      			let callIds = [];
+      			for (let n = 0; n < this.state.callList.length; n++){
+      				callIds.push(this.state.callList[n].id);
+      			}
       			for (let i = 0; i < docs.length; i++){
       				for (let j = 0; j < docs[i].workSked.length; j++){
-      					if (docs[i].workSked[j].id >= 7 && docs[i].workSked[j].id <= 9){
-      						arr.push({
-      							id: docs[i].workSked[j].id,
-      							date: docs[i].workSked[j].date,
-      							name: docs[i].lastName,
-      							colour: docs[i].colour,
-      							priority: this.priorityCheck(docs[i].workSked[j].id)
-      						})
+      					for (let m = 0; m < callIds.length; m++){
+      						if (docs[i].workSked[j].id === callIds[m]){
+      							arr.push({
+	      							id: docs[i].workSked[j].id,
+	      							date: docs[i].workSked[j].date,
+	      							name: docs[i].lastName,
+	      							colour: docs[i].colour,
+	      							priority: this.priorityCheck(docs[i].workSked[j].id)
+      							})
+      						}
       					}
       				}
       			}
@@ -243,7 +249,7 @@ class CSchedule extends React.Component{
 		for (let i = 0; i < callSked.length; i++){
 			const splitArr = callSked[i].date.split('/');
 			if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
-				modalList.push(<li>{this.idToName(callSked[i].id) + ' '}<span style={{'background-color':callSked[i].colour}}>{callSked[i].name}</span></li>);
+				modalList.push(<li key={-i-1}>{this.idToName(callSked[i].id) + ' '}<span style={{'backgroundColor':callSked[i].colour}}>{callSked[i].name}</span></li>);
 			}
 		}
 

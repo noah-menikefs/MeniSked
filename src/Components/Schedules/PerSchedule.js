@@ -180,7 +180,6 @@ class PerSchedule extends React.Component{
 			const typeID = parseInt(typeId,10);
 			for (let i = 0;  i < this.state.personalDays.length; i++){
 				if (this.state.personalDays[i].date === date && typeID === this.state.personalDays[i].id){
-					
 					method = 'delete';
 					break;
 				}

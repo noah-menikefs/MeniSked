@@ -33,7 +33,8 @@ class PubSchedule extends React.Component{
 			sked: [],
 			entryList: [],
 			callList: [],
-			day: -1
+			day: -1,
+			published: -1
 		}
 	}
 
@@ -44,7 +45,29 @@ class PubSchedule extends React.Component{
    		this.loadEntries();
    		this.loadCallTypes();
    		this.loadSked();
+   		this.loadPublished();
    		
+  	}
+
+  	loadPublished = () => {
+  		fetch('http://localhost:3000/published')
+      		.then(response => response.json())
+      		.then(num => this.setState({published: num}));
+  	}
+
+  	publishSked = () => {
+		var a = moment([2020, 5, 1]);
+		var b = this.state.dateContext;
+		const num = b.diff(a, 'months');
+		fetch('http://localhost:3000/published', {
+			method: 'put',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				newNum: num
+			})
+		})
+		.then(response => response.json())
+		.then(num => this.setState({published: num}));
   	}
 
   	loadSked = () => {
@@ -175,7 +198,28 @@ class PubSchedule extends React.Component{
 	nextMonth = () => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).add(1, "month");
-		if (dateContext.year() <= (this.props.today.year() + 10)){
+		if (!this.props.testIsAdmin){
+			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
+			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
+			if (dateContext.year() < nYear){
+				this.setState({
+					dateContext: dateContext
+				});
+				this.loadNewDays(dateContext);
+				this.props.onNextYear && this.props.onNextYear();
+			}
+			else if (dateContext.year() === nYear){
+				if (dateContext.month() <= nMonth){
+					this.setState({
+						dateContext: dateContext,
+					});
+					this.loadNewDays(dateContext);
+					this.props.onNextMonth && this.props.onNextMonth();
+				}
+				
+			}
+		}
+		else if (dateContext.year() <= (this.props.today.year() + 10)){
 			this.setState({
 				dateContext: dateContext,
 			});
@@ -197,7 +241,19 @@ class PubSchedule extends React.Component{
 	}
 
 	nextYear = () => {
-		if ((this.state.dateContext.year() + 1) <= (this.props.today.year() + 10)){
+		if (!this.props.testIsAdmin){
+			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
+			if ((this.state.dateContext.year() + 1) <= nYear){
+				let dateContext = Object.assign({}, this.state.dateContext);
+				dateContext = moment(dateContext).add(1, "year");
+				this.setState({
+					dateContext: dateContext
+				});
+				this.loadNewDays(dateContext);
+				this.props.onNextYear && this.props.onNextYear();
+			}
+		}
+		else if ((this.state.dateContext.year() + 1) <= (this.props.today.year() + 10)){
 			let dateContext = Object.assign({}, this.state.dateContext);
 			dateContext = moment(dateContext).add(1, "year");
 			this.setState({
@@ -223,6 +279,13 @@ class PubSchedule extends React.Component{
 	setYear = (year) => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).set("year",year);
+		if (!this.props.testIsAdmin){
+			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
+			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
+			if (dateContext.year() === nYear && nMonth < dateContext.month()){
+				dateContext = moment(dateContext).set("month",nMonth);
+			}
+		}
 		this.setState({
 			dateContext: dateContext
 		})
@@ -282,61 +345,58 @@ class PubSchedule extends React.Component{
 	yearSelect = () => {
 		let arr = [];
 		let fYear = this.props.today.year();
-		for (let i = 2020; i <= fYear + 10; i++){
-			arr.push(<option key={i} value={i}>{i}</option>)
+		if (this.props.testIsAdmin){
+			for (let i = 2020; i <= fYear + 10; i++){
+				arr.push(<option key={i} value={i}>{i}</option>);
+			}
+		}
+
+		else{
+			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
+			for (let i = 2020; i <= nYear; i++){
+				arr.push(<option key={i} value={i}>{i}</option>);
+			}
+		}
+		
+		return arr;
+	}
+
+	monthSelect = () => {
+		let m = 11;
+		let arr = [];
+		if (!this.props.testIsAdmin){
+			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
+			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
+			if (this.state.dateContext.year() === nYear){
+				m = nMonth;
+			}
+		}
+		for (let i = 0; i <= m; i++){
+			arr.push(<option key={i} value={this.months[i]}>{this.months[i]}</option>);
 		}
 		return arr;
 	}
 
-	adminSelect(isAdmin, user){
-		if (isAdmin){
-			return (
-				<div>
-				<Row className="labels">
-					<Col sm><h5 className="labels-child">Month</h5></Col>
-					<Col sm><h5 className="labels-child">Year</h5></Col>
-					<Col sm><Button onClick={() => console.log('click')} className="top-child" variant="primary">Publish</Button></Col>
-					<Col sm><Button onClick={this.reset} id="today" className="top-child" variant="primary">Today</Button></Col>
-				</Row>
-				<Row>
-					<Col sm><select value={this.state.dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
-	  					<option value="January">January</option>
-	  					<option value="February">February</option>
-	  					<option value="March">March</option>
-	  					<option value="April">April</option>
-	  					<option value="May">May</option>
-	  					<option value="June">June</option>
-	  					<option value="July">July</option>
-	  					<option value="August">August</option>
-	  					<option value="September">September</option>
-	  					<option value="October">October</option>
-	  					<option value="November">November</option>
-	  					<option value="December">December</option>
-					</select></Col>
-					<Col ><select value={this.state.dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
-	  					{this.yearSelect()}
-					</select></Col>
-					<Col ><p></p></Col>
-					<Col ><p></p></Col>
-				</Row>
-				<Row className="subheader">
-					<Col sm>
-						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
-					</Col>
-					<Col sm>
-						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
-					</Col>
-					<Col >
-						<p></p>
-					</Col>
-					<Col >
-						<p></p>
-					</Col>
-				</Row>
-				</div>
-			);
+	publishShow = () => {
+		if (this.props.testIsAdmin){
+			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
+			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
+			let p = true
+			if (this.state.dateContext.year() === nYear){
+				if (this.state.dateContext.month() > nMonth){
+					p = false;
+				}
+			}
+			else if (this.state.dateContext.year() > nYear){
+				p = false;
+			}
+			if (p){
+				return (<Col sm><h5>Published</h5></Col>)
+			}
+			return (<Col sm><Button onClick={this.publishSked} className="top-child" variant="primary">Publish</Button></Col>);
+		}
+		else{
+			return (<Col sm><p></p></Col>);
 		}
 	}
 
@@ -377,7 +437,7 @@ class PubSchedule extends React.Component{
 
 	render(){
 		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, callList, day} = this.state;
-		const {testIsAdmin, user, today} = this.props;
+		const {testIsAdmin, today} = this.props;
 
 		let modalList = [];
 		for (let i = 0; i < sked.length; i++){
@@ -407,10 +467,41 @@ class PubSchedule extends React.Component{
 		return(
 			<div className="screen">
 				<div>
-					{this.adminSelect(testIsAdmin, user)}
+					<Row className="labels">
+						<Col sm><h5 className="labels-child">Month</h5></Col>
+						<Col sm><h5 className="labels-child">Year</h5></Col>
+						{this.publishShow()}
+						<Col sm><Button onClick={this.reset} id="today" className="top-child" variant="primary">Today</Button></Col>
+					</Row>
+					<Row>
+						<Col sm><select value={this.state.dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
+	  						{this.monthSelect()}
+						</select></Col>
+						<Col ><select value={this.state.dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
+	  						{this.yearSelect()}
+						</select></Col>
+						<Col ><p></p></Col>
+						<Col ><p></p></Col>
+					</Row>
+					<Row className="subheader">
+						<Col sm>
+							<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
+							<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
+						</Col>
+						<Col sm>
+							<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
+							<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
+						</Col>
+						<Col >
+							<p></p>
+						</Col>
+						<Col >
+							<p></p>
+						</Col>
+					</Row>
 				</div>
 				<Row className="curr">
-					<Col xl><h2>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h2></Col>
+					<Col xl><h3>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h3></Col>
 				</Row>
 				<div className="sked">
 					{ (nrHolidayList.length > 0 && !render)

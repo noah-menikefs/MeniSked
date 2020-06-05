@@ -160,10 +160,10 @@ class Calendar extends React.Component{
 
 	idToName = (id) => {
 		for (let n = 0; n < this.props.callList.length; n++){
-				if (this.props.callList[n].id === id){
-					return this.props.callList[n].name;
-				}
+			if (this.props.callList[n].id === id){
+				return this.props.callList[n].name;
 			}
+		}
 		for (let i = 0; i < this.props.entries.length; i++){
 			if (this.props.entries[i].id === id){
 				return this.props.entries[i].name;
