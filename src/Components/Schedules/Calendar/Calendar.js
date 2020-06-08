@@ -132,7 +132,7 @@ class Calendar extends React.Component{
 			}
 		}
 
-		if (this.props.testIsAdmin){
+		if (this.props.testisadmin){
 			const arr2 = [...this.props.iNotes];
 			for (let i = 0; i < arr2.length; i++){
 				const splitArr2 = arr2[i].date.split('/');
@@ -145,7 +145,7 @@ class Calendar extends React.Component{
 	}
 
 	numToday = (d) => {
-		if (this.props.numNotes && this.props.testIsAdmin){
+		if (this.props.numNotes && this.props.testisadmin){
 			const arr = [...this.props.numNotes];
 			let list = [];
 			for (let i = 0; i < arr.length; i++){

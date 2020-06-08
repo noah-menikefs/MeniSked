@@ -51,7 +51,7 @@ class PerSchedule extends React.Component{
 	loadrHolidays = () => {
 		fetch('http://localhost:3000/holiday/r')
 			.then(response => response.json())
-			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isActive === true))}));
+			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isactive === true))}));
 	}
 
 	loadnrHolidays = () => {
@@ -83,7 +83,7 @@ class PerSchedule extends React.Component{
   	loadEntries = () => {
   		fetch('http://localhost:3000/sked/entries')
       		.then(response => response.json())
-      		.then(entries => this.setState({entries: entries.filter((entry => entry.isActive === true))}));
+      		.then(entries => this.setState({entries: entries.filter((entry => entry.isactive === true))}));
   	}
 
   	loadCallTypes = () => {
@@ -95,7 +95,7 @@ class PerSchedule extends React.Component{
 	loadNewDays = (dateContext) => {
 		let newArr = [];
 		this.state.nrHolidayList.forEach((nholiday => {
-			nholiday.eventSked.forEach((date => {
+			nholiday.eventsked.forEach((date => {
 				let dateArr = date.split("/");
 				if (dateArr[0] === dateContext.format('MM') && dateArr[2] === dateContext.format('YYYY')){
 					newArr.push({
@@ -125,11 +125,11 @@ class PerSchedule extends React.Component{
 		for (let i = 0; i < activeDocs.length; i++){
 			if (user.id === activeDocs[i].id){
 				let currentUser = Object.assign({}, activeDocs[i]);
-				currentUser.workSked = [...user.workSked];
+				currentUser.worksked = [...user.worksked];
 				activeDocs[i] = currentUser;
 				this.setState({
 					activeDocs: activeDocs,
-					personalDays: currentUser.workSked
+					personalDays: currentUser.worksked
 				});
 			}
 		}
@@ -137,7 +137,7 @@ class PerSchedule extends React.Component{
 
 	loadPersonalDays = (index, docs = this.state.activeDocs) => {
 		this.setState({
-			personalDays: [...docs[index].workSked]
+			personalDays: [...docs[index].worksked]
 		})
 		
 	}
@@ -165,7 +165,7 @@ class PerSchedule extends React.Component{
 		})
 		.then(response => response.json())
 		.then(user => {
-			if (user.lastName){
+			if (user.lastname){
 				this.loadPersonalSked(user);
 			}
 		})
@@ -176,7 +176,7 @@ class PerSchedule extends React.Component{
 		
 
 	assignOrDelete = (typeId, day = this.state.day) => {
-		if (this.props.testIsAdmin && (typeId !== -1)){
+		if (this.props.testisadmin && (typeId !== -1)){
 			let method = 'post';
 			const date = this.state.dateContext.format('MM')+'/'+day+'/'+this.state.dateContext.format('YYYY');
 			const typeID = parseInt(typeId,10);
@@ -316,7 +316,7 @@ class PerSchedule extends React.Component{
 		else{
 			let index = -1;
 			for (let i = 0; i < this.state.activeDocs.length; i++){
-				if (this.state.activeDocs[i].lastName === event.target.value){
+				if (this.state.activeDocs[i].lastname === event.target.value){
 					index = i;
 					break;
 				}
@@ -356,8 +356,8 @@ class PerSchedule extends React.Component{
 		this.setState({show: !this.state.show})
 	}
 
-	adminButton = (isAdmin) => {
-		if (isAdmin){
+	adminButton = (isadmin) => {
+		if (isadmin){
 			return (
 			<div>
 				<Button onClick={this.prevDoc} className="arrow top-child" variant="secondary">&#9668;</Button>
@@ -395,23 +395,23 @@ class PerSchedule extends React.Component{
 
 	render(){
 		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList, holiDays, nrHolidayList, render, personalDays} = this.state;
-		const {testIsAdmin, user, today} = this.props;
+		const {testisadmin, user, today} = this.props;
 
 		let docSelect = activeDocs.map((doc,i) => {
-			return <option key={i} value={doc.lastName}>{doc.lastName}</option>
+			return <option key={i} value={doc.lastname}>{doc.lastname}</option>
 		})
 
-		let adminSelect = (isAdmin, user) => {
-			if (isAdmin && activeDocs.length!==0){
+		let adminSelect = (isadmin, user) => {
+			if (isadmin && activeDocs.length!==0){
 				return (
-					<select value={activeDocs[docIndex].lastName} onChange={this.onPhysicianChange} className="top-child doc selector">
+					<select value={activeDocs[docIndex].lastname} onChange={this.onPhysicianChange} className="top-child doc selector">
   						{docSelect}
 					</select>
 				);
 			}
 			else{
 				return (
-					<h6 className="top-child">{user.lastName}</h6>
+					<h6 className="top-child">{user.lastname}</h6>
 				);
 			}
 		}
@@ -458,7 +458,7 @@ class PerSchedule extends React.Component{
 					<Col ><Button onClick={this.reset} id="today" className="top-child"variant="primary">Today</Button></Col>
 				</Row>
 				<Row className="header">
-					<Col >{adminSelect(testIsAdmin, user)}</Col>
+					<Col >{adminSelect(testisadmin, user)}</Col>
 					<Col >{eSelect()}</Col>
 					<Col ><select value={dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
 	  					<option value="January">January</option>
@@ -481,7 +481,7 @@ class PerSchedule extends React.Component{
 				</Row>
 				<Row className="subheader">
 					<Col sm>
-						{this.adminButton(testIsAdmin)}
+						{this.adminButton(testisadmin)}
 					</Col>
 					<Col sm>
 						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#9668;</Button>

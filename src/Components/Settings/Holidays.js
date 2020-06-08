@@ -19,7 +19,7 @@ class Holidays extends React.Component{
 			name: '',
 			month: "January",
 			day: 1,
-			isActive: false,
+			isactive: false,
 			dateContext: moment()
 		}
 	}
@@ -60,7 +60,7 @@ class Holidays extends React.Component{
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
 					name: this.state.name,
-					isActive: this.state.isActive,
+					isactive: this.state.isactive,
 					month: this.state.month,
 					day: parseInt(this.state.day,10)
 
@@ -101,7 +101,7 @@ class Holidays extends React.Component{
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
 				name: this.state.name,
-				isActive: this.state.isActive,
+				isactive: this.state.isactive,
 				month: this.state.month,
 				day: parseInt(this.state.day,10)
 
@@ -197,7 +197,7 @@ class Holidays extends React.Component{
 	}
 
 	onActiveChange = () => {
-		this.setState({isActive: !this.state.isActive});
+		this.setState({isactive: !this.state.isactive});
 	}
 
 	setYear = (year) => {
@@ -226,7 +226,7 @@ class Holidays extends React.Component{
 							name: this.state.rHolidayList[i].name,
 							month: this.state.rHolidayList[i].month,
 							day: this.state.rHolidayList[i].day,
-							isActive: this.state.rHolidayList[i].isActive
+							isactive: this.state.rHolidayList[i].isactive
 						});
 					}
 				}
@@ -238,7 +238,7 @@ class Holidays extends React.Component{
 				name: '',
 				month: 'January',
 				day: 1,
-				isActive: false
+				isactive: false
 			})
 		}
 		this.setState({newRshow: !this.state.newRshow});
@@ -267,7 +267,7 @@ class Holidays extends React.Component{
 	}
 
 	render(){
-		const {rHolidayList, nrHolidayList, newNRshow, newRshow, sShow, dateContext, name, month, day, isActive} = this.state;
+		const {rHolidayList, nrHolidayList, newNRshow, newRshow, sShow, dateContext, name, month, day, isactive} = this.state;
 		const {today} = this.props;
 		
 		let daySelect = [];
@@ -419,7 +419,7 @@ class Holidays extends React.Component{
 							    </Form.Control>
 							</Form.Group>
 							<Form.Group onChange={this.onActiveChange} id="activeCheck" controlId="formBasicCheckbox">
-						    	<Form.Check checked={isActive} type="checkbox" label="Active"/>
+						    	<Form.Check checked={isactive} type="checkbox" label="Active"/>
 						 	 </Form.Group>
         				</Modal.Body>
         				<Modal.Footer>

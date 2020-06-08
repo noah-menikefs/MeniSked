@@ -7,8 +7,8 @@ class Account extends React.Component {
 		super(props);
 		this.state = {
 			email: '',
-			firstName: '',
-			lastName: '',
+			firstname: '',
+			lastname: '',
 			cPassword: '',
 			nPassword: '',
 			cNPassword: '',
@@ -23,9 +23,9 @@ class Account extends React.Component {
 					<h5 id='text'>Email Address</h5>
 					<input type='email' value={this.state.email}/>
 					<h5 id='text'>First Name</h5>
-					<input type='name' value={this.state.firstName}/>
+					<input type='name' value={this.state.firstname}/>
 					<h5 id='text'>Last Name</h5>
-					<input type='name' value={this.state.lastName}/>
+					<input type='name' value={this.state.lastname}/>
 				</div>
 				<div className='changePass'>
 					<h2 id='header'>Change Password</h2>

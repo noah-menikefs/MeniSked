@@ -39,15 +39,15 @@ class People extends React.Component{
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					firstName: this.state.fName,
-					lastName: this.state.lName,
+					firstname: this.state.fName,
+					lastname: this.state.lName,
 					email: this.state.email,
 					department: this.props.department.replace(" Admin",'')
 				})
 			})
 				.then(response => response.json())
 				.then(person => {
-					if (person.lastName){
+					if (person.lastname){
 						this.loadAllUsers();
 					}
 					else if (person === 'a user with this email already exists.'){
@@ -68,7 +68,7 @@ class People extends React.Component{
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
 				id: parseInt(e.target.parentNode.id,10),
-				isActive: e.target.checked
+				isactive: e.target.checked
 			})
 		})
 			.then(response => response.json())
@@ -130,8 +130,8 @@ class People extends React.Component{
 		for (let j = 0; j < peopleList.length; j++){
 			docList.push(
 				<li key={peopleList[j].id} id={peopleList[j].id}>
-					{peopleList[j].lastName}, {peopleList[j].firstName}
-					<input onChange={this.activeChange} checked={peopleList[j].isActive} key={j} className='inp' onInput={() => console.log("click")} type="checkbox" />
+					{peopleList[j].lastname}, {peopleList[j].firstname}
+					<input onChange={this.activeChange} checked={peopleList[j].isactive} key={j} className='inp' onInput={() => console.log("click")} type="checkbox" />
 					<Button key={-j-1} onClick={this.toggleDShow} className="delete butn" size="sm" variant="danger">Delete</Button>
 				</li>
 			)

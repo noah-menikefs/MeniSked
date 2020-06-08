@@ -48,15 +48,15 @@ class CSchedule extends React.Component{
       				callIds.push(this.state.callList[n].id);
       			}
       			for (let i = 0; i < docs.length; i++){
-      				for (let j = 0; j < docs[i].workSked.length; j++){
+      				for (let j = 0; j < docs[i].worksked.length; j++){
       					for (let m = 0; m < callIds.length; m++){
-      						if (docs[i].workSked[j].id === callIds[m]){
+      						if (docs[i].worksked[j].id === callIds[m]){
       							arr.push({
-	      							id: docs[i].workSked[j].id,
-	      							date: docs[i].workSked[j].date,
-	      							name: docs[i].lastName,
+	      							id: docs[i].worksked[j].id,
+	      							date: docs[i].worksked[j].date,
+	      							name: docs[i].lastname,
 	      							colour: docs[i].colour,
-	      							priority: this.priorityCheck(docs[i].workSked[j].id)
+	      							priority: this.priorityCheck(docs[i].worksked[j].id)
       							})
       						}
       					}
@@ -79,7 +79,7 @@ class CSchedule extends React.Component{
 	loadrHolidays = () => {
 		fetch('http://localhost:3000/holiday/r')
 			.then(response => response.json())
-			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isActive === true))}));
+			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isactive === true))}));
 	}
 
 	loadnrHolidays = () => {
@@ -97,7 +97,7 @@ class CSchedule extends React.Component{
 	loadNewDays = (dateContext) => {
 		let newArr = [];
 		this.state.nrHolidayList.forEach((nholiday => {
-			nholiday.eventSked.forEach((date => {
+			nholiday.eventsked.forEach((date => {
 				let dateArr = date.split("/");
 				if (dateArr[0] === dateContext.format('MM') && dateArr[2] === dateContext.format('YYYY')){
 					newArr.push({

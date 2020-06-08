@@ -24,14 +24,14 @@ class App extends Component {
       route: 'Login',
       user:{
         id: '',
-        firstName: '',
-        lastName: 'Ismail',
+        firstname: '',
+        lastname: 'Ismail',
         email: '',
         colour: '',
         department: '',
-        isAdmin: true,
-        isActive: true,
-        workSked: []
+        isadmin: true,
+        isactive: true,
+        worksked: []
       },
       entries: [
         "Request No Call",
@@ -48,14 +48,14 @@ class App extends Component {
   loadUser = (data) => {
     this.setState({user: {
       id: data.id,
-      firstName: data.firstName,
-      lastName: data.lastName,
+      firstname: data.firstname,
+      lastname: data.lastname,
       email: data.email,
       colour: data.colour,
       department: data.department,
-      isAdmin: data.isAdmin,
-      isActive: data.isActive,
-      workSked: data.workSked
+      isadmin: data.isadmin,
+      isactive: data.isactive,
+      worksked: data.worksked
     }})
   }
 
@@ -79,9 +79,9 @@ class App extends Component {
   inRenderSwitch(route){
     switch(route){
       case "Personal Schedule": 
-        return <PerSchedule today={this.state.today} entries={this.state.entries} docs={this.state.docs} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
+        return <PerSchedule today={this.state.today} entries={this.state.entries} docs={this.state.docs} user={this.state.user} testisadmin={this.state.user.isadmin}/>
       case 'Published Schedule': 
-        return <PubSchedule today={this.state.today} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
+        return <PubSchedule today={this.state.today} user={this.state.user} testisadmin={this.state.user.isadmin}/>
       case 'Call Schedule': 
         return <CSchedule today={this.state.today} />
       case 'Account Information': 
@@ -99,7 +99,7 @@ class App extends Component {
         case 'Entries': 
         return <Entries/>
       default:
-        return <PerSchedule entries={this.state.entries} docs={this.state.docs} user={this.state.user} testIsAdmin={this.state.user.isAdmin}/>
+        return <PerSchedule entries={this.state.entries} docs={this.state.docs} user={this.state.user} testisadmin={this.state.user.isadmin}/>
     }
   }
 
@@ -146,14 +146,14 @@ class App extends Component {
 
   render(){
      const {route, isSignedIn, user} = this.state;
-     const {isAdmin} = user;
+     const {isadmin} = user;
      return (
         <div>
         <div className="App">
           { (! isSignedIn)
             ? this.outRenderSwitch(route)
             : <div>
-                <Navigation onRouteChange={this.onRouteChange} testIsAdmin={isAdmin}/>
+                <Navigation onRouteChange={this.onRouteChange} testisadmin={isadmin}/>
                 <br/>
                 <h1>{route}</h1>
                 {this.inRenderSwitch(route)}

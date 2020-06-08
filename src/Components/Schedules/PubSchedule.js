@@ -76,13 +76,13 @@ class PubSchedule extends React.Component{
       		.then(docs => {
       			let arr = [];
       			for (let i = 0; i < docs.length; i++){
-      				for (let j = 0; j < docs[i].workSked.length; j++){
+      				for (let j = 0; j < docs[i].worksked.length; j++){
       					arr.push({
-      						id: docs[i].workSked[j].id,
-      						date: docs[i].workSked[j].date,
-      						name: docs[i].lastName,
+      						id: docs[i].worksked[j].id,
+      						date: docs[i].worksked[j].date,
+      						name: docs[i].lastname,
       						colour: docs[i].colour,
-      						priority: this.priorityCheck(docs[i].workSked[j].id)
+      						priority: this.priorityCheck(docs[i].worksked[j].id)
       					})
       				}
       			}
@@ -103,7 +103,7 @@ class PubSchedule extends React.Component{
   	loadEntries = () => {
   		fetch('http://localhost:3000/sked/entries')
       		.then(response => response.json())
-      		.then(entries => this.setState({entryList: entries.filter((entry => entry.isActive === true))}));
+      		.then(entries => this.setState({entryList: entries.filter((entry => entry.isactive === true))}));
   	}
 
   	loadCallTypes = () => {
@@ -126,7 +126,7 @@ class PubSchedule extends React.Component{
   	loadrHolidays = () => {
 		fetch('http://localhost:3000/holiday/r')
 			.then(response => response.json())
-			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isActive === true))}));
+			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isactive === true))}));
 	}
 
 	loadnrHolidays = () => {
@@ -138,7 +138,7 @@ class PubSchedule extends React.Component{
 	loadNewDays = (dateContext) => {
 		let newArr = [];
 		this.state.nrHolidayList.forEach((nholiday => {
-			nholiday.eventSked.forEach((date => {
+			nholiday.eventsked.forEach((date => {
 				let dateArr = date.split("/");
 				if (dateArr[0] === dateContext.format('MM') && dateArr[2] === dateContext.format('YYYY')){
 					newArr.push({
@@ -198,7 +198,7 @@ class PubSchedule extends React.Component{
 	nextMonth = () => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).add(1, "month");
-		if (!this.props.testIsAdmin){
+		if (!this.props.testisadmin){
 			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			if (dateContext.year() < nYear){
@@ -241,7 +241,7 @@ class PubSchedule extends React.Component{
 	}
 
 	nextYear = () => {
-		if (!this.props.testIsAdmin){
+		if (!this.props.testisadmin){
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			if ((this.state.dateContext.year() + 1) <= nYear){
 				let dateContext = Object.assign({}, this.state.dateContext);
@@ -279,7 +279,7 @@ class PubSchedule extends React.Component{
 	setYear = (year) => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).set("year",year);
-		if (!this.props.testIsAdmin){
+		if (!this.props.testisadmin){
 			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			if (dateContext.year() === nYear && nMonth < dateContext.month()){
@@ -345,7 +345,7 @@ class PubSchedule extends React.Component{
 	yearSelect = () => {
 		let arr = [];
 		let fYear = this.props.today.year();
-		if (this.props.testIsAdmin){
+		if (this.props.testisadmin){
 			for (let i = 2020; i <= fYear + 10; i++){
 				arr.push(<option key={i} value={i}>{i}</option>);
 			}
@@ -364,7 +364,7 @@ class PubSchedule extends React.Component{
 	monthSelect = () => {
 		let m = 11;
 		let arr = [];
-		if (!this.props.testIsAdmin){
+		if (!this.props.testisadmin){
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
 			if (this.state.dateContext.year() === nYear){
@@ -378,7 +378,7 @@ class PubSchedule extends React.Component{
 	}
 
 	publishShow = () => {
-		if (this.props.testIsAdmin){
+		if (this.props.testisadmin){
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
 			let p = true
@@ -401,7 +401,7 @@ class PubSchedule extends React.Component{
 	}
 
 	adminNotes = () => {
-		if (this.props.testIsAdmin === true){
+		if (this.props.testisadmin === true){
 			return (
 				<Form>
 					<hr/>
@@ -437,7 +437,7 @@ class PubSchedule extends React.Component{
 
 	render(){
 		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, callList, day} = this.state;
-		const {testIsAdmin, today} = this.props;
+		const {testisadmin, today} = this.props;
 
 		let modalList = [];
 		for (let i = 0; i < sked.length; i++){
@@ -454,7 +454,7 @@ class PubSchedule extends React.Component{
 				noteList.push(<li key={i} id="notes">{vNotes[i].msg}</li>);
 			}
 		}
-		if (testIsAdmin){
+		if (testisadmin){
 			for (let i = 0; i < iNotes.length; i++){
 				const splitArr = iNotes[i].date.split('/');
 				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
@@ -508,7 +508,7 @@ class PubSchedule extends React.Component{
 						?this.loadNewDays(this.props.today)
 						: false
 					}
-					<Calendar testIsAdmin={testIsAdmin} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} callList={callList} entries={entryList} sked={sked} holiDays={holiDays} onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar testisadmin={testisadmin} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} callList={callList} entries={entryList} sked={sked} holiDays={holiDays} onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					<Col ><Button variant="primary">Download as PDF</Button></Col>

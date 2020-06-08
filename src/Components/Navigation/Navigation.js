@@ -12,8 +12,8 @@ class Navigation extends React.Component {
     }
   }
 
-  adminNavbar(isAdmin){
-    if (isAdmin){
+  adminNavbar(isadmin){
+    if (isadmin){
       return (
         <NavDropdown className="" title="Settings" id="collasible-nav-dropdown">
           <NavDropdown.Item onClick={() => this.props.onRouteChange("Holidays")} href="#h">Holidays</NavDropdown.Item>
@@ -26,7 +26,7 @@ class Navigation extends React.Component {
   }
 
   render(){
-    const {testIsAdmin, onRouteChange} = this.props;
+    const {testisadmin, onRouteChange} = this.props;
     return (
       <Navbar id="myNav">
         <Navbar.Brand onClick={() => onRouteChange("Personal Schedule")} href="#p" id=''>
@@ -35,7 +35,7 @@ class Navigation extends React.Component {
         </Navbar.Brand>
     			<div id="collapser">
       			<Nav className="">
-        				{this.adminNavbar(testIsAdmin)}
+        				{this.adminNavbar(testisadmin)}
                 <NavDropdown className="full-text" title="Schedules" id="collasible-nav-dropdown">
          					<NavDropdown.Item onClick={() => onRouteChange("Personal Schedule")} href="#p">Personal</NavDropdown.Item>
           				<NavDropdown.Item onClick={() => onRouteChange("Call Schedule")} href="#c">Call</NavDropdown.Item>

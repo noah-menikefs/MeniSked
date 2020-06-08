@@ -11,7 +11,7 @@ class CallTypes extends React.Component{
 			callList: [],
 			callName: '',
 			priority: 1,
-			isActive: false,
+			isactive: false,
 			add: true,
 			id: -1
 		}
@@ -49,7 +49,7 @@ class CallTypes extends React.Component{
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
 					name: this.state.callName,
-					active: this.state.isActive,
+					active: this.state.isactive,
 					priority: parseInt(this.state.priority, 10)
 
 				})
@@ -63,7 +63,7 @@ class CallTypes extends React.Component{
 			this.setState({
 				callName: '',
 				priority: 1,
-				isActive: false
+				isactive: false
 			})
 		}
 	}
@@ -91,7 +91,7 @@ class CallTypes extends React.Component{
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
 					name: this.state.callName,
-					active: this.state.isActive,
+					active: this.state.isactive,
 					priority: parseInt(this.state.priority, 10),
 					id: parseInt(this.state.id,10)
 				})
@@ -105,7 +105,7 @@ class CallTypes extends React.Component{
 			this.setState({
 				callName: '',
 				priority: 1,
-				isActive: false,
+				isactive: false,
 				add: true,
 				id: -1
 			})
@@ -121,7 +121,7 @@ class CallTypes extends React.Component{
 	}
 
 	onActiveChange = () => {
-		this.setState({isActive: !this.state.isActive});
+		this.setState({isactive: !this.state.isactive});
 	}
 
 	onEdit = (e) => {
@@ -131,7 +131,7 @@ class CallTypes extends React.Component{
 				this.setState({
 					callName: this.state.callList[i].name,
 					priority: this.state.callList[i].priority,
-					isActive: this.state.callList[i].active,
+					isactive: this.state.callList[i].active,
 					add: false,
 					id: id
 				})
@@ -144,14 +144,14 @@ class CallTypes extends React.Component{
 		this.setState({
 			callName: '',
 			priority: 1,
-			isActive: false,
+			isactive: false,
 			add: true,
 			id: -1
 		})
 	}
 
 	render(){
-		const {callList, callName, priority, isActive} = this.state;
+		const {callList, callName, priority, isactive} = this.state;
 
 		let priorityList = [];
 		for (let j = 0; j < callList.length; j++){
@@ -203,7 +203,7 @@ class CallTypes extends React.Component{
    				 				</Form.Control>
   							</Form.Group> 
 						  <Form.Group  id="activeCheck" controlId="formBasicCheckbox">
-						    	<Form.Check onChange={this.onActiveChange} checked={isActive} type="checkbox" label="Active"/>
+						    	<Form.Check onChange={this.onActiveChange} checked={isactive} type="checkbox" label="Active"/>
 						 	 </Form.Group>
 						</div>
 						<div className="bottom">

@@ -9,8 +9,8 @@ class Register extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {
-			lastName: '',
-			firstName: '',
+			lastname: '',
+			firstname: '',
 			email: '',
 			password: '',
 			cPassword: '',
@@ -38,11 +38,11 @@ class Register extends React.Component{
 	}
 
 	onFNameChange = (event) => {
-		this.setState({firstName: event.target.value})
+		this.setState({firstname: event.target.value})
 	}
 
 	onLNameChange = (event) => {
-		this.setState({lastName: event.target.value})
+		this.setState({lastname: event.target.value})
 	}
 
 	onSubmitRegister = () => {
@@ -55,16 +55,16 @@ class Register extends React.Component{
 			return false;
 		}
 		else if (
-			this.state.firstName.length > 0 && 
-			this.state.lastName.length > 0 &&
+			this.state.firstname.length > 0 && 
+			this.state.lastname.length > 0 &&
 			this.props.validateEmail(this.state.email) &&
 			this.state.password.length > 0 &&
 			this.state.code.length > 0
 		){
 
-			let isAdmin = false;
+			let isadmin = false;
 			if (this.state.code.includes("Admin")){
-				isAdmin = true;
+				isadmin = true;
 			}
 			
 			fetch('http://localhost:3000/register', {
@@ -73,15 +73,15 @@ class Register extends React.Component{
 				body: JSON.stringify({
 					email: this.state.email,
 					password: this.state.password,
-					firstName: this.state.firstName,
-					lastName: this.state.lastName,
+					firstname: this.state.firstname,
+					lastname: this.state.lastname,
 					department: this.state.code,
-					isAdmin: isAdmin,
+					isadmin: isadmin,
 				})
 			})
 				.then(response => response.json())
 				.then(user => {
-					if (user.lastName){
+					if (user.lastname){
 						this.props.loadUser(user)
 						this.props.onRouteChange("Personal Schedule");
 					}

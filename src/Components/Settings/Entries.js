@@ -10,7 +10,7 @@ class Entries extends React.Component{
 		this.state = {
 			entryList: [],
 			entryName: '',
-			isActive: false,
+			isactive: false,
 			add: true,
 			id: -1
 		}
@@ -42,7 +42,7 @@ class Entries extends React.Component{
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
 					name: this.state.entryName,
-					active: this.state.isActive
+					active: this.state.isactive
 				})
 			})
 				.then(response => response.json())
@@ -53,7 +53,7 @@ class Entries extends React.Component{
 				})
 			this.setState({
 				entryName: '',
-				isActive: false
+				isactive: false
 			})
 		}
 	}
@@ -74,7 +74,7 @@ class Entries extends React.Component{
 			})
 		this.setState({
 			entryName: '',
-			isActive: false,
+			isactive: false,
 			add: true,
 			id: -1
 		})
@@ -87,7 +87,7 @@ class Entries extends React.Component{
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
 					name: this.state.entryName,
-					active: this.state.isActive,
+					active: this.state.isactive,
 					id: parseInt(this.state.id,10)
 				})
 			})
@@ -99,7 +99,7 @@ class Entries extends React.Component{
 				})
 			this.setState({
 				entryName: '',
-				isActive: false,
+				isactive: false,
 				add: true,
 				id: -1
 			})
@@ -111,7 +111,7 @@ class Entries extends React.Component{
 	}
 
 	onActiveChange = () => {
-		this.setState({isActive: !this.state.isActive});
+		this.setState({isactive: !this.state.isactive});
 	}
 
 	onEdit = (e) => {
@@ -120,7 +120,7 @@ class Entries extends React.Component{
 			if (this.state.entryList[i].id === id){
 				this.setState({
 					entryName: this.state.entryList[i].name,
-					isActive: this.state.entryList[i].isActive,
+					isactive: this.state.entryList[i].isactive,
 					add: false,
 					id: id
 				})
@@ -132,14 +132,14 @@ class Entries extends React.Component{
 	onCancel = () => {
 		this.setState({
 			entryName: '',
-			isActive: false,
+			isactive: false,
 			add: true,
 			id: -1
 		})
 	}
 
 	render(){
-		const {entryList, entryName, isActive} = this.state;
+		const {entryList, entryName, isactive} = this.state;
 		let priorityList = [];
 		for (let j = 0; j < entryList.length; j++){
 			priorityList.push(
@@ -172,7 +172,7 @@ class Entries extends React.Component{
 								<Form.Control required value={entryName} onChange={this.onNameChange} type="text" placeholder="Name" />
 							</Form.Group>
 						  <Form.Group  id="activeCheck" controlId="formBasicCheckbox">
-						    	<Form.Check onChange={this.onActiveChange} checked={isActive} type="checkbox" label="Active"/>
+						    	<Form.Check onChange={this.onActiveChange} checked={isactive} type="checkbox" label="Active"/>
 						 	 </Form.Group>
 						</div>
 						<div className="bottom">

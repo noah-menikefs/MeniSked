@@ -36,7 +36,7 @@ class Login extends React.Component{
 		})
 			.then(response => response.json())
 			.then(user => {
-				if (user.lastName){
+				if (user.lastname){
 					this.props.onRouteChange("Personal Schedule");
 					this.props.loadUser(user);
 				}
