@@ -86,7 +86,9 @@ class PubSchedule extends React.Component{
       					})
       				}
       			}
+      			console.log(arr);
       			arr.sort(function(a, b){return a.priority - b.priority})
+      			console.log(arr);
       			this.setState({sked: arr})
       		});
   	}
@@ -97,7 +99,7 @@ class PubSchedule extends React.Component{
 				return this.state.callList[n].priority;
 			}
 		}
-		return 50;
+		return 1000;
   	}
 
   	loadEntries = () => {

@@ -80,11 +80,20 @@ class People extends React.Component{
 	}
 
 	deletePerson = () => {
+		const id = parseInt(this.state.id,10);
+		let email = '';
+		for (let i = 0; i < this.state.peopleList.length; i++){
+			if (id === this.state.peopleList[i].id){
+				email = this.state.peopleList[i].email;
+				break;
+			}
+		}
+
 		fetch('http://localhost:3000/people', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				id: parseInt(this.state.id,10)
+				email: email 
 			})
 		})
 			.then(response => response.json())

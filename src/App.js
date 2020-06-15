@@ -20,8 +20,8 @@ class App extends Component {
     super();
     this.state = {
       today: moment(),
-      isSignedIn: true,
-      route: 'Messages',
+      isSignedIn: false,
+      route: 'Login',
       user:{
         id: '',
         firstname: '',
@@ -79,7 +79,7 @@ class App extends Component {
   inRenderSwitch(route){
     switch(route){
       case "Personal Schedule": 
-        return <PerSchedule today={this.state.today} entries={this.state.entries} docs={this.state.docs} user={this.state.user} testisadmin={this.state.user.isadmin}/>
+        return <PerSchedule today={this.state.today} entries={this.state.entries}  user={this.state.user} testisadmin={this.state.user.isadmin}/>
       case 'Published Schedule': 
         return <PubSchedule today={this.state.today} user={this.state.user} testisadmin={this.state.user.isadmin}/>
       case 'Call Schedule': 
@@ -99,7 +99,7 @@ class App extends Component {
         case 'Entries': 
         return <Entries/>
       default:
-        return <PerSchedule entries={this.state.entries} docs={this.state.docs} user={this.state.user} testisadmin={this.state.user.isadmin}/>
+        return <PerSchedule entries={this.state.entries}  user={this.state.user} testisadmin={this.state.user.isadmin}/>
     }
   }
 

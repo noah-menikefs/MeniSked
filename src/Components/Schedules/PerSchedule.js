@@ -144,7 +144,7 @@ class PerSchedule extends React.Component{
 
 	onDayClick = (e,day) => {
 		const id = this.state.entries[this.state.entryIndex].id;
-		if (id === 6){
+		if (id === 12){
 			this.setState({day:day})
 			this.toggleShow();
 		}
