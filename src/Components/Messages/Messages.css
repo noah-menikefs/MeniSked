@@ -13,3 +13,13 @@
 .counter {
 	text-align: right;
 }
+
+.size {
+	padding-left: 25px;
+	width: 690px;
+}
+
+h4 {
+	text-align: left;
+	padding-left: 25px;
+}
