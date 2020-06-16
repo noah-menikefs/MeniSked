@@ -85,11 +85,11 @@ class App extends Component {
       case 'Call Schedule': 
         return <CSchedule today={this.state.today} />
       case 'Account Information': 
-        return <Account />
+        return <Account user={this.state.user} testisadmin={this.state.user.isadmin}/>
       case 'Admin Messages': 
-        return <AMessages  />
+        return <AMessages user={this.state.user} testisadmin={this.state.user.isadmin}/>
       case 'Messages': 
-        return <EMessages />
+        return <EMessages user={this.state.user} testisadmin={this.state.user.isadmin}/>
       case 'Holidays': 
         return <Holidays today={this.state.today}/>
       case 'Call Types': 

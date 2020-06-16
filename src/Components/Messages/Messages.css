@@ -6,6 +6,10 @@
 	color: red;
 }
 
+.explanation {
+	width: 100%;
+}
+
 .content {
 	text-align: left;
 }
