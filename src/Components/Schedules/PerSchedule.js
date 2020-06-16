@@ -1,12 +1,12 @@
 import React from 'react';
 import Calendar from './Calendar/Calendar';
+import MyDocument from './../PDF/MyDocument'
 import Button from 'react-bootstrap/button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
-// import axios from 'axios';
-// import {saveAs} from 'file-saver';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import moment from 'moment';
 
 
@@ -374,23 +374,6 @@ class PerSchedule extends React.Component{
 		this.setState({dateContext: this.props.today});
 		this.loadNewDays(this.props.today);
 	}
-
-	createPDF = () => {
-		// const sObj = {
-		// 	name: 'JavaScript Mastery',
-		// 	receiptId: 8237238,
-		// 	price1: 20,
-		// 	price2: 22
-		// }
-		// axios.post('/create-pdf',sObj)
-		// 	.then(() => axios.get('fetch-pdf', {responseType: 'blob'}))
-		// 	.then((res) => {
-		// 		const pdfBlob = new Blob([res.data], {type: 'application/pdf'});
-
-		// 		saveAs(pdfBlob, 'newPdf.pdf');
-		// 	})
-	}
-
 	
 
 	render(){
@@ -510,7 +493,10 @@ class PerSchedule extends React.Component{
 					<Calendar entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>
+					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
+					<Col><PDFDownloadLink document={<MyDocument entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
+    				</PDFDownloadLink></Col>
 				</div>
 
 				<div className='modal'>

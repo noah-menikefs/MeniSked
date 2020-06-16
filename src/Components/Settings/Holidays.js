@@ -149,7 +149,7 @@ class Holidays extends React.Component{
 
 	onSkedHoliday = (e) => {
 		fetch('http://localhost:3000/holiday/snr', {
-			method: 'post',
+			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
 				name: this.state.name,

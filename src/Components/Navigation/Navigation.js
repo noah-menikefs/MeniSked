@@ -25,6 +25,25 @@ class Navigation extends React.Component {
     }
   }
 
+  messagesNavbar(img){
+    if (img){
+      if (this.props.testisadmin){
+        return <img onClick={() => this.props.onRouteChange("Admin Messages")} alt="Messages" src="https://img.icons8.com/material-rounded/96/000000/important-mail.png" width="30" height="30" className="logo linky"/>
+      } 
+      else{
+         return <img onClick={() => this.props.onRouteChange("Messages")} alt="Messages" src="https://img.icons8.com/material-rounded/96/000000/important-mail.png" width="30" height="30" className="logo linky"/>
+      }
+    }
+    else{
+      if (this.props.testisadmin){
+         return <Nav.Link onClick={() => this.props.onRouteChange("Admin Messages")} className="full-text linky" href="#m">Messages</Nav.Link>
+      } 
+      else{
+          return <Nav.Link onClick={() => this.props.onRouteChange("Messages")} className="full-text linky" href="#m">Messages</Nav.Link>
+      }
+    }
+  }
+
   render(){
     const {testisadmin, onRouteChange} = this.props;
     return (
@@ -46,8 +65,8 @@ class Navigation extends React.Component {
                   <NavDropdown.Item onClick={() => onRouteChange("Call Schedule")} href="#c">Call</NavDropdown.Item>
                   <NavDropdown.Item onClick={() => onRouteChange("Published Schedule")} href="#pu">Published</NavDropdown.Item>
                 </NavDropdown>
-                <Nav.Link onClick={() => console.log("click")} className="full-text linky" href="#m">Messages</Nav.Link>
-                <img onClick={() => console.log("click")} alt="Messages" src="https://img.icons8.com/material-rounded/96/000000/important-mail.png" width="30" height="30" className="logo linky"/>
+                {this.messagesNavbar(false)}
+                {this.messagesNavbar(true)}
                 <Nav.Link onClick={() => onRouteChange("Account Information")} className="full-text linky" href="#a">Account</Nav.Link>
                 <img onClick={() => onRouteChange("Account Information")} alt="Account" src="https://img.icons8.com/material-rounded/96/000000/user-male-circle.png" width="30" height="30" className="logo linky"/>
       			</Nav>

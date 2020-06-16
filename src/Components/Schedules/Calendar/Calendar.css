@@ -92,8 +92,14 @@ td > ul > li, div > li{
 #note{
     list-style-type: "– ";
     list-style-position: inside;
-
 }
+
+#iNote{
+    list-style-type: circle;
+    list-style-position: inside;
+}
+
+
 
 td > ul{
     height: 115px;

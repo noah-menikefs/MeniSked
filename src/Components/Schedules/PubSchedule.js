@@ -3,8 +3,10 @@ import Calendar from './Calendar/Calendar';
 import Button from 'react-bootstrap/button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import MyDocument from './../PDF/MyDocument'
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
+import { PDFDownloadLink } from '@react-pdf/renderer';
 import moment from 'moment';
 
 import './Schedules.css';
@@ -86,7 +88,6 @@ class PubSchedule extends React.Component{
       					})
       				}
       			}
-      			console.log(arr);
       			arr.sort(function(a, b){return a.priority - b.priority})
       			console.log(arr);
       			this.setState({sked: arr})
@@ -94,12 +95,19 @@ class PubSchedule extends React.Component{
   	}
 
   	priorityCheck = (id) => {
+  		let index = -1;
 		for (let n = 0; n < this.state.callList.length; n++){
 			if (this.state.callList[n].id === id){
-				return this.state.callList[n].priority;
+				index = n;
+				break;
 			}
 		}
-		return 1000;
+		if (index !== -1){
+			return this.state.callList[index].priority;
+		}
+		else{
+			return 1000;
+		}	
   	}
 
   	loadEntries = () => {
@@ -460,7 +468,7 @@ class PubSchedule extends React.Component{
 			for (let i = 0; i < iNotes.length; i++){
 				const splitArr = iNotes[i].date.split('/');
 				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
-					noteList.push(<li key={i} id="notes">{iNotes[i].msg}</li>);
+					noteList.push(<li key={i} id="iNotes">{iNotes[i].msg}</li>);
 				}
 			}
 		}
@@ -513,7 +521,10 @@ class PubSchedule extends React.Component{
 					<Calendar testisadmin={testisadmin} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} callList={callList} entries={entryList} sked={sked} holiDays={holiDays} onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					<Col ><Button variant="primary">Download as PDF</Button></Col>
+					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
+					<Col><PDFDownloadLink document={<MyDocument />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
+    				</PDFDownloadLink></Col>
 				</div>
 
 				<div className='modal'>

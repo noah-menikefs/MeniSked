@@ -115,6 +115,7 @@ class Calendar extends React.Component{
 		let list = [];
 		for (let i = 0; i < arr.length; i++){
 			const splitArr = arr[i].date.split('/');
+			console.log(splitArr[0], this.props.dateContext.format('MM'));
 			if (splitArr[0] === this.props.dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === this.props.dateContext.format('YYYY')){	
 				list.push(<li key={i} className="call" id="call">{this.idToName(arr[i].id) + ' '}<span style={{backgroundColor:arr[i].colour}}>{arr[i].name}</span></li>);
 			}
@@ -137,7 +138,7 @@ class Calendar extends React.Component{
 			for (let i = 0; i < arr2.length; i++){
 				const splitArr2 = arr2[i].date.split('/');
 				if (splitArr2[0] === this.props.dateContext.format('MM') && parseInt(splitArr2[1],10) === d && splitArr2[2] === this.props.dateContext.format('YYYY')){	
-					list.push(<li key={-i-1} className="note" id="note">{arr2[i].msg}</li>);
+					list.push(<li key={-i-1} className="note" id="iNote">{arr2[i].msg}</li>);
 				}
 			}
 		}

@@ -33,3 +33,7 @@
 #notes{
 	list-style-type: "- ";
 }
+
+#iNotes{
+	list-style-type: circle; 
+}
