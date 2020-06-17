@@ -26,10 +26,10 @@ class AMessages extends React.Component{
 			<div>
 				<h4>Requests</h4>
 
-				<div className="listStyle">
+				<div className="listStyleA">
 
 					<ListGroup horizontal>
-						<ListGroup.Item><p>Noah Menikefs has requested vacation from May 15, 2020 --> May 20, 2020</p>
+						<ListGroup.Item action><p>Noah Menikefs has requested vacation from May 15, 2020 --> May 20, 2020</p>
 						  	<Button variant="success">Accept</Button>
 						  	<Button variant="danger" onClick={this.showModal}>Deny</Button>
 						  	<Modal show={this.state.show} handleClose={this.hideModal}>
@@ -50,7 +50,7 @@ class AMessages extends React.Component{
 
 
 					<ListGroup horizontal>
-						<ListGroup.Item><p>Nikhil Ismail has requested 2nd call from June 1, 2020 - June 3, 2020</p>
+						<ListGroup.Item action><p>Nikhil Ismail has requested 2nd call from June 1, 2020 - June 3, 2020</p>
 						  	<Button variant="success">Accept</Button>
 						  	<Button variant="danger" onClick={this.showModal}>Deny</Button>
 						  	<Modal show={this.state.show} handleClose={this.hideModal}>
@@ -71,7 +71,7 @@ class AMessages extends React.Component{
 
 
 					<ListGroup horizontal>
-						<ListGroup.Item><p>Paul Miskew has requested 1st call from May 28, 2020 - May 30, 2020</p>
+						<ListGroup.Item action><p>Paul Miskew has requested 1st call from May 28, 2020 - May 30, 2020</p>
 						  	<Button variant="success">Accept</Button>
 						  	<Button variant="danger" onClick={this.showModal}>Deny</Button>
 						  	<Modal show={this.state.show} handleClose={this.hideModal}>
@@ -92,7 +92,7 @@ class AMessages extends React.Component{
 
 
 					<ListGroup horizontal>
-						<ListGroup.Item><p>Noah Menikefs has requested vacation from December 15, 2020 --> December 27, 2020</p>
+						<ListGroup.Item action><p>Noah Menikefs has requested vacation from December 15, 2020 --> December 27, 2020</p>
 						  	<Button variant="success">Accept</Button>
 						  	<Button variant="danger" onClick={this.showModal}>Deny</Button>
 						  	<Modal show={this.state.show} handleClose={this.hideModal}>

@@ -20,8 +20,8 @@ class App extends Component {
     super();
     this.state = {
       today: moment(),
-      isSignedIn: false,
-      route: 'Login',
+      isSignedIn: true,
+      route: 'Messages',
       user:{
         id: '',
         firstname: '',
@@ -29,7 +29,7 @@ class App extends Component {
         email: '',
         colour: '',
         department: '',
-        isadmin: true,
+        isadmin: false,
         isactive: true,
         worksked: []
       },
@@ -85,11 +85,11 @@ class App extends Component {
       case 'Call Schedule': 
         return <CSchedule today={this.state.today} user={this.state.user}/>
       case 'Account Information': 
-        return <Account user={this.state.user} testisadmin={this.state.user.isadmin}/>
+        return <Account />
       case 'Admin Messages': 
-        return <AMessages user={this.state.user} testisadmin={this.state.user.isadmin}/>
+        return <AMessages />
       case 'Messages': 
-        return <EMessages user={this.state.user} testisadmin={this.state.user.isadmin}/>
+        return <EMessages />
       case 'Holidays': 
         return <Holidays today={this.state.today}/>
       case 'Call Types': 
