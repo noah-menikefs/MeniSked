@@ -26,7 +26,7 @@ class AMessages extends React.Component{
 			<div>
 				<h4>Requests</h4>
 
-				<div className="listStyle">
+				<div className="listStyleA">
 
 					<ListGroup horizontal>
 						<ListGroup.Item><p>Noah Menikefs has requested vacation from May 15, 2020 --> May 20, 2020</p>

@@ -1,8 +1,8 @@
-#accepted {
+.accepted {
 	color: green;
 }
 
-#denied {
+.denied {
 	color: red;
 }
 
@@ -18,9 +18,15 @@
 	text-align: right;
 }
 
-.listStyle {
+.listStyleA {
 	padding-left: 25px;
 	width: 690px;
+}
+
+.listStyleE {
+	padding-left: 25px;
+	padding-right: 25px;
+	width: 65%;
 }
 
 h4 {
