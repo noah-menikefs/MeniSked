@@ -447,7 +447,7 @@ class PubSchedule extends React.Component{
 
 	render(){
 		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, callList, day} = this.state;
-		const {testisadmin, today} = this.props;
+		const {testisadmin, today, user} = this.props;
 
 		let modalList = [];
 		for (let i = 0; i < sked.length; i++){
@@ -522,7 +522,7 @@ class PubSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
-					<Col><PDFDownloadLink document={<MyDocument />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
+					<Col><PDFDownloadLink document={<MyDocument type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>

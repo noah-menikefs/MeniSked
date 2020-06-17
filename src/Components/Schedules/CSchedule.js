@@ -238,7 +238,7 @@ class CSchedule extends React.Component{
 
 	render(){
 		const {dateContext, show, holiDays, nrHolidayList, render, callSked, callList, day} = this.state;
-		const {today} = this.props;
+		const {today, user} = this.props;
 		let yearSelect = [];
 
 		let fYear = today.year();
@@ -309,7 +309,7 @@ class CSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
-					<Col><PDFDownloadLink document={<MyDocument />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
+					<Col><PDFDownloadLink document={<MyDocument type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>

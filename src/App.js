@@ -83,7 +83,7 @@ class App extends Component {
       case 'Published Schedule': 
         return <PubSchedule today={this.state.today} user={this.state.user} testisadmin={this.state.user.isadmin}/>
       case 'Call Schedule': 
-        return <CSchedule today={this.state.today} />
+        return <CSchedule today={this.state.today} user={this.state.user}/>
       case 'Account Information': 
         return <Account user={this.state.user} testisadmin={this.state.user.isadmin}/>
       case 'Admin Messages': 
@@ -157,7 +157,6 @@ class App extends Component {
                 <br/>
                 <h1>{route}</h1>
                 {this.inRenderSwitch(route)}
-
               </div>
           }
 
