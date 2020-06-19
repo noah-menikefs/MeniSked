@@ -98,6 +98,7 @@ class CallTypes extends React.Component{
 			})
 				.then(response => response.json())
 				.then(call => {
+					console.log(call);
 					if (call){
 						this.loadCallTypes();
 					}
@@ -131,7 +132,7 @@ class CallTypes extends React.Component{
 				this.setState({
 					callName: this.state.callList[i].name,
 					priority: this.state.callList[i].priority,
-					isactive: this.state.callList[i].active,
+					isactive: this.state.callList[i].isactive,
 					add: false,
 					id: id
 				})

@@ -89,7 +89,6 @@ class PubSchedule extends React.Component{
       				}
       			}
       			arr.sort(function(a, b){return a.priority - b.priority})
-      			console.log(arr);
       			this.setState({sked: arr})
       		});
   	}

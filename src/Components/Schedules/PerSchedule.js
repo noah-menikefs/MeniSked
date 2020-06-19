@@ -400,7 +400,9 @@ class PerSchedule extends React.Component{
 		}
 
 		let entrySelect = entries.map((entry, i) => {
+			if (entry.isactive){
 				return <option key={i} value={entry.name}>{entry.name}</option>
+			}
 		})
 
 		let eSelect = () => {
@@ -426,9 +428,11 @@ class PerSchedule extends React.Component{
 
 		let radioSelect = [];
 		for (let j = 0; j < callList.length; j++){
-			radioSelect.push(
+			if (callList[j].isactive){
+				radioSelect.push(
 				<Form.Check required key={j} name="callType" type='radio' id={callList[j].id} label={callList[j].name}/>
-			)
+				)
+			}
 		}
 
 		return(
@@ -494,7 +498,7 @@ class PerSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
-					<Col><PDFDownloadLink document={<MyDocument entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
+					<Col><PDFDownloadLink document={<MyDocument entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>
