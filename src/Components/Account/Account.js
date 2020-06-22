@@ -85,9 +85,25 @@ class Account extends React.Component {
 	}
 
 	onSubmitAll = () => {
-		if (this.state.nPassword !== this.state.cNPassword){
-			// this.toggleErrorShow('dp');
-			return false;
+		if(	
+			this.state.cPassword.length > 0 && 
+			this.state.nPassword.length > 0 &&
+			this.state.nPassword === this.state.cNPassword
+		){			
+			fetch('http://localhost:3000/account/'+this.props.user.id, {
+				method: 'post',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					oldPassword: this.state.cPassword,
+					newPassword: this.state.nPassword
+				})
+			})
+			this.onSubmitBasic();
+			this.setState({
+				cPassword: '',
+				nPassword: '',
+				cNPassword: ''
+			})
 		}
 	}
 
@@ -115,11 +131,11 @@ class Account extends React.Component {
 				<div className='changePass'>
 					<h2 id='header'>Change Password</h2>
 					<h5 id='text'>Current Password</h5>
-					<input onChange={this.onCPasswordChange} type='password' name='cp' className='accountInp'/>
+					<input value={this.state.cPassword} onChange={this.onCPasswordChange} type='password' name='cp' className='accountInp'/>
 					<h5 id='text'>New Password</h5>
-					<input onChange={this.onNPasswordChange} type='password' name='np' className='accountInp'/>
+					<input value={this.state.nPassword} onChange={this.onNPasswordChange} type='password' name='np' className='accountInp'/>
 					<h5 id='text'>Confirm New Password</h5>
-					<input onChange={this.onCNPasswordChange} type='password' name='cnp' className='accountInp'/>
+					<input value={this.state.cNPassword} onChange={this.onCNPasswordChange} type='password' name='cnp' className='accountInp'/>
 				</div>
 
 				<Button onClick={this.onSubmitChoose} id="submit" variant="primary">Submit</Button>
