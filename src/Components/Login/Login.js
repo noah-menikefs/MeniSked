@@ -13,7 +13,9 @@ class Login extends React.Component{
 			loginPassword: '',
 			show: false,
 			errorShow: false,
-			msg: ''
+			msg: '',
+			pWordShow: false,
+			forgotEmail: ''
 		}
 	}
 
@@ -23,6 +25,10 @@ class Login extends React.Component{
 
 	onPasswordChange = (event) => {
 		this.setState({loginPassword: event.target.value})
+	}
+
+	forgotPWordChange = (event) => {
+		this.setState({forgotEmail: event.target.value})
 	}
 
 	onSLogin = () => {
@@ -51,10 +57,7 @@ class Login extends React.Component{
 	}
 
 	toggleErrorShow = (type) => {
-		if (type === 'fp'){
-			this.setState({msg: 'Please input a correct email address.'})
-		}
-		else if (type === 'email'){
+		if (type === 'email'){
 			this.setState({msg: 'Sorry, the email address you entered does not match our records.'})
 		}
 		else{
@@ -64,35 +67,35 @@ class Login extends React.Component{
 		this.setState({errorShow: !this.state.errorShow})
 	}
 
+	forgotPWordShow = () => {
+		this.setState({pWordShow: !this.state.pWordShow})
+	}
+
 	forgotPassword = () => {
 		fetch('http://localhost:3000/forgot', {
 			method: 'post',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				email: this.state.loginEmail
+				email: this.state.forgotEmail
 			})
 		})
 		.then(response => response.json())
-		.then(data => {
-			if (data === 'user not found'){
-				this.toggleShow();
+		.then(data => {	
+			if (data === 'unable to get user'){
 				this.toggleErrorShow('email');
 			}
+			else{
+				this.toggleShow();
+			}
+		})
+		this.setState({
+			pWordShow: !this.state.pWordShow
 		})
 	}
 
-	modalChoose = () => {
-		if (this.props.validateEmail(this.state.loginEmail)){
-			this.forgotPassword();
-			this.toggleShow();
-		}
-		else{
-			this.toggleErrorShow('fp');
-		}
-	}	
 
 	render(){
-		const {show, loginEmail, errorShow, msg} = this.state;
+		const {show, loginEmail, errorShow, msg, pWordShow, forgotEmail} = this.state;
 		const {onRouteChange} = this.props;
 		return(
 			<div>
@@ -115,7 +118,7 @@ class Login extends React.Component{
 								Login
 							</Button>
 							<Form.Group>
-								<Form.Label onClick={this.modalChoose} className="mt-3 label">Forgot Password?</Form.Label>
+								<Form.Label onClick={this.forgotPWordShow} className="mt-3 label">Forgot Password?</Form.Label>
 							</Form.Group>
 						</Form>
 					</div>
@@ -129,7 +132,7 @@ class Login extends React.Component{
           					<Modal.Title id='modalTitle'>Forgot Password</Modal.Title>
        	 				</Modal.Header>
         				<Modal.Body>
-        					A temporary password has been sent to {loginEmail}. Once you have signed in please change your password in the account tab.
+        					A temporary password has been sent to {forgotEmail}. Once you have signed in please change your password in the account tab.
         				</Modal.Body>
         				<Modal.Footer>
           					<Button variant="secondary" onClick={this.toggleShow}>
@@ -151,6 +154,29 @@ class Login extends React.Component{
             					Close
           					</Button>
 	        			</Modal.Footer>
+      				</Modal>
+				</div>
+				<div className='modal'>
+					<Modal show={pWordShow} onHide={this.forgotPWordShow}>
+        				<Modal.Header closeButton>
+          					<Modal.Title id='modalTitle'>Forgot Password</Modal.Title>
+       	 				</Modal.Header>
+        				<Form>
+        					<Modal.Body>
+        						<Form.Group controlId="formBasicEmail">
+    								<Form.Label>Enter your email below and we'll send you instructions to retrieve your account</Form.Label>
+    								<Form.Control onChange={this.forgotPWordChange} required type="email" placeholder="Email" />
+  								</Form.Group>
+        					</Modal.Body>
+        				<Modal.Footer>
+          					<Button onClick={this.forgotPWordShow} variant="secondary" >
+            					Close
+          					</Button>
+          					 <Button onClick={this.forgotPassword} variant="primary" >
+            					Submit
+          					</Button>
+	        			</Modal.Footer>
+	        			</Form>
       				</Modal>
 				</div>
 			</div>

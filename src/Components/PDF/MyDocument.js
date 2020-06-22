@@ -108,7 +108,6 @@ class MyDocument extends React.Component{
             }
           }
           for (let m = 0; m < listType.length; m++){
-            console.log(listType[m]);
             name = '';
             if (listType[m].date === dateContext.format('MM')+'/'+ctr+'/'+dateContext.format('YYYY')){
               for (let x = 0; x < entries.length; x++){

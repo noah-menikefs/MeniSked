@@ -309,7 +309,7 @@ class CSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
-					<Col><PDFDownloadLink document={<MyDocument entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>

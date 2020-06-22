@@ -521,7 +521,7 @@ class PubSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
-					<Col><PDFDownloadLink document={<MyDocument holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>
