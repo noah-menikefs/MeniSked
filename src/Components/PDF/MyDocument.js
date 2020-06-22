@@ -72,7 +72,7 @@ class MyDocument extends React.Component{
   }
 
   render(){
-    const {user, type, dateContext, holiDays, personalDays, entries, callList, callSked, sked} = this.props;
+    const {user, type, dateContext, holiDays, personalDays, entries, callList, callSked, sked, numNotes, iNotes, vNotes} = this.props;
     let firstDay = dateContext.startOf('month').format('d'); //Day of week 0-6
     let daysInMonth = dateContext.daysInMonth();
     let ctr = 1;
@@ -81,8 +81,12 @@ class MyDocument extends React.Component{
     let holiday = '';
     let today = [];
     let name = '';
+    let numNote = '';
+    let iNote = '';
+    let vNote = '';
 
     let listType = [];
+
 
     if (callSked){
       listType = [...callSked];
@@ -97,9 +101,12 @@ class MyDocument extends React.Component{
     for (let i = 0; i < 6; i++){
       let tableCols = [];
       for (let j = 0; j < 7; j++){
-        today = []
-        day = ''
-        holiday = ''
+        today = [];
+        day = '';
+        holiday = '';
+        numNote = '';
+        iNote = '';
+        vNote = '';
         if ((i !== 0 || j >= firstDay) && (ctr <= daysInMonth)){
           day = ctr;
           for (let n = 0; n < holiDays.length; n++){
@@ -132,12 +139,32 @@ class MyDocument extends React.Component{
               today.push(<Text key={m} style={styles.tableCellList}>{name}</Text>);
             }
           }
+          for (let b = 0; b < vNotes.length; b++){
+            if (vNotes[b].date === dateContext.format('MM')+'/'+ctr+'/'+dateContext.format('YYYY')){
+              vNote = vNotes[b].msg;
+              today.push((<Text key={b} style={styles.tableCellList}>{' - '+vNote}</Text>))
+            }
+          }
+          if (user.isadmin){
+             for (let a = 0; a < iNotes.length; a++){
+              if (iNotes[a].date === dateContext.format('MM')+'/'+ctr+'/'+dateContext.format('YYYY')){
+                iNote = iNotes[a].msg;
+                today.push((<Text key={a} style={styles.tableCellList}>{' - '+iNote}</Text>))
+              }
+            }
+            for (let s = 0; s < numNotes.length; s++){
+              if (numNotes[s].date === dateContext.format('MM')+'/'+ctr+'/'+dateContext.format('YYYY')){
+                numNote = numNotes[s].msg;
+              }
+            }
+          }
+         
 
           ctr++;
         }
         tableCols.push(
           <View key={j} style={styles.tableCol}> 
-            <Text style={styles.tableCell}>{day+'   '+holiday}</Text>
+            <Text style={styles.tableCell}>{day+'     '+numNote+'     '+holiday}</Text>
             {today}
           </View> 
         )

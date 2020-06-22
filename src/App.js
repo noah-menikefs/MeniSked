@@ -85,7 +85,7 @@ class App extends Component {
       case 'Call Schedule': 
         return <CSchedule today={this.state.today} user={this.state.user}/>
       case 'Account Information': 
-        return <Account />
+        return <Account loadUser={this.loadUser} user={this.state.user} validateEmail={this.validateEmail}/>
       case 'Admin Messages': 
         return <AMessages />
       case 'Messages': 

@@ -95,7 +95,7 @@ class Login extends React.Component{
 
 
 	render(){
-		const {show, loginEmail, errorShow, msg, pWordShow, forgotEmail} = this.state;
+		const {show, errorShow, msg, pWordShow, forgotEmail} = this.state;
 		const {onRouteChange} = this.props;
 		return(
 			<div>

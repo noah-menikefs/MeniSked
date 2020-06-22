@@ -320,7 +320,7 @@ class PubSchedule extends React.Component{
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					date: this.state.dateContext.format("MM/DD/YYYY"),
+					date: this.state.dateContext.format('MM')+'/'+this.state.day+'/'+this.state.dateContext.format('Y'),
 					type: parseInt(this.state.radio,10),
 					msg: this.state.note
 
@@ -521,7 +521,7 @@ class PubSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
-					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>
@@ -529,7 +529,7 @@ class PubSchedule extends React.Component{
 				<div className='modal'>
 					<Modal show={show} onHide={this.toggleShow} >
         				<Modal.Header closeButton>
-          					<Modal.Title id='modalTitle'>{dateContext.format("MMMM DD, YYYY")}</Modal.Title>
+          					<Modal.Title id='modalTitle'>{dateContext.format('MMMM')+' '+day+' '+dateContext.format('Y')}</Modal.Title>
        	 				</Modal.Header>
         				<Modal.Body>
         					<ul>

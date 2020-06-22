@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from 'react-bootstrap/button';
 import './Account.css';
 
 
@@ -15,29 +16,113 @@ class Account extends React.Component {
 		}
 	}
 
+	componentDidMount = () => {
+		this.loadAccount();
+	}
+
+	loadAccount = () => {
+		fetch('http://localhost:3000/account/'+this.props.user.id)
+			.then(response => response.json())
+			.then(user => this.setState({
+				email: user.email,
+				firstname: user.firstname,
+				lastname: user.lastname
+			}));
+	}
+
+	onEmailChange = (event) => {
+		this.setState({email: event.target.value})
+	}
+	
+	onFNameChange = (event) => {
+		this.setState({firstname: event.target.value})
+	}
+
+	onLNameChange = (event) => {
+		this.setState({lastname: event.target.value})
+	}
+
+	onCPasswordChange = (event) => {
+		this.setState({cPassword: event.target.value})
+	}
+
+	onNPasswordChange = (event) => {
+		this.setState({nPassword: event.target.value})
+	}
+
+	onCNPasswordChange = (event) => {
+		this.setState({cNPassword: event.target.value})
+	}
+
+	onSubmitBasic = () => {
+		if (
+			this.state.firstname.length > 0 && 
+			this.state.lastname.length > 0 &&
+			this.props.validateEmail(this.state.email)
+		){
+			
+			fetch('http://localhost:3000/account/'+this.props.user.id, {
+				method: 'put',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					email: this.state.email,
+					firstname: this.state.firstname,
+					lastname: this.state.lastname
+				})
+			})
+				.then(response => response.json())
+				.then(user => {
+					if (user.email){
+						this.setState({
+							email: user.email,
+							firstname: user.firstname,
+							lastname: user.lastname
+						})
+						this.props.loadUser(user);
+					}
+				})
+		}
+	}
+
+	onSubmitAll = () => {
+		if (this.state.nPassword !== this.state.cNPassword){
+			// this.toggleErrorShow('dp');
+			return false;
+		}
+	}
+
+	onSubmitChoose = () => {
+		if (this.state.cPassword.length > 0){
+			this.onSubmitAll();
+		}
+		else{
+			this.onSubmitBasic();
+		}
+	}
+
 	render(){
 		return(
 
 			<div>
 				<div className='accountInfo'>
 					<h5 id='text'>Email Address</h5>
-					<input type='email' name='email'/>
+					<input value={this.state.email} onChange={this.onEmailChange}  type='email' name='email' className='accountInp'/>
 					<h5 id='text'>First Name</h5>
-					<input type='text' name='first'/>
+					<input value={this.state.firstname} onChange={this.onFNameChange} type='text' name='first' className='accountInp'/>
 					<h5 id='text'>Last Name</h5>
-					<input type='text' name='last'/>
+					<input value={this.state.lastname} onChange={this.onLNameChange} type='text' name='last' className='accountInp'/>
 				</div>
 				<div className='changePass'>
 					<h2 id='header'>Change Password</h2>
 					<h5 id='text'>Current Password</h5>
-					<input type='password' name='cp'/>
+					<input onChange={this.onCPasswordChange} type='password' name='cp' className='accountInp'/>
 					<h5 id='text'>New Password</h5>
-					<input type='password' name='np'/>
+					<input onChange={this.onNPasswordChange} type='password' name='np' className='accountInp'/>
 					<h5 id='text'>Confirm New Password</h5>
-					<input type='password' name='cnp'/>
+					<input onChange={this.onCNPasswordChange} type='password' name='cnp' className='accountInp'/>
 				</div>
 
-				<input class="btn btn-primary" type="submit" value="Submit" id='submit'/>
+				<Button onClick={this.onSubmitChoose} id="submit" variant="primary">Submit</Button>
 
 			</div>
 
