@@ -164,7 +164,7 @@ class Login extends React.Component{
         				<Form>
         					<Modal.Body>
         						<Form.Group controlId="formBasicEmail">
-    								<Form.Label>Enter your email below and we'll send you instructions to retrieve your account</Form.Label>
+    								<Form.Label>Enter your email below and we'll send you instructions to retrieve your account.</Form.Label>
     								<Form.Control onChange={this.forgotPWordChange} required type="email" placeholder="Email" />
   								</Form.Group>
         					</Modal.Body>
