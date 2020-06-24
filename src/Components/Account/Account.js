@@ -102,6 +102,13 @@ class Account extends React.Component {
 				show: true
 			})
 		}
+		else if (route === 'error'){
+			this.setState({
+				title: 'Error',
+				msg: 'Sorry, this email appears to already be in use.',
+				show: true
+			})
+		}
 		else{
 			this.setState({
 				title: '',
@@ -138,6 +145,9 @@ class Account extends React.Component {
 						})
 						this.props.loadUser(user);
 						this.toggleShow('success');
+					}
+					else if (user === 'unable to edit'){
+						this.toggleShow('error');
 					}
 				})
 		}
