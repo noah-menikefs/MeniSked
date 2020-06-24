@@ -19,12 +19,14 @@
 }
 
 .listStyleA {
+	display: inline-block;
 	padding-left: 25px;
 	padding-right: 25px;
 	width: 100%;
 }
 
 .listStyleE {
+	display: inline-block;
 	padding-left: 25px;
 	padding-right: 25px;
 	width: 100%;
@@ -33,4 +35,35 @@
 h4 {
 	text-align: left;
 	padding-left: 25px;
+}
+
+.accept{
+	margin-right: 0.15em;
+}
+
+.deny{
+	margin-left: 0.15em;
+}
+
+.requestList{
+	margin-bottom: 0.5em; 
+}
+
+.requests{
+	margin-top: 1em;
+}
+
+.dates.list{
+	width: 125px;
+	padding: 6px 10px;
+}
+
+.edates.list{
+	width: 125px;
+	padding: 12px 20px;
+}
+
+.pend.list{
+	width: 90%;
+	padding: 5px 10px;
 }

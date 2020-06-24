@@ -27,34 +27,62 @@ class EMessages extends React.Component{
 			<div>
 				<div className='listStyleE'>
 					<ListGroup horizontal>
-						<ListGroup.Item action disabled>
-							Peter Menikefs <p className='accepted'>accepted</p> your request for 1st call on July 17, 2020
+						<ListGroup.Item className='pend list' action disabled>Peter Menikefs <span className='accepted'>accepted</span> your request for 1st call on July 17, 2020
 						</ListGroup.Item>
-						<ListGroup.Item>06/24/2020</ListGroup.Item>
+						<ListGroup.Item className='edates list'>06/24/2020</ListGroup.Item>
 					</ListGroup>
 					<ListGroup horizontal>
-						<ListGroup.Item action disabled>
-							Peter Menikefs <p className='accepted'>accepted</p> your request for vacation from July 2, 2020 --> July 6, 2020
+						<ListGroup.Item className='pend list' action disabled>
+							Peter Menikefs <span className='accepted'>accepted</span> your request for vacation from July 2, 2020 - July 6, 2020
 						</ListGroup.Item>
-						<ListGroup.Item>06/17/2020</ListGroup.Item>
+						<ListGroup.Item className='edates list'>06/17/2020</ListGroup.Item>
 					</ListGroup>
 					<ListGroup horizontal>
-						<ListGroup.Item action onClick={() => this.toggleShow("Sorry, I can't let you work that day.")}>
-							Peter Menikefs <p className='denied'>denied</p> your request for 2nd call on August 3, 2020
+						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow("Sorry, I can't let you work that day.")}>
+							Peter Menikefs <span className='denied'>denied</span> your request for 2nd call on August 3, 2020
 						</ListGroup.Item>
-						<ListGroup.Item>05/29/2020</ListGroup.Item>
+						<ListGroup.Item className='edates list'>05/29/2020</ListGroup.Item>
 					</ListGroup>
 					<ListGroup horizontal>
-						<ListGroup.Item action disabled>
-							Peter Menikefs <p className='accepted'>accepted</p> your request for 1st call on June 30, 2020
+						<ListGroup.Item className='pend list' action disabled>
+							Peter Menikefs <span className='accepted'>accepted</span> your request for 1st call on June 30, 2020
 						</ListGroup.Item>
-						<ListGroup.Item>04/22/2020</ListGroup.Item>
+						<ListGroup.Item className='edates list'>04/22/2020</ListGroup.Item>
 					</ListGroup>
 					<ListGroup horizontal>
-						<ListGroup.Item action onClick={() => this.toggleShow("Sorry, I can't let you go on vacation then.")}>
-							Peter Menikefs <p className='denied'>denied</p> your request for vacation from September 3, 2020 --> September 10, 2020
+						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow("Sorry, I can't let you go on vacation then.")}>
+							Peter Menikefs <span className='denied'>denied</span> your request for vacation from September 3, 2020 - September 10, 2020
 						</ListGroup.Item>
-						<ListGroup.Item>01/08/2020</ListGroup.Item>
+						<ListGroup.Item className='edates list'>01/08/2020</ListGroup.Item>
+					</ListGroup>
+					<ListGroup horizontal>
+						<ListGroup.Item className='pend list' action disabled>Peter Menikefs <span className='accepted'>accepted</span> your request for 1st call on July 17, 2020
+						</ListGroup.Item>
+						<ListGroup.Item className='edates list'>06/24/2020</ListGroup.Item>
+					</ListGroup>
+					<ListGroup horizontal>
+						<ListGroup.Item className='pend list' action disabled>
+							Peter Menikefs <span className='accepted'>accepted</span> your request for vacation from July 2, 2020 - July 6, 2020
+						</ListGroup.Item>
+						<ListGroup.Item className='edates list'>06/17/2020</ListGroup.Item>
+					</ListGroup>
+					<ListGroup horizontal>
+						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow("Sorry, I can't let you work that day.")}>
+							Peter Menikefs <span className='denied'>denied</span> your request for 2nd call on August 3, 2020
+						</ListGroup.Item>
+						<ListGroup.Item className='edates list'>05/29/2020</ListGroup.Item>
+					</ListGroup>
+					<ListGroup horizontal>
+						<ListGroup.Item className='pend list' action disabled>
+							Peter Menikefs <span className='accepted'>accepted</span> your request for 1st call on June 30, 2020
+						</ListGroup.Item>
+						<ListGroup.Item className='edates list'>04/22/2020</ListGroup.Item>
+					</ListGroup>
+					<ListGroup horizontal>
+						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow("Sorry, I can't let you go on vacation then.")}>
+							Peter Menikefs <span className='denied'>denied</span> your request for vacation from September 3, 2020 - September 10, 2020
+						</ListGroup.Item>
+						<ListGroup.Item className='edates list'>01/08/2020</ListGroup.Item>
 					</ListGroup>
 				</div>
 				<div className='modal'>
