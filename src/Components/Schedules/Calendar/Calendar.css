@@ -153,6 +153,12 @@ td > hr {
     margin-top: 2em;
 }
 
+.pending{
+    font-size: 1.5em;
+    margin-top: 2em;
+    color: #FF0000;
+}
+
 /*
 td > .spacer{
     justify-content: space-between;

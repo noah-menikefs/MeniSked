@@ -36,7 +36,9 @@ class PerSchedule extends React.Component{
 			nrHolidayList: [],
 			holiDays: [],
 			personalDays: [],
-			render: false
+			render: false,
+			pending: [],
+			loaded: false
 		}
 	}
 
@@ -142,6 +144,12 @@ class PerSchedule extends React.Component{
 		
 	}
 
+	loadPending = () => {
+		fetch('http://localhost:3000/emessages/'+this.props.user.id)
+      		.then(response => response.json())
+      		.then(messages => this.setState({pending: messages.filter((message => message.status === 'pending'))}));
+	}
+
 	onDayClick = (e,day) => {
 		const id = this.state.entries[this.state.entryIndex].id;
 		if (id === 12){
@@ -173,21 +181,30 @@ class PerSchedule extends React.Component{
 			this.toggleShow();
 		}
 	}
-		
+
+	// requestCall = () => {
+
+	// }
 
 	assignOrDelete = (typeId, day = this.state.day) => {
-		if (this.props.testisadmin && (typeId !== -1)){
-			let method = 'post';
-			const date = this.state.dateContext.format('MM')+'/'+day+'/'+this.state.dateContext.format('YYYY');
-			const typeID = parseInt(typeId,10);
-			for (let i = 0;  i < this.state.personalDays.length; i++){
-				if (this.state.personalDays[i].date === date && typeID === this.state.personalDays[i].id){
-					method = 'delete';
-					break;
+		if (typeId !== -1){
+			if (this.props.testisadmin){
+				let method = 'post';
+				const date = this.state.dateContext.format('MM')+'/'+day+'/'+this.state.dateContext.format('YYYY');
+				const typeID = parseInt(typeId,10);
+				for (let i = 0;  i < this.state.personalDays.length; i++){
+					if (this.state.personalDays[i].date === date && typeID === this.state.personalDays[i].id){
+						method = 'delete';
+						break;
+					}
 				}
+				this.assignCall(typeID, method, date);
 			}
-			this.assignCall(typeID, method, date);
+			else if (!this.props.testisadmin){
+				//
+			}
 		}
+
 		this.setState({
 				day:0,
 				radio:-1,
@@ -377,8 +394,14 @@ class PerSchedule extends React.Component{
 	
 
 	render(){
-		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList, holiDays, nrHolidayList, render, personalDays} = this.state;
+		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList, holiDays, nrHolidayList, render, personalDays, pending, loaded} = this.state;
 		const {testisadmin, user, today} = this.props;
+
+		console.log(pending);
+		if (user.id && !loaded){
+			this.loadPending();
+			this.setState({loaded: true})
+		}
 
 		let docSelect = activeDocs.map((doc,i) => {
 			return <option key={i} value={doc.lastname}>{doc.lastname}</option>
@@ -494,7 +517,7 @@ class PerSchedule extends React.Component{
 						?this.loadNewDays(this.props.today)
 						: false
 					}
-					<Calendar entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar pending={pending} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}

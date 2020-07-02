@@ -58,6 +58,7 @@ class Calendar extends React.Component{
 			return (
 				<ul>
 					{this.personalToday(d)}
+					{this.pendingToday(d)}
 				</ul>
 			)
 		}
@@ -168,6 +169,19 @@ class Calendar extends React.Component{
 			if (this.props.entries[i].id === id){
 				return this.props.entries[i].name;
 			}
+		}
+	}
+
+	pendingToday = (d) => {
+		const arr = [...this.props.pending];
+		for (let i = 0; i < arr.length; i++){
+			for (let n = 0; n < arr[i].dates.length; n++){
+				const splitArr = arr[i].dates[n].split('/');
+				if (splitArr[0] === this.props.dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === this.props.dateContext.format('YYYY')){
+					return <li key={i+n} className="pending" id="pending">{this.idToName(parseInt(arr[i].entryid,10))}</li>
+				}
+			}
+			
 		}
 	}
 
