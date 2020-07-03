@@ -396,8 +396,6 @@ class PerSchedule extends React.Component{
 	render(){
 		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList, holiDays, nrHolidayList, render, personalDays, pending, loaded} = this.state;
 		const {testisadmin, user, today} = this.props;
-
-		console.log(pending);
 		if (user.id && !loaded){
 			this.loadPending();
 			this.setState({loaded: true})

@@ -3,6 +3,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
+import moment from 'moment';
 import './Messages.css';
 
 
@@ -16,7 +17,8 @@ class AMessages extends React.Component{
 			messages: [],
 			peopleList: [],
 			entryList: [],
-			callList: []
+			callList: [],
+			ctr: 10
 		}
 	}
 
@@ -26,6 +28,8 @@ class AMessages extends React.Component{
 		this.loadEntries();
 		this.loadCallTypes();
 	}
+
+	months = moment.months(); // List of each month
 
 	loadMessages = () => {
 		fetch('http://localhost:3000/amessages')
@@ -92,17 +96,49 @@ class AMessages extends React.Component{
 	}
 
 	dateStyler = (dates) => {
+		let splitArr = [];
+		let flag = false;
+
 		if (dates.length === 1){
-			return 'on ' + dates[0]
+			splitArr = dates[0].split('/');
+			return 'on ' + this.months[splitArr[0] - 1] + ' ' + splitArr[1] + ', ' + splitArr[2];
 		}
-		//OTHER OPTIONS
-		else {
-			return 'from ' + dates[0] + ' - ' + dates[dates.length-1];
+
+		for (let i = 0; i < dates.length; i++){
+			splitArr.push(dates[i].split('/'));
+		}
+
+		for (let n = 1; n < splitArr.length; n++){
+			if (splitArr[n][0] !== splitArr[n-1][0] || (splitArr[n][1] - 1) !== parseInt(splitArr[n-1][1],10) || splitArr[n][2] !== splitArr[n-1][2]){
+				flag = true;
+				break;
+			}
+		}
+
+		if (flag){
+			let str = "on " + this.months[splitArr[0][0] - 1] + ' ' + splitArr[0][1] + ', ' + splitArr[0][2];
+			for (let j = 1; j < splitArr.length; j++){
+				str = str + ', ' + this.months[splitArr[j][0] - 1] + ' ' + splitArr[j][1] + ', ' + splitArr[j][2];
+			}
+			return str;
+		}
+
+		return 'from ' + this.months[splitArr[0][0] - 1] + ' ' + splitArr[0][1] + ', ' + splitArr[0][2] + ' - ' + this.months[splitArr[splitArr.length - 1][0] - 1] + ' ' + splitArr[splitArr.length - 1][1] + ', ' + splitArr[splitArr.length - 1][2]
+	
+	}
+
+	showMore = () => {
+		this.setState({ctr: this.state.ctr+10})
+	}
+
+	showButton = (length) => {
+		if (this.state.ctr < length){
+			return (<Button onClick={this.showMore} className='showMore' variant="primary">Show More</Button>);
 		}
 	}
 
 	render(){
-		const {show, dshow, msg, messages} = this.state;
+		const {show, dshow, msg, messages, ctr} = this.state;
 
 		let pendingList = [];
 		let pastList = [];
@@ -129,9 +165,29 @@ class AMessages extends React.Component{
 			)
 		}
 
+		for (let j = 0; j < Math.min(past.length,ctr); j++){
+			if (past[j].status === 'accepted'){
+				pastList.push(
+					<ListGroup horizontal>
+						<ListGroup.Item className='past list' action disabled>
+							You <span className='accepted'>accepted</span> {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
+						</ListGroup.Item>
+						<ListGroup.Item className='edates list'>{past[j].stamp}</ListGroup.Item>
+					</ListGroup>
+				);
+			}
+			else{
+				pastList.push(
+					<ListGroup horizontal>
+						<ListGroup.Item className='past list' action onClick={() => this.toggleDShow(past[j].msg)}>
+							You <span className='denied'>denied</span> {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
+						</ListGroup.Item>
+						<ListGroup.Item className='edates list'>{past[j].stamp}</ListGroup.Item>
+					</ListGroup>
+				);
+			}
+		}
 
-		
-		
 
 		return(
 			<div>
@@ -141,64 +197,10 @@ class AMessages extends React.Component{
 				</div>
 				<h4 className="requests">Past Requests</h4>
 				<div className='listStyleE'>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>You <span className='accepted'>accepted</span> John Smith's request for 1st call on July 17, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>06/24/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>
-							You <span className='accepted'>accepted</span> Sally Jenkins request for vacation from July 2, 2020 - July 6, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>06/17/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action onClick={() => this.toggleDShow("Sorry, I can't let you work that day.")}>
-							You <span className='denied'>denied</span> Noah Menikefs's request for 2nd call on August 3, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>05/29/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>
-							You <span className='accepted'>accepted</span> Donald Trump's request for 1st call on June 30, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>04/22/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action onClick={() => this.toggleDShow("Sorry, I can't let you go on vacation then.")}>
-							You <span className='denied'>denied</span> Justin Trudeau's request for vacation from September 3, 2020 - September 10, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>01/08/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>You <span className='accepted'>accepted</span> Bob Joe's request for 1st call on July 17, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>06/24/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>
-							You <span className='accepted'>accepted</span> James Johnson's request for vacation from July 2, 2020 - July 6, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>06/17/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action onClick={() => this.toggleDShow("Sorry, I can't let you work that day.")}>
-							You <span className='denied'>denied</span> Random Person's request for 2nd call on August 3, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>05/29/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>
-							You <span className='accepted'>accepted</span> Nikhil Ismail's request for 1st call on June 30, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>04/22/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action onClick={() => this.toggleDShow("Sorry, I can't let you go on vacation then.")}>
-							You <span className='denied'>denied</span> Hudson Leon's request for vacation from September 3, 2020 - September 10, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>01/08/2020</ListGroup.Item>
-					</ListGroup>
+					{pastList}
+				</div>
+				<div>
+					{this.showButton(past.length)}
 				</div>
 				<div className='modal'>
 					<Modal show={show} onHide={this.toggleShow}>
