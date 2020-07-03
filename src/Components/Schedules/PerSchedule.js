@@ -182,16 +182,55 @@ class PerSchedule extends React.Component{
 		}
 	}
 
-	// requestCall = () => {
+	requestCall = (typeID, date) => {
+		fetch('http://localhost:3000/request', {
+			method: 'post',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				docid: this.props.user.id,
+				entryid: typeID,
+				date: date,
+				stamp: this.props.today.format('MM/DD/YYYY')
+			})
+		})
+		.then(response => response.json())
+		.then(message => {
+			if (message){
+				this.loadPending();
+			}
+		})
+		if (this.state.radio !== -1){
+			this.toggleShow();
+		}
+	}
 
-	// }
+	editCall = (typeID, date) => {
+		fetch('http://localhost:3000/request', {
+			method: 'put',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				docid: parseInt(this.props.user.id),
+				typeId: parseInt(typeID,10),
+				date: date
+			})
+		})
+		.then(response => response.json())
+		.then(message => {
+			if (message){
+				this.loadPending();
+			}
+		})
+		if (this.state.radio !== -1){
+			this.toggleShow();
+		}
+	}
 
 	assignOrDelete = (typeId, day = this.state.day) => {
 		if (typeId !== -1){
+			const typeID = parseInt(typeId,10);
+			const date = this.state.dateContext.format('MM')+'/'+day+'/'+this.state.dateContext.format('YYYY');
 			if (this.props.testisadmin){
 				let method = 'post';
-				const date = this.state.dateContext.format('MM')+'/'+day+'/'+this.state.dateContext.format('YYYY');
-				const typeID = parseInt(typeId,10);
 				for (let i = 0;  i < this.state.personalDays.length; i++){
 					if (this.state.personalDays[i].date === date && typeID === this.state.personalDays[i].id){
 						method = 'delete';
@@ -201,7 +240,19 @@ class PerSchedule extends React.Component{
 				this.assignCall(typeID, method, date);
 			}
 			else if (!this.props.testisadmin){
-				//
+				let flag = false;
+
+				for (let i = 0; i < this.state.pending.length; i++){
+					if (this.props.user.id === parseInt(this.state.pending[i].docid,10) && typeID === parseInt(this.state.pending[i].entryid,10)){
+						flag = true;
+					}
+				}
+				if (!flag){
+					this.requestCall(typeID, date);
+				}
+				else{
+					this.editCall(typeID, date)
+				}
 			}
 		}
 

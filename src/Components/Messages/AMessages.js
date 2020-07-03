@@ -18,7 +18,8 @@ class AMessages extends React.Component{
 			peopleList: [],
 			entryList: [],
 			callList: [],
-			ctr: 10
+			ctr: 10,
+			id: -1
 		}
 	}
 
@@ -38,6 +39,7 @@ class AMessages extends React.Component{
 				messages: messages
 			}));
 	}
+
 	loadUsers = () => {
 		fetch('http://localhost:3000/people')
 			.then(response => response.json())
@@ -56,11 +58,33 @@ class AMessages extends React.Component{
 			.then(calls => this.setState({callList: calls}));
 	}
 	
+	respond = (id, status) => {
+		fetch('http://localhost:3000/amessages', {
+			method: 'put',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				id: id,
+				status: status,
+				msg: this.state.msg
+			})
+		})
+			.then(response => response.json())
+			.then(message => {
+				if (message){
+					this.loadMessages();
+				}
+			})
+		this.setState({
+			msg: '',
+			show: false
+		})
+	}
 
-	toggleShow = () => {
+	toggleShow = (id = -1) => {
 		this.setState({
 			show: !this.state.show,
-			msg: ''
+			msg: '',
+			id: id
 		});
 	}
 
@@ -72,7 +96,6 @@ class AMessages extends React.Component{
 	 };
 
 	onMsgChange = (event) => {
-		console.log(event.target.value);
 		this.setState({msg: event.target.value});
 	}
 
@@ -157,8 +180,8 @@ class AMessages extends React.Component{
 			pendingList.push(
 				<ListGroup horizontal>
 					<ListGroup.Item className='pend list' action><p className="requestList">{this.docIdToName(pends[n].docid)} has requested {this.entryIdToName(pends[n].entryid)} {this.dateStyler(pends[n].dates)}</p>
-					  	<Button className="accept" size="sm" variant="success">Accept</Button>
-					  	<Button className="deny" size="sm" variant="danger" onClick={this.toggleShow}>Deny</Button>
+					  	<Button onClick={() => this.respond(pends[n].id,'accepted')} className="accept" size="sm" variant="success">Accept</Button>
+					  	<Button onClick={() => this.toggleShow(pends[n].id)} className="deny" size="sm" variant="danger">Deny</Button>
 					</ListGroup.Item>
 					<ListGroup.Item className='dates list'>{pends[n].stamp}</ListGroup.Item>
 				</ListGroup>
@@ -217,7 +240,7 @@ class AMessages extends React.Component{
           						<Button onClick={this.toggleShow} variant="secondary" >
             						Close
           						</Button>
-          					 	<Button onClick={() => console.log('click')} variant="primary" >
+          					 	<Button onClick={() => this.respond(this.state.id, "denied")} variant="primary" >
             						Submit
           						</Button>
 	        				</Modal.Footer>

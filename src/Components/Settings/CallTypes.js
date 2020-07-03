@@ -98,7 +98,6 @@ class CallTypes extends React.Component{
 			})
 				.then(response => response.json())
 				.then(call => {
-					console.log(call);
 					if (call){
 						this.loadCallTypes();
 					}
