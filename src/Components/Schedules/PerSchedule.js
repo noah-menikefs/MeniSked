@@ -144,8 +144,8 @@ class PerSchedule extends React.Component{
 		
 	}
 
-	loadPending = () => {
-		fetch('http://localhost:3000/emessages/'+this.props.user.id)
+	loadPending = (userid = this.props.user.id) => {
+		fetch('http://localhost:3000/emessages/'+userid)
       		.then(response => response.json())
       		.then(messages => this.setState({pending: messages.filter((message => message.status === 'pending'))}));
 	}
@@ -210,7 +210,7 @@ class PerSchedule extends React.Component{
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
 				docid: parseInt(this.props.user.id),
-				typeId: parseInt(typeID,10),
+				entryid: parseInt(typeID,10),
 				date: date
 			})
 		})
@@ -304,10 +304,12 @@ class PerSchedule extends React.Component{
 		let i = this.state.docIndex;
 		if (i !== (this.state.activeDocs.length - 1)){
 			this.loadPersonalDays(i+1);
+			this.loadPending(this.state.activeDocs[i+1].id);
 			this.setState({docIndex: (i+1)});
 		}
 		else{
 			this.loadPersonalDays(0);
+			this.loadPending(this.state.activeDocs[0].id);
 			this.setState({docIndex: 0});
 		}
 	}
@@ -315,10 +317,12 @@ class PerSchedule extends React.Component{
 		let i = this.state.docIndex;
 		if (i !== 0){
 			this.loadPersonalDays(i-1);
+			this.loadPending(this.state.activeDocs[i-1].id);
 			this.setState({docIndex: (i-1)});
 		}
 		else{
 			this.loadPersonalDays(this.state.activeDocs.length - 1);
+			this.loadPending(this.state.activeDocs[this.state.activeDocs.length - 1].id);
 			this.setState({docIndex: (this.state.activeDocs.length - 1)});
 		}
 	}
@@ -390,6 +394,7 @@ class PerSchedule extends React.Component{
 				}
 			}
 			this.loadPersonalDays(index);
+			this.loadPending(this.state.activeDocs[index].id);
 			this.setState({docIndex: index})
 		}
 	}

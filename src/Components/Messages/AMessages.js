@@ -128,8 +128,17 @@ class AMessages extends React.Component{
 		}
 
 		for (let i = 0; i < dates.length; i++){
+			if (dates[i].charAt(4) === '/'){
+				dates[i] = dates[i].substring(0,3) + '0' + dates[i].substring(3);
+			}
+		}
+
+		dates.sort(function(a, b){return a.substring(3,5) - b.substring(3,5)})
+
+		for (let i = 0; i < dates.length; i++){
 			splitArr.push(dates[i].split('/'));
 		}
+
 
 		for (let n = 1; n < splitArr.length; n++){
 			if (splitArr[n][0] !== splitArr[n-1][0] || (splitArr[n][1] - 1) !== parseInt(splitArr[n-1][1],10) || splitArr[n][2] !== splitArr[n-1][2]){
@@ -162,7 +171,6 @@ class AMessages extends React.Component{
 
 	render(){
 		const {show, dshow, msg, messages, ctr} = this.state;
-
 		let pendingList = [];
 		let pastList = [];
 		let pends = [];
