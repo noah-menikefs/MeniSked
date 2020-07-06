@@ -225,6 +225,10 @@ class PerSchedule extends React.Component{
 		}
 	}
 
+	deleteCall = (typeID, date) => {
+	
+	}
+
 	assignOrDelete = (typeId, day = this.state.day) => {
 		if (typeId !== -1){
 			const typeID = parseInt(typeId,10);
@@ -241,18 +245,36 @@ class PerSchedule extends React.Component{
 			}
 			else if (!this.props.testisadmin){
 				let flag = false;
+				let flag2 = false;
 
-				for (let i = 0; i < this.state.pending.length; i++){
-					if (this.props.user.id === parseInt(this.state.pending[i].docid,10) && typeID === parseInt(this.state.pending[i].entryid,10)){
-						flag = true;
+				for (let j = 0; j < this.state.pending.length; j++){
+					for (let n = 0; n < this.state.pending[j].dates.length; n++){
+						if (this.state.pending[j].dates[n] === date){
+							if (parseInt(this.state.pending[j].entryid,10) === typeID){
+								flag2 = true;
+							}
+							this.deleteCall(typeID, date);
+							break;
+						}
 					}
 				}
-				if (!flag){
-					this.requestCall(typeID, date);
+
+				if (!flag2){
+					for (let i = 0; i < this.state.pending.length; i++){
+						if (this.props.user.id === parseInt(this.state.pending[i].docid,10) && typeID === parseInt(this.state.pending[i].entryid,10)){
+							flag = true;
+						}
+					}
+					if (!flag){
+						this.requestCall(typeID, date);
+					}
+					else{
+						this.editCall(typeID, date)
+					}
 				}
-				else{
-					this.editCall(typeID, date)
-				}
+			
+
+				
 			}
 		}
 

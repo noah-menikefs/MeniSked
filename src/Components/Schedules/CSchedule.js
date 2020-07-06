@@ -140,9 +140,6 @@ class CSchedule extends React.Component{
 		});
 	}
 
-	onDoubleClick = (e,day) => {
-		console.log('YEEEEE');
-	}
 
 	months = moment.months(); // List of each month
 
@@ -305,7 +302,7 @@ class CSchedule extends React.Component{
 						?this.loadNewDays(this.props.today)
 						: false
 					}
-					<Calendar callList={callList} callSked={callSked} holiDays={holiDays} onDoubleClick={(e,day) => this.onDoubleClick(e,day)} type="Call" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}

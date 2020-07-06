@@ -59,7 +59,6 @@ class Account extends React.Component {
 	}
 
 	toggleShow = (route) => {
-		console.log(route);
 		if (route === 'success'){
 			this.setState({
 				title: 'Success!',
@@ -179,7 +178,6 @@ class Account extends React.Component {
 						this.toggleShow('incorrect');
 					}
 					else {
-						console.log(user);
 						this.onSubmitBasic();
 						this.setState({
 							cPassword: '',

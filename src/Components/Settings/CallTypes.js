@@ -30,7 +30,6 @@ class CallTypes extends React.Component{
 	sortList = () => {
 		let newArr = this.state.callList.sort(function(a, b){return a.priority - b.priority})
 		this.setState({callList: newArr});
-		console.log(this.state.callList);
 	}
 
 	addOrEdit = () => {

@@ -140,7 +140,7 @@ class People extends React.Component{
 			docList.push(
 				<li key={peopleList[j].id} id={peopleList[j].id}>
 					{peopleList[j].lastname}, {peopleList[j].firstname}
-					<input onChange={this.activeChange} checked={peopleList[j].isactive} key={j} className='inp' onInput={() => console.log("click")} type="checkbox" />
+					<input onChange={this.activeChange} checked={peopleList[j].isactive} key={j} className='inp' type="checkbox" />
 					<Button key={-j-1} onClick={this.toggleDShow} className="delete butn" size="sm" variant="danger">Delete</Button>
 				</li>
 			)

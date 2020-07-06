@@ -2,6 +2,7 @@ import React from 'react';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal';
+import moment from 'moment';
 import './Messages.css';
 
 class EMessages extends React.Component{
@@ -9,9 +10,39 @@ class EMessages extends React.Component{
 		super(props);
 		this.state = {
 			show: false,
-			msg: ''
+			msg: '',
+			messages: [],
+			entryList: [],
+			callList: [],
+			ctr: 10
 		}
 	}
+
+	componentDidMount = () => {
+		this.loadMessages();
+		this.loadEntries();
+		this.loadCallTypes();
+	}
+
+	loadMessages = () => {
+		fetch('http://localhost:3000/emessages/'+this.props.user.id)
+      		.then(response => response.json())
+      		.then(messages => this.setState({messages: messages.filter((message => message.status !== 'pending'))}));
+	}
+
+	loadEntries = () => {
+		fetch('http://localhost:3000/sked/entries')
+			.then(response => response.json())
+			.then(entries => this.setState({entryList: entries}));
+	}
+
+	loadCallTypes = () => {
+		fetch('http://localhost:3000/callTypes')
+			.then(response => response.json())
+			.then(calls => this.setState({callList: calls}));
+	}
+
+	months = moment.months(); // List of each month
 
 	toggleShow = (route) => {
 	    this.setState({ 
@@ -20,70 +51,100 @@ class EMessages extends React.Component{
 	   	});
 	 };
 
+	showMore = () => {
+		this.setState({ctr: this.state.ctr+10})
+	}
+
+	showButton = (length) => {
+		if (this.state.ctr < length){
+			return (<Button onClick={this.showMore} className='showMore' variant="primary">Show More</Button>);
+		}
+	}
+
+	entryIdToName = (id) => {
+		id = parseInt(id,10);
+		const arr = [...this.state.entryList, ...this.state.callList]
+		for (let i = 0; i < arr.length; i++){
+			if (id === arr[i].id){
+				return arr[i].name;
+			}
+		}
+	}
+
+	dateStyler = (dates) => {
+		let splitArr = [];
+		let flag = false;
+		if (dates.length === 1){
+			splitArr = dates[0].split('/');
+			return 'on ' + this.months[splitArr[0] - 1] + ' ' + splitArr[1] + ', ' + splitArr[2];
+		}
+
+		for (let i = 0; i < dates.length; i++){
+			if (dates[i].charAt(4) === '/'){
+				dates[i] = dates[i].substring(0,3) + '0' + dates[i].substring(3);
+			}
+		}
+
+		dates.sort(function(a, b){return a.substring(3,5) - b.substring(3,5)})
+
+		for (let i = 0; i < dates.length; i++){
+			splitArr.push(dates[i].split('/'));
+		}
+
+
+		for (let n = 1; n < splitArr.length; n++){
+			if (splitArr[n][0] !== splitArr[n-1][0] || (splitArr[n][1] - 1) !== parseInt(splitArr[n-1][1],10) || splitArr[n][2] !== splitArr[n-1][2]){
+				flag = true;
+				break;
+			}
+		}
+
+		if (flag){
+			let str = "on " + this.months[splitArr[0][0] - 1] + ' ' + splitArr[0][1] + ', ' + splitArr[0][2];
+			for (let j = 1; j < splitArr.length; j++){
+				str = str + ', ' + this.months[splitArr[j][0] - 1] + ' ' + splitArr[j][1] + ', ' + splitArr[j][2];
+			}
+			return str;
+		}
+
+		return 'from ' + this.months[splitArr[0][0] - 1] + ' ' + splitArr[0][1] + ', ' + splitArr[0][2] + ' - ' + this.months[splitArr[splitArr.length - 1][0] - 1] + ' ' + splitArr[splitArr.length - 1][1] + ', ' + splitArr[splitArr.length - 1][2]
+	
+	}
 
 	render(){
-		const {show, msg} = this.state;
+		const {show, msg, messages, ctr} = this.state;
+
+		let msgList = [];
+
+		for (let j = (Math.min(messages.length,ctr)) - 1; j >= 0; j--){
+			if (messages[j].status === 'accepted'){
+				msgList.push(
+					<ListGroup key={j} horizontal>
+						<ListGroup.Item className='pend list' action disabled>Peter Menikefs <span className={messages[j].status}>{messages[j].status}</span> your request for {this.entryIdToName(messages[j].entryid)} {this.dateStyler(messages[j].dates)}
+						</ListGroup.Item>
+						<ListGroup.Item className='edates list'>{messages[j].stamp}</ListGroup.Item>
+					</ListGroup>
+				)
+			}
+			else{
+				msgList.push(
+					<ListGroup key={j} horizontal>
+						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow(messages[j].msg)}>Peter Menikefs <span className={messages[j].status}>{messages[j].status}</span> your request for {this.entryIdToName(messages[j].entryid)} {this.dateStyler(messages[j].dates)}
+						</ListGroup.Item>
+						<ListGroup.Item className='edates list'>{messages[j].stamp}</ListGroup.Item>
+					</ListGroup>
+				)
+			}
+			
+		}
+
 		return(
 			<div>
 				<div className='listStyleE'>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>Peter Menikefs <span className='accepted'>accepted</span> your request for 1st call on July 17, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>06/24/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>
-							Peter Menikefs <span className='accepted'>accepted</span> your request for vacation from July 2, 2020 - July 6, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>06/17/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow("Sorry, I can't let you work that day.")}>
-							Peter Menikefs <span className='denied'>denied</span> your request for 2nd call on August 3, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>05/29/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>
-							Peter Menikefs <span className='accepted'>accepted</span> your request for 1st call on June 30, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>04/22/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow("Sorry, I can't let you go on vacation then.")}>
-							Peter Menikefs <span className='denied'>denied</span> your request for vacation from September 3, 2020 - September 10, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>01/08/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>Peter Menikefs <span className='accepted'>accepted</span> your request for 1st call on July 17, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>06/24/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>
-							Peter Menikefs <span className='accepted'>accepted</span> your request for vacation from July 2, 2020 - July 6, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>06/17/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow("Sorry, I can't let you work that day.")}>
-							Peter Menikefs <span className='denied'>denied</span> your request for 2nd call on August 3, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>05/29/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action disabled>
-							Peter Menikefs <span className='accepted'>accepted</span> your request for 1st call on June 30, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>04/22/2020</ListGroup.Item>
-					</ListGroup>
-					<ListGroup horizontal>
-						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow("Sorry, I can't let you go on vacation then.")}>
-							Peter Menikefs <span className='denied'>denied</span> your request for vacation from September 3, 2020 - September 10, 2020
-						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>01/08/2020</ListGroup.Item>
-					</ListGroup>
+					{msgList}
+				</div>
+				<div>
+					{this.showButton(messages.length)}
 				</div>
 				<div className='modal'>
 					<Modal show={show} onHide={() => this.toggleShow('')}>

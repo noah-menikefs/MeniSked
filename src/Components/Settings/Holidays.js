@@ -44,7 +44,6 @@ class Holidays extends React.Component{
 	months = moment.months();
 
 	addOrEdit = () => {
-		console.log(this.state.add);
 		if (this.state.add === true){
 			this.onNewRHoliday();
 		}

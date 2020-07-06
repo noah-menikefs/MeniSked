@@ -20,15 +20,14 @@
 
 .listStyleA {
 	display: inline-block;
-	padding-left: 25px;
-	padding-right: 25px;
+	padding: 0 25px;
 	width: 100%;
 }
 
 .listStyleE {
 	display: inline-block;
-	padding-left: 25px;
-	padding-right: 25px;
+	padding: 0 25px;
+	margin-bottom: 0.5em;
 	width: 100%;
 }
 

@@ -49,10 +49,6 @@ class Calendar extends React.Component{
 		this.props.onDayClick && this.props.onDayClick(e,day);
 	}
 
-	onDoubleClick = (e,day) => {
-		this.props.onDoubleClick && this.props.onDoubleClick(e,day);
-	}
-
 	dayType = (d) => {
 		if (this.props.type === "Personal"){
 			return (

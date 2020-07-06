@@ -187,10 +187,6 @@ class PubSchedule extends React.Component{
 		this.setState({show: !this.state.show});
 	}
 
-	onDoubleClick = (e,day) => {
-		this.alert(day);
-	}
-
 	months = moment.months(); // List of each month
 	
 	
@@ -517,7 +513,7 @@ class PubSchedule extends React.Component{
 						?this.loadNewDays(this.props.today)
 						: false
 					}
-					<Calendar testisadmin={testisadmin} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} callList={callList} entries={entryList} sked={sked} holiDays={holiDays} onDoubleClick={this.onDoubleClick} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar testisadmin={testisadmin} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} callList={callList} entries={entryList} sked={sked} holiDays={holiDays} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
