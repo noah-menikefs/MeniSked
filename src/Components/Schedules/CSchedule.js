@@ -254,14 +254,13 @@ class CSchedule extends React.Component{
 
 		return(
 			<div className="screen">
-				<Row className="labels">
-					<Col sm><h5 className="labels-child">Month</h5></Col>
-					<Col sm><h5 className="labels-child">Year</h5></Col>
-					<Col sm><Button onClick={this.reset} id="today" className="top-child" variant="primary">Today</Button></Col>
+				<Row className="clabels">
+					<Col><h5 className="labels-child">Month</h5></Col>
+					<Col><h5 className="labels-child">Year</h5></Col>
+					<Col><Button onClick={this.reset} id="today" className="top-child" variant="primary">Today</Button></Col>
 				</Row>
-				<Row className="header">
-
-				<Col sm><select value={dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
+				<Row className="cheader">
+				<Col><select value={dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
 	  					<option value="January">January</option>
 	  					<option value="February">February</option>
 	  					<option value="March">March</option>
@@ -278,19 +277,19 @@ class CSchedule extends React.Component{
 					<Col ><select value={dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
 	  					{yearSelect}
 					</select></Col>
-					<Col sm><p className="vis top-child"></p></Col>
+					<Col><p className="vis top-child"></p></Col>
 
 				</Row>
-				<Row className="subheader">
-					<Col sm>
+				<Row className="csubheader">
+					<Col>
 						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
 						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
 					</Col>
-					<Col sm>
+					<Col>
 						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
 						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
 					</Col>
-					<Col sm>
+					<Col>
 						<p className="vis top-child"></p>
 					</Col>
 				</Row>

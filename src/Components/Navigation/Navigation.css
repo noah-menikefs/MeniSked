@@ -28,8 +28,8 @@
 }
 
 
-/*When resolution <= 700px, hide full text and show short text*/
-@media (max-width: 700px) {
+/*When resolution <= 750px, hide full text and show short text*/
+@media (max-width: 750px) {
     .logo.linky { display: inline-block; }
     .logo { display: inline-block; }
     .full-text.linky { display: none; }
@@ -44,7 +44,10 @@
     	height: 40px;
     	margin-top: 0.25em;
     }
-
-
-
+}
+@media (max-width: 450px) {
+    #brandTitle{
+        font-size: 0;
+        visibility: hidden;
+    }
 }

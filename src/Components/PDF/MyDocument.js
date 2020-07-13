@@ -53,14 +53,9 @@ const styles = StyleSheet.create({
   tableCell: { 
     marginTop: 1,  
     fontSize: 8,
-    paddingLeft: 5,
+    paddingLeft: 2,
     borderStyle: "solid",  
     borderBottomWidth: 0.5
-  },
-  holiday: {
-    marginTop: 1,  
-    fontSize: 8,
-    paddingLeft: 1,
   },
   tableCellList: {   
     fontSize: 8,
@@ -167,13 +162,26 @@ class MyDocument extends React.Component{
 
           ctr++;
         }
-        tableCols.push(
-          <View key={j} style={styles.tableCol}> 
-            <Text style={styles.tableCell}>{day+'  '+numNote}</Text>
-            <Text style={styles.holiday}>{holiday}</Text>
-            {today}
-          </View> 
-        )
+        if (user.isadmin){
+          tableCols.push(
+            <View key={j} style={styles.tableCol}>
+              <View key={-j-1} style={styles.tableCell}>
+                <Text>{day+'  '+numNote}</Text>
+                <Text>{holiday}</Text>
+              </View>
+              {today}
+            </View> 
+          )
+        }
+        else{
+          tableCols.push(
+            <View key={j} style={styles.tableCol}>
+              <Text style={styles.tableCell}>{day+'   '+holiday}</Text>
+              {today}
+            </View> 
+          )
+        }
+       
       }
       tableRows.push(tableCols);
     }

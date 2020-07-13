@@ -396,12 +396,12 @@ class PubSchedule extends React.Component{
 				p = false;
 			}
 			if (p){
-				return (<Col sm><h5>Published</h5></Col>)
+				return (<Col><h5>Published</h5></Col>)
 			}
-			return (<Col sm><Button onClick={this.publishSked} className="top-child" variant="primary">Publish</Button></Col>);
+			return (<Col><Button onClick={this.publishSked} className="top-child" variant="primary">Publish</Button></Col>);
 		}
 		else{
-			return (<Col sm><p></p></Col>);
+			return (<Col><p></p></Col>);
 		}
 	}
 
@@ -472,33 +472,33 @@ class PubSchedule extends React.Component{
 		return(
 			<div className="screen">
 				<div>
-					<Row className="labels">
-						<Col sm><h5 className="labels-child">Month</h5></Col>
-						<Col sm><h5 className="labels-child">Year</h5></Col>
+					<Row className="plabels">
 						{this.publishShow()}
-						<Col sm><Button onClick={this.reset} id="today" className="top-child" variant="primary">Today</Button></Col>
+						<Col><h5 className="labels-child">Month</h5></Col>
+						<Col><h5 className="labels-child">Year</h5></Col>
+						<Col><Button onClick={this.reset} id="today" className="top-child" variant="primary">Today</Button></Col>
 					</Row>
 					<Row>
-						<Col sm><select value={this.state.dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
+						<Col ><p></p></Col>
+						<Col><select value={this.state.dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
 	  						{this.monthSelect()}
 						</select></Col>
 						<Col ><select value={this.state.dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
 	  						{this.yearSelect()}
 						</select></Col>
 						<Col ><p></p></Col>
-						<Col ><p></p></Col>
 					</Row>
-					<Row className="subheader">
-						<Col sm>
+					<Row className="psubheader">
+						<Col >
+							<p></p>
+						</Col>
+						<Col>
 							<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
 							<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
 						</Col>
-						<Col sm>
+						<Col>
 							<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
 							<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
-						</Col>
-						<Col >
-							<p></p>
 						</Col>
 						<Col >
 							<p></p>

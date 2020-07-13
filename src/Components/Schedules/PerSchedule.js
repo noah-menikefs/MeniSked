@@ -534,10 +534,10 @@ class PerSchedule extends React.Component{
 		return(
 			<div className="screen">
 				<Row className="labels">
-					<Col sm><h5 className="labels-child">Physician</h5></Col>
-					<Col sm><h5 className="labels-child">Type of Entry</h5></Col>
-					<Col sm><h5 className="labels-child">Month</h5></Col>
-					<Col sm><h5 className="labels-child">Year</h5></Col>
+					<Col><h5 className="labels-child">Physician</h5></Col>
+					<Col><h5 className="labels-child">Type of Entry</h5></Col>
+					<Col><h5 className="labels-child">Month</h5></Col>
+					<Col><h5 className="labels-child">Year</h5></Col>
 					<Col ><Button onClick={this.reset} id="today" className="top-child"variant="primary">Today</Button></Col>
 				</Row>
 				<Row className="header">
@@ -560,13 +560,13 @@ class PerSchedule extends React.Component{
 					<Col ><select value={dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
 					{yearSelect}
 					</select></Col>
-					<Col sm><p className="vis labels-child"></p></Col>
+					<Col><p className="vis labels-child"></p></Col>
 				</Row>
 				<Row className="subheader">
-					<Col sm>
+					<Col>
 						{this.adminButton(testisadmin)}
 					</Col>
-					<Col sm>
+					<Col>
 						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#9668;</Button>
 						<Button onClick={this.nextEntry} className="arrow top-child"variant="secondary">&#9658;</Button>
 					</Col>
@@ -574,17 +574,70 @@ class PerSchedule extends React.Component{
 						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
 						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
 					</Col>
-					<Col sm>
+					<Col>
 						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
 						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
 					</Col>
-					<Col sm>
+					<Col>
 						<p className="vis top-child"></p>
 					</Col>
 				</Row>
-				<Row className="curr">
-					<Col xl><h3>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h3></Col>
+				<Row className="labels1">
+					<Col><h5 className="labels-child">Physician</h5></Col>
+					<Col><h5 className="labels-child">Type of Entry</h5></Col>
 				</Row>
+				<Row className="header1">
+					<Col >{adminSelect(testisadmin, user)}</Col>
+					<Col >{eSelect()}</Col>
+				</Row>
+
+				<Row className="subheader1">
+					<Col>
+						{this.adminButton(testisadmin)}
+					</Col>
+					<Col>
+						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#9668;</Button>
+						<Button onClick={this.nextEntry} className="arrow top-child"variant="secondary">&#9658;</Button>
+					</Col>
+				</Row>
+				<Row className="labels2">
+					<Col><h5 className="labels-child">Month</h5></Col>
+					<Col><h5 className="labels-child">Year</h5></Col>
+				</Row>
+				<Row className="header2">
+					<Col ><select value={dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
+	  					<option value="January">January</option>
+	  					<option value="February">February</option>
+	  					<option value="March">March</option>
+	  					<option value="April">April</option>
+	  					<option value="May">May</option>
+	  					<option value="June">June</option>
+	  					<option value="July">July</option>
+	  					<option value="August">August</option>
+	  					<option value="September">September</option>
+	  					<option value="October">October</option>
+	  					<option value="November">November</option>
+	  					<option value="December">December</option>
+					</select></Col>
+					<Col ><select value={dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
+					{yearSelect}
+					</select></Col>
+				</Row>
+				<Row className="subheader2">
+					<Col >
+						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
+						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
+					</Col>
+					<Col>
+						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
+						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
+					</Col>
+				</Row>
+				<div className="curr">
+					<h3>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h3>
+					<Button onClick={this.reset} id="today1" className="top-child"variant="primary">Today</Button>
+				</div>
+
 				<div className="sked">
 					{ (nrHolidayList.length > 0 && !render)
 						?this.loadNewDays(this.props.today)
