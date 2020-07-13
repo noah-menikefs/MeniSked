@@ -141,17 +141,19 @@ class Calendar extends React.Component{
 		return list;
 	}
 
-	numToday = (d) => {
+	numToday = (d, id) => {
 		if (this.props.numNotes && this.props.testisadmin){
+			let idVar = 'num';
 			const arr = [...this.props.numNotes];
-			let list = [];
 			for (let i = 0; i < arr.length; i++){
 				const splitArr = arr[i].date.split('/');
 				if (splitArr[0] === this.props.dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === this.props.dateContext.format('YYYY')){	
-					return <span key={i} id="num">{arr[i].msg}</span>
+					if (id){
+						idVar = 'num2'
+					}
+					return <span key={i} id={idVar}>{arr[i].msg}</span>
 				}
 			}
-			return list;
 		}
 	}
 
@@ -196,12 +198,13 @@ class Calendar extends React.Component{
 
 		let daysInMonth = [];
 		for (let d = 1; d <= this.daysInMonth(); d++){
+			let id = (this.holidayToday(d));
 			let className = (d === this.currentDay() ? "day current-day" : "day");
 			daysInMonth.push(
 				<td key={d} onClick={(e) => {this.onDayClick(e,d)}} className={className}>
 					<div className="spacer">
-						{this.holidayToday(d)}
-						{this.numToday(d)}
+						{id}
+						{this.numToday(d,id)}
 						<span className="text" >{d}</span>
 					</div>
 					<hr/>
@@ -246,8 +249,6 @@ class Calendar extends React.Component{
 				</tr>
 			);
 		})
-
-
 
 		return(
 			<div className="calendar-container" style={this.state.style}>

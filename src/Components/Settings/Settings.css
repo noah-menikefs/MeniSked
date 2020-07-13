@@ -1,13 +1,13 @@
 .left, .right{
 	display: inline-block;
-	width: 40%;
+	width: 47%;
 }
 
 .left{
-	margin-right: 2.5%;
+	margin-right: 1%;
 }
 .right{
-	margin-left: 2.5%;
+	margin-left: 1%;
 }
 
 .p.right{
@@ -65,7 +65,7 @@ li{
 }
 
 #priority{
-	width: 20%;
+	width: 25%;
 }
 
 
@@ -73,3 +73,10 @@ li{
 	margin: 1em 0 0 1em;
 }
 
+.subtitle{
+	padding-left: 0px;
+}
+
+.setList{
+	padding-left: 30px;
+}

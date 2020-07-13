@@ -180,7 +180,7 @@ class CallTypes extends React.Component{
 						<h4 className="subtitle">Priority List</h4>
 					</div>
 					<Scroll>
-						<ol className="">
+						<ol className="setList">
 							{priorityList}
 						</ol>
 					</Scroll>

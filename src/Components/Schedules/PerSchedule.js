@@ -272,9 +272,6 @@ class PerSchedule extends React.Component{
 						this.editCall(typeID, date)
 					}
 				}
-			
-
-				
 			}
 		}
 

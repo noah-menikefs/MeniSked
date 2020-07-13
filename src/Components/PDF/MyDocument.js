@@ -57,6 +57,11 @@ const styles = StyleSheet.create({
     borderStyle: "solid",  
     borderBottomWidth: 0.5
   },
+  holiday: {
+    marginTop: 1,  
+    fontSize: 8,
+    paddingLeft: 1,
+  },
   tableCellList: {   
     fontSize: 8,
     paddingLeft: 1
@@ -164,7 +169,8 @@ class MyDocument extends React.Component{
         }
         tableCols.push(
           <View key={j} style={styles.tableCol}> 
-            <Text style={styles.tableCell}>{day+'     '+numNote+'     '+holiday}</Text>
+            <Text style={styles.tableCell}>{day+'  '+numNote}</Text>
+            <Text style={styles.holiday}>{holiday}</Text>
             {today}
           </View> 
         )

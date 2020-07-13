@@ -99,8 +99,6 @@ td > ul > li, div > li{
     list-style-position: inside;
 }
 
-
-
 td > ul{
     height: 115px;
     text-align: center;
@@ -159,11 +157,9 @@ td > hr {
     color: #FF0000;
 }
 
-/*
-td > .spacer{
-    justify-content: space-between;
-    text-align: right;
-}*/
+#num2{
+    padding: 0 15% 0 5%;
+}
 
 
 

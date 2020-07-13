@@ -157,7 +157,7 @@ class Entries extends React.Component{
 						<h4 className="subtitle">Entry List</h4>
 					</div>
 					<Scroll>
-						<ol className="">
+						<ol className="setList">
 							{priorityList}
 						</ol>
 					</Scroll>

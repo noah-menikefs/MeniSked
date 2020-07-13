@@ -313,7 +313,7 @@ class Holidays extends React.Component{
 						<Button className="add" onClick={this.toggleRShow} variant="primary">Add Recurring Holiday</Button>
 					</div>
 					<Scroll>
-						<ul className="">
+						<ul className="setList">
 							{rList}
 						</ul>
 					</Scroll>
@@ -324,7 +324,7 @@ class Holidays extends React.Component{
 						<Button onClick={this.toggleNRShow} variant="primary">Add Non-recurring Holiday</Button>
 					</div>
 					<Scroll>
-						<ul className="">
+						<ul className="setList">
 							{nrList}
 
 

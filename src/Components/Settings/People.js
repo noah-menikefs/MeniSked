@@ -154,7 +154,7 @@ class People extends React.Component{
 						<h4 className="subtitle">Staff List</h4>
 					</div>
 					<Scroll>
-						<ul className="">
+						<ul className="setList">
 							{docList}
 						</ul>
 					</Scroll>
