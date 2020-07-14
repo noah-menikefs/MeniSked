@@ -34,28 +34,8 @@ class Account extends React.Component {
 			}));
 	}
 
-	onEmailChange = (event) => {
-		this.setState({email: event.target.value})
-	}
-	
-	onFNameChange = (event) => {
-		this.setState({firstname: event.target.value})
-	}
-
-	onLNameChange = (event) => {
-		this.setState({lastname: event.target.value})
-	}
-
-	onCPasswordChange = (event) => {
-		this.setState({cPassword: event.target.value})
-	}
-
-	onNPasswordChange = (event) => {
-		this.setState({nPassword: event.target.value})
-	}
-
-	onCNPasswordChange = (event) => {
-		this.setState({cNPassword: event.target.value})
+	onChange = (event, type) => {
+		this.setState({[type]: event.target.value})
 	}
 
 	toggleShow = (route) => {
@@ -205,26 +185,26 @@ class Account extends React.Component {
 	}
 
 	render(){
-		const {show, title, msg} = this.state;
+		const {show, title, msg, email, firstname, lastname, cPassword, nPassword, cNPassword} = this.state;
 		return(
 			<div>
 				<div>
 					<div className='accountInfo'>
 						<h5 id='text'>Email Address</h5>
-						<input value={this.state.email} onChange={this.onEmailChange}  type='email' name='email' className='accountInp'/>
+						<input value={email} onChange={(e) => this.onChange(e,'email')}  type='email' name='email' className='accountInp'/>
 						<h5 id='text'>First Name</h5>
-						<input value={this.state.firstname} onChange={this.onFNameChange} type='text' name='first' className='accountInp'/>
+						<input value={firstname} onChange={(e) => this.onChange(e,'firstname')} type='text' name='first' className='accountInp'/>
 						<h5 id='text'>Last Name</h5>
-						<input value={this.state.lastname} onChange={this.onLNameChange} type='text' name='last' className='accountInp'/>
+						<input value={lastname} onChange={(e) => this.onChange(e,'lastname')} type='text' name='last' className='accountInp'/>
 					</div>
 					<div className='changePass'>
 						<h2 id='header'>Change Password</h2>
 						<h5 id='text'>Current Password</h5>
-						<input value={this.state.cPassword} onChange={this.onCPasswordChange} type='password' name='cp' className='accountInp'/>
+						<input value={cPassword} onChange={(e) => this.onChange(e,'cPassword')} type='password' name='cp' className='accountInp'/>
 						<h5 id='text'>New Password</h5>
-						<input value={this.state.nPassword} onChange={this.onNPasswordChange} type='password' name='np' className='accountInp'/>
+						<input value={nPassword} onChange={(e) => this.onChange(e,'nPassword')} type='password' name='np' className='accountInp'/>
 						<h5 id='text'>Confirm New Password</h5>
-						<input value={this.state.cNPassword} onChange={this.onCNPasswordChange} type='password' name='cnp' className='accountInp'/>
+						<input value={cNPassword} onChange={(e) => this.onChange(e,'cNPassword')} type='password' name='cnp' className='accountInp'/>
 					</div>
 					<Button onClick={this.onSubmitChoose} id="submit" variant="primary">Submit</Button>
 				</div>

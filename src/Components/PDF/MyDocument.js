@@ -1,6 +1,5 @@
 import React from 'react';
 import { Page, Text, Document, StyleSheet, View } from '@react-pdf/renderer';
-import './MyDocument.css';
 
 // Font.register({
 //   family: 'Source Sans Pro',

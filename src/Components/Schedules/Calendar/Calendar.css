@@ -1,13 +1,6 @@
-.calendar-container,
-.calendar,
-.calendar-header,
-td,
-tr {
+.calendar-container, .calendar, .calendar-header, td, tr {
     padding: 0;
     margin: 0;
-}
-
-.calendar-container { 
 }
 
 .calendar {
@@ -17,27 +10,15 @@ tr {
     width: 100%;
 }
 
-.calendar-header {
-    font-size: 1.6em;
-}
-
-.calendar-header td {
-    border-spacing: 0;
-    padding-left: 5px;
-}
-
-.day,
-.emptySlot,
-.week-day {
+.day, .emptySlot, .week-day {
     text-align: center;
     height: 40px;
     width: 150px;
     border: 1px solid black;
 }
 
-.day,
-.week-day {
-    padding: 0 0 5px 0;
+.day, .week-day {
+    padding-bottom: 5px;
 }
 
 .emptySlot{
@@ -57,32 +38,6 @@ tr {
     height: 100%;
 }
 
-.selected-day {
-    background-color:yellow;
-    width: 28px;
-    height: 125px;
-    line-height: 125px;
-    border-radius: 2%;
-    color: black;
-}
-
-.month-popup {
-    position: absolute;
-    padding: 5px;
-    background: white;
-    border: 2px solid skyblue;
-}
-
-.month-popup div {
-    padding: 0.3em;
-}
-
-.nav-month {
-    position: absolute;
-    top: 0.6em;
-    font-size: 0.6em;
-    right:3px;
-}
 
 td > ul > li, div > li{
     list-style-type: none;
@@ -107,19 +62,6 @@ td > ul{
     overflow: hidden;
 }
 
-.editor-year {
-    max-width: 3.6em;
-}
-
-.label-month,
-.label-year {
-    font-size: 0.6em;
-}
-
-.label-month {
-    cursor: pointer;
-}
-
 div > .text{
     padding-right: 5px; 
     margin-top: 0;
@@ -136,30 +78,20 @@ td > hr {
 }
 
 
-#holiday{
+#holiday, #num{
     float: left;
     padding-left: 5px;
 }
 
-#num{
-    float: left;
-    padding-left: 5px;
-}
-
-.personal{
+.personal, .pending{
     font-size: 1.5em;
     margin-top: 2em;
 }
 
 .pending{
-    font-size: 1.5em;
-    margin-top: 2em;
     color: #FF0000;
 }
 
 #num2{
     padding: 0 15% 0 5%;
 }
-
-
-

@@ -65,5 +65,6 @@
 @media (max-width: 750px) {
     .labels1.row, .header1.row, .subheader1.row, .labels2.row, .header2.row, .subheader2.row, #today1 { display: flex; }
     .labels.row, .header.row, .subheader.row{ display: none; }
+    #pcurr{ position: relative; left: 40px; }
     
 }

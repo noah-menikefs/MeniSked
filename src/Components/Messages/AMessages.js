@@ -88,7 +88,6 @@ class AMessages extends React.Component{
 
 	}
 
-
 	toggleShow = (id = -1) => {
 		this.setState({
 			show: !this.state.show,
@@ -228,7 +227,6 @@ class AMessages extends React.Component{
 			}
 		}
 
-
 		return(
 			<div>
 				<h4 className="requests">Pending</h4>
@@ -279,17 +277,9 @@ class AMessages extends React.Component{
 						</Modal.Footer>
 					</Modal>
 				</div>
-
-
 			</div>
-
 		);
-
-
-
 	}
-
-
 }
 
 export default AMessages;

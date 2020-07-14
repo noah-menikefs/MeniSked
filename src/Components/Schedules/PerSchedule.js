@@ -634,7 +634,7 @@ class PerSchedule extends React.Component{
 					</Col>
 				</Row>
 				<div className="curr">
-					<h3>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h3>
+					<h3 id='pcurr'>{dateContext.format('MMMM')+' '+dateContext.format('Y')}</h3>
 					<Button onClick={this.reset} id="today1" className="top-child"variant="primary">Today</Button>
 				</div>
 
@@ -674,15 +674,9 @@ class PerSchedule extends React.Component{
 	        			</Form>
       				</Modal>
 				</div>
-
 			</div>
 		);
-
-
-
 	}
-
-
 }
 
 export default PerSchedule;

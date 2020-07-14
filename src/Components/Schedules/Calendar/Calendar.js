@@ -14,9 +14,6 @@ class Calendar extends React.Component{
 		}
 	}
 
-	
-
-
 	weekdays = moment.weekdays(); //List of weekdays
 	weekdaysShort = moment.weekdaysShort(); //List of shortened days
 	months = moment.months(); // List of each month
@@ -43,8 +40,6 @@ class Calendar extends React.Component{
 		return firstDay;
 	}
 
-
-
 	onDayClick = (e,day) => {
 		this.props.onDayClick && this.props.onDayClick(e,day);
 	}
@@ -68,10 +63,10 @@ class Calendar extends React.Component{
 
 		else{
 			return (
-					<ul>
-						{this.workToday(d)}
-						{this.noteToday(d)}
-					</ul>
+				<ul>
+					{this.workToday(d)}
+					{this.noteToday(d)}
+				</ul>
 			)
 		}
 	}
@@ -253,25 +248,12 @@ class Calendar extends React.Component{
 		return(
 			<div className="calendar-container" style={this.state.style}>
 				<table className="calendar">
-					<thead>
-						<tr className="calendar-header">
-							<td colSpan="2" className="nav-month">
-								<i className="prev fa fa-fw fa-chevron-left"
-									onClick={(e) => {this.prevMonth()}}>
-								</i>
-								<i className="prev fa fa-fw fa-chevron-right"
-									onClick={(e) => {this.nextMonth()}}>
-								</i>
-							</td>
-						</tr>
-					</thead>
 					<tbody>
 						<tr>
 							{weekdays}
 						</tr>
 						{trElements}
 					</tbody>
-
 				</table>
 			</div>
 		);

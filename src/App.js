@@ -87,7 +87,7 @@ class App extends Component {
       case 'Account Information': 
         return <Account loadUser={this.loadUser} user={this.state.user} validateEmail={this.validateEmail}/>
       case 'Admin Messages': 
-        return <AMessages today={this.state.today} />
+        return <AMessages user={this.state.user} today={this.state.today} />
       case 'Messages': 
         return <EMessages user={this.state.user}/>
       case 'Holidays': 

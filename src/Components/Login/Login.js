@@ -19,16 +19,8 @@ class Login extends React.Component{
 		}
 	}
 
-	onEmailChange = (event) => {
-		this.setState({loginEmail: event.target.value})
-	}
-
-	onPasswordChange = (event) => {
-		this.setState({loginPassword: event.target.value})
-	}
-
-	forgotPWordChange = (event) => {
-		this.setState({forgotEmail: event.target.value})
+	onChange = (event, type) => {
+		this.setState({[type]: event.target.value})
 	}
 
 	onSLogin = () => {
@@ -108,11 +100,11 @@ class Login extends React.Component{
 						<Form className="login-form" /*onSubmit={this.onSLogin}*/ >
 							<h1 id="loginTitle">Login</h1>
 							<Form.Group controlId="formBasicEmail">
-							    <Form.Control onChange={this.onEmailChange} required type="email" autoComplete="email" placeholder="Email" />
+							    <Form.Control onChange={(e) => this.onChange(e,'loginEmail')} required type="email" autoComplete="email" placeholder="Email" />
 							  </Form.Group>
 
 							<Form.Group controlId="formBasicPassword">
-								<Form.Control onChange={this.onPasswordChange} type="password" autoComplete="current-password" placeholder="Password" />
+								<Form.Control onChange={(e) => this.onChange(e,'loginPassword')} type="password" autoComplete="current-password" placeholder="Password" />
 							</Form.Group>
 							<Button onClick={this.onSLogin} /*type="submit"*/ id='loginButton' variant="primary">
 								Login
@@ -165,7 +157,7 @@ class Login extends React.Component{
         					<Modal.Body>
         						<Form.Group controlId="formBasicEmail">
     								<Form.Label>Enter your email below and we'll send you instructions to retrieve your account.</Form.Label>
-    								<Form.Control onChange={this.forgotPWordChange} required type="email" placeholder="Email" />
+    								<Form.Control onChange={(e) => this.onChange(e,'forgotEmail')} required type="email" placeholder="Email" />
   								</Form.Group>
         					</Modal.Body>
         				<Modal.Footer>

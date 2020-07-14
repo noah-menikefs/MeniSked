@@ -3,7 +3,7 @@
 	margin: auto;
 }
 .spacing{
-	width: 100%;
+	/*width: 100%;*/
 	padding: 0.25em 0em 0.25em 0em;
 	display: flex;
 	justify-content: center;
@@ -16,15 +16,15 @@
 }
 
 #loginBody{
-	width: 100%;
+	/*width: 100%;*/
 	background-color: #00B7BC;
 }
 
 .login-form{
-	width: 100%;
+	/*width: 100%;*/
 	max-width: 300px;
 	margin: auto;
-	height: 100%;
+	/*height: 100%;*/
 	padding: 1em 0em 1.5em 0em;
 
 }
@@ -52,8 +52,4 @@
 
 #modalTitle{
 	max-height: 30px;
-}
-
-.err{
-	color: #D01C1FFF;
 }

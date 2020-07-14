@@ -21,28 +21,8 @@ class Register extends React.Component{
 		}
 	}
 
-	onEmailChange = (event) => {
-		this.setState({email: event.target.value})
-	}
-
-	onPasswordChange = (event) => {
-		this.setState({password: event.target.value})
-	}
-
-	onCPasswordChange = (event) => {
-		this.setState({cPassword: event.target.value})
-	}
-
-	onCodeChange = (event) => {
-		this.setState({code: event.target.value})
-	}
-
-	onFNameChange = (event) => {
-		this.setState({firstname: event.target.value})
-	}
-
-	onLNameChange = (event) => {
-		this.setState({lastname: event.target.value})
+	onChange = (event, type) => {
+		this.setState({[type]: event.target.value})
 	}
 
 	onSubmitRegister = () => {
@@ -119,22 +99,22 @@ class Register extends React.Component{
 						<Form className="login-form">
 							<h1 id="loginTitle">Register</h1>
 							<Form.Group controlId="formBasicFName">
-								<Form.Control required onChange={this.onFNameChange} type="text" autoComplete="off" placeholder="First Name" />
+								<Form.Control required onChange={(e) => this.onChange(e,'firstname')} type="text" autoComplete="off" placeholder="First Name" />
 							</Form.Group>
 							<Form.Group controlId="formBasicLName">
-								<Form.Control required onChange={this.onLNameChange} type="text" autoComplete="off" placeholder="Last Name" />
+								<Form.Control required onChange={(e) => this.onChange(e,'lastname')} type="text" autoComplete="off" placeholder="Last Name" />
 							</Form.Group>
 							<Form.Group controlId="formBasicEmail">
-							    <Form.Control required onChange={this.onEmailChange} type="email" autoComplete="off" placeholder="Email" />
+							    <Form.Control required onChange={(e) => this.onChange(e,'email')} type="email" autoComplete="off" placeholder="Email" />
 							</Form.Group>
 							<Form.Group controlId="formBasicPassword">
-								<Form.Control required onChange={this.onPasswordChange} type="password" autoComplete="off" placeholder="Password" />
+								<Form.Control required onChange={(e) => this.onChange(e,'password')} type="password" autoComplete="off" placeholder="Password" />
 							</Form.Group>
 							<Form.Group controlId="formBasicCPassword">
-								<Form.Control required onChange={this.onCPasswordChange} type="password" autoComplete="off" placeholder="Confirm Password" />
+								<Form.Control required onChange={(e) => this.onChange(e,'cPassword')} type="password" autoComplete="off" placeholder="Confirm Password" />
 							</Form.Group>
 							<Form.Group controlId="formBasicCode">
-								<Form.Control required onChange={this.onCodeChange} type="text" autoComplete="off" placeholder="Department Code" />
+								<Form.Control required onChange={(e) => this.onChange(e,'code')} type="text" autoComplete="off" placeholder="Department Code" />
 							</Form.Group>
 							<Button onClick={this.onSubmitRegister} id='loginButton' variant="primary" >
 								Register
