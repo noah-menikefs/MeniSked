@@ -29,7 +29,6 @@ class PerSchedule extends React.Component{
 			entryIndex: 0,
 			show: false,
 			dateContext: moment(),
-			callList: [],
 			radio: -1,
 			day: 0,
 			rHolidayList: [],
@@ -45,7 +44,7 @@ class PerSchedule extends React.Component{
 	componentDidMount = () => {
    		this.loadActiveDocs();
    		this.loadEntries();
-   		this.loadCallTypes();
+   		this.props.loadCallTypes();
    		this.loadrHolidays();
    		this.loadnrHolidays();
   	}
@@ -87,12 +86,6 @@ class PerSchedule extends React.Component{
       		.then(response => response.json())
       		.then(entries => this.setState({entries: entries.filter((entry => entry.isactive === true))}));
   	}
-
-  	loadCallTypes = () => {
-		fetch('http://localhost:3000/callTypes')
-			.then(response => response.json())
-			.then(calls => this.setState({callList: calls.sort(function(a, b){return a.priority - b.priority})}));
-	}
 
 	loadNewDays = (dateContext) => {
 		let newArr = [];
@@ -233,7 +226,7 @@ class PerSchedule extends React.Component{
 		if (typeId !== -1){
 			const typeID = parseInt(typeId,10);
 			const date = this.state.dateContext.format('MM')+'/'+day+'/'+this.state.dateContext.format('YYYY');
-			if (this.props.testisadmin){
+			if (this.props.user.isadmin){
 				let method = 'post';
 				for (let i = 0;  i < this.state.personalDays.length; i++){
 					if (this.state.personalDays[i].date === date && typeID === this.state.personalDays[i].id){
@@ -243,7 +236,7 @@ class PerSchedule extends React.Component{
 				}
 				this.assignCall(typeID, method, date);
 			}
-			else if (!this.props.testisadmin){
+			else if (!this.props.user.isadmin){
 				let flag = false;
 				let flag2 = false;
 
@@ -448,8 +441,8 @@ class PerSchedule extends React.Component{
 		this.setState({show: !this.state.show})
 	}
 
-	adminButton = (isadmin) => {
-		if (isadmin){
+	adminButton = () => {
+		if (this.props.user.isadmin){
 			return (
 			<div>
 				<Button onClick={this.prevDoc} className="arrow top-child" variant="secondary">&#9668;</Button>
@@ -469,8 +462,8 @@ class PerSchedule extends React.Component{
 	
 
 	render(){
-		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, callList, holiDays, nrHolidayList, render, personalDays, pending, loaded} = this.state;
-		const {testisadmin, user, today} = this.props;
+		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, holiDays, nrHolidayList, render, personalDays, pending, loaded} = this.state;
+		const {user, today, callList} = this.props;
 		if (user.id && !loaded){
 			this.loadPending();
 			this.setState({loaded: true})
@@ -480,8 +473,9 @@ class PerSchedule extends React.Component{
 			return <option key={i} value={doc.lastname}>{doc.lastname}</option>
 		})
 
-		let adminSelect = (isadmin, user) => {
-			if (isadmin && activeDocs.length!==0){
+		let adminSelect = () => {
+			let user = this.props.user;
+			if (user.isadmin && activeDocs.length!==0){
 				return (
 					<select value={activeDocs[docIndex].lastname} onChange={this.onPhysicianChange} className="top-child doc selector">
   						{docSelect}
@@ -541,7 +535,7 @@ class PerSchedule extends React.Component{
 					<Col ><Button onClick={this.reset} id="today" className="top-child"variant="primary">Today</Button></Col>
 				</Row>
 				<Row className="header">
-					<Col >{adminSelect(testisadmin, user)}</Col>
+					<Col >{adminSelect()}</Col>
 					<Col >{eSelect()}</Col>
 					<Col ><select value={dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
 	  					<option value="January">January</option>
@@ -564,7 +558,7 @@ class PerSchedule extends React.Component{
 				</Row>
 				<Row className="subheader">
 					<Col>
-						{this.adminButton(testisadmin)}
+						{this.adminButton()}
 					</Col>
 					<Col>
 						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#9668;</Button>
@@ -587,13 +581,13 @@ class PerSchedule extends React.Component{
 					<Col><h5 className="labels-child">Type of Entry</h5></Col>
 				</Row>
 				<Row className="header1">
-					<Col >{adminSelect(testisadmin, user)}</Col>
+					<Col >{adminSelect()}</Col>
 					<Col >{eSelect()}</Col>
 				</Row>
 
 				<Row className="subheader1">
 					<Col>
-						{this.adminButton(testisadmin)}
+						{this.adminButton()}
 					</Col>
 					<Col>
 						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#9668;</Button>
@@ -646,7 +640,6 @@ class PerSchedule extends React.Component{
 					<Calendar pending={pending} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
 					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>

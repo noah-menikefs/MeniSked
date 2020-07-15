@@ -22,26 +22,18 @@ class App extends Component {
       today: moment(),
       isSignedIn: false,
       route: 'Login',
+      callList: [],
       user:{
         id: '',
         firstname: '',
-        lastname: 'Ismail',
+        lastname: '',
         email: '',
         colour: '',
         department: '',
         isadmin: false,
-        isactive: true,
+        isactive: false,
         worksked: []
-      },
-      entries: [
-        "Request No Call",
-        "Vacation",
-        "Staycation",
-        "No Assignment",
-        "Not Available",
-        "Not Available Night",
-        "Assign Call Type"
-      ]
+      }
     }
   }
 
@@ -59,31 +51,21 @@ class App extends Component {
     }})
   }
 
+  loadCallTypes = () => {
+    fetch('http://localhost:3000/callTypes')
+      .then(response => response.json())
+      .then(calls => this.setState({callList: calls.sort(function(a, b){return a.priority - b.priority})}));
+  }
 
-  /*
-  Different cases:
-  Login
-  Register
-  Personal Schedule
-  Published Schedule
-  Call Schedule
-  Account Information
-  Admin Messages
-  Messages
-  Holidays
-  Call Types
-  People
-  Entries
-  */
   //used for rendering when signed in 
   inRenderSwitch(route){
     switch(route){
       case "Personal Schedule": 
-        return <PerSchedule today={this.state.today} entries={this.state.entries}  user={this.state.user} testisadmin={this.state.user.isadmin}/>
+        return <PerSchedule loadCallTypes={this.loadCallTypes} callList={this.state.callList} today={this.state.today} user={this.state.user}/>
       case 'Published Schedule': 
-        return <PubSchedule today={this.state.today} user={this.state.user} testisadmin={this.state.user.isadmin}/>
+        return <PubSchedule loadCallTypes={this.loadCallTypes} callList={this.state.callList} today={this.state.today} user={this.state.user}/>
       case 'Call Schedule': 
-        return <CSchedule today={this.state.today} user={this.state.user}/>
+        return <CSchedule loadCallTypes={this.loadCallTypes} callList={this.state.callList} today={this.state.today} user={this.state.user}/>
       case 'Account Information': 
         return <Account loadUser={this.loadUser} user={this.state.user} validateEmail={this.validateEmail}/>
       case 'Admin Messages': 
@@ -99,7 +81,7 @@ class App extends Component {
         case 'Entries': 
         return <Entries/>
       default:
-        return <PerSchedule entries={this.state.entries}  user={this.state.user} testisadmin={this.state.user.isadmin}/>
+        return <PerSchedule today={this.state.today} user={this.state.user}/>
     }
   }
 

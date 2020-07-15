@@ -34,7 +34,6 @@ class PubSchedule extends React.Component{
 			render: false,
 			sked: [],
 			entryList: [],
-			callList: [],
 			day: -1,
 			published: -1
 		}
@@ -45,7 +44,7 @@ class PubSchedule extends React.Component{
    		this.loadrHolidays();
    		this.loadnrHolidays();
    		this.loadEntries();
-   		this.loadCallTypes();
+   		this.props.loadCallTypes();
    		this.loadSked();
    		this.loadPublished();
    		
@@ -95,14 +94,14 @@ class PubSchedule extends React.Component{
 
   	priorityCheck = (id) => {
   		let index = -1;
-		for (let n = 0; n < this.state.callList.length; n++){
-			if (this.state.callList[n].id === id){
+		for (let n = 0; n < this.props.callList.length; n++){
+			if (this.props.callList[n].id === id){
 				index = n;
 				break;
 			}
 		}
 		if (index !== -1){
-			return this.state.callList[index].priority;
+			return this.props.callList[index].priority;
 		}
 		else{
 			return 1000;
@@ -114,12 +113,6 @@ class PubSchedule extends React.Component{
       		.then(response => response.json())
       		.then(entries => this.setState({entryList: entries.filter((entry => entry.isactive === true))}));
   	}
-
-  	loadCallTypes = () => {
-		fetch('http://localhost:3000/callTypes')
-			.then(response => response.json())
-			.then(calls => this.setState({callList: calls.sort(function(a, b){return a.priority - b.priority})}));
-	}
 
   	loadAllNotes = () => {
     	fetch('http://localhost:3000/sked/allNotes')
@@ -203,7 +196,7 @@ class PubSchedule extends React.Component{
 	nextMonth = () => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).add(1, "month");
-		if (!this.props.testisadmin){
+		if (!this.props.user.isadmin){
 			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			if (dateContext.year() < nYear){
@@ -246,7 +239,7 @@ class PubSchedule extends React.Component{
 	}
 
 	nextYear = () => {
-		if (!this.props.testisadmin){
+		if (!this.props.user.isadmin){
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			if ((this.state.dateContext.year() + 1) <= nYear){
 				let dateContext = Object.assign({}, this.state.dateContext);
@@ -284,7 +277,7 @@ class PubSchedule extends React.Component{
 	setYear = (year) => {
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).set("year",year);
-		if (!this.props.testisadmin){
+		if (!this.props.user.isadmin){
 			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			if (dateContext.year() === nYear && nMonth < dateContext.month()){
@@ -350,7 +343,7 @@ class PubSchedule extends React.Component{
 	yearSelect = () => {
 		let arr = [];
 		let fYear = this.props.today.year();
-		if (this.props.testisadmin){
+		if (this.props.user.isadmin){
 			for (let i = 2020; i <= fYear + 10; i++){
 				arr.push(<option key={i} value={i}>{i}</option>);
 			}
@@ -369,7 +362,7 @@ class PubSchedule extends React.Component{
 	monthSelect = () => {
 		let m = 11;
 		let arr = [];
-		if (!this.props.testisadmin){
+		if (!this.props.user.isadmin){
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
 			if (this.state.dateContext.year() === nYear){
@@ -383,7 +376,7 @@ class PubSchedule extends React.Component{
 	}
 
 	publishShow = () => {
-		if (this.props.testisadmin){
+		if (this.props.user.isadmin){
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
 			let p = true
@@ -406,7 +399,7 @@ class PubSchedule extends React.Component{
 	}
 
 	adminNotes = () => {
-		if (this.props.testisadmin === true){
+		if (this.props.user.isadmin){
 			return (
 				<Form>
 					<hr/>
@@ -428,9 +421,9 @@ class PubSchedule extends React.Component{
 	}
 
 	idToName = (id) => {
-		for (let n = 0; n < this.state.callList.length; n++){
-				if (this.state.callList[n].id === id){
-					return this.state.callList[n].name;
+		for (let n = 0; n < this.props.callList.length; n++){
+				if (this.props.callList[n].id === id){
+					return this.props.callList[n].name;
 				}
 			}
 		for (let i = 0; i < this.state.entryList.length; i++){
@@ -441,8 +434,8 @@ class PubSchedule extends React.Component{
 	}
 
 	render(){
-		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, callList, day} = this.state;
-		const {testisadmin, today, user} = this.props;
+		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, day} = this.state;
+		const {today, user, callList} = this.props;
 
 		let modalList = [];
 		for (let i = 0; i < sked.length; i++){
@@ -459,7 +452,7 @@ class PubSchedule extends React.Component{
 				noteList.push(<li key={i} id="notes">{vNotes[i].msg}</li>);
 			}
 		}
-		if (testisadmin){
+		if (user.isadmin){
 			for (let i = 0; i < iNotes.length; i++){
 				const splitArr = iNotes[i].date.split('/');
 				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
@@ -513,7 +506,7 @@ class PubSchedule extends React.Component{
 						?this.loadNewDays(this.props.today)
 						: false
 					}
-					<Calendar testisadmin={testisadmin} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} callList={callList} entries={entryList} sked={sked} holiDays={holiDays} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
+					<Calendar testisadmin={user.isadmin} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} callList={callList} entries={entryList} sked={sked} holiDays={holiDays} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}

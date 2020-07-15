@@ -28,7 +28,6 @@ class CSchedule extends React.Component{
 			nrHolidayList: [],
 			render: false,
 			callSked:[],
-			callList: [],
 			day: -1
 		}
 	}
@@ -36,7 +35,7 @@ class CSchedule extends React.Component{
 	componentDidMount = () => {
    		this.loadrHolidays();
    		this.loadnrHolidays();
-   		this.loadCallTypes();
+   		this.props.loadCallTypes();
    		this.loadCallSked();
   	}
 
@@ -46,8 +45,8 @@ class CSchedule extends React.Component{
       		.then(docs => {
       			let arr = [];
       			let callIds = [];
-      			for (let n = 0; n < this.state.callList.length; n++){
-      				callIds.push(this.state.callList[n].id);
+      			for (let n = 0; n < this.props.callList.length; n++){
+      				callIds.push(this.props.callList[n].id);
       			}
       			for (let i = 0; i < docs.length; i++){
       				for (let j = 0; j < docs[i].worksked.length; j++){
@@ -70,13 +69,12 @@ class CSchedule extends React.Component{
   	}
 
   	priorityCheck = (id) => {
-		for (let n = 0; n < this.state.callList.length; n++){
-			if (this.state.callList[n].id === id){
-				return this.state.callList[n].priority;
+		for (let n = 0; n < this.props.callList.length; n++){
+			if (this.props.callList[n].id === id){
+				return this.props.callList[n].priority;
 			}
 		}
   	}
-
 
 	loadrHolidays = () => {
 		fetch('http://localhost:3000/holiday/r')
@@ -88,12 +86,6 @@ class CSchedule extends React.Component{
 		fetch('http://localhost:3000/holiday/nr')
 			.then(response => response.json())
 			.then(holidays => this.setState({nrHolidayList: holidays}));
-	}
-
-	loadCallTypes = () => {
-		fetch('http://localhost:3000/callTypes')
-			.then(response => response.json())
-			.then(calls => this.setState({callList: calls.sort(function(a, b){return a.priority - b.priority})}));
 	}
 
 	loadNewDays = (dateContext) => {
@@ -139,7 +131,6 @@ class CSchedule extends React.Component{
 			day: day
 		});
 	}
-
 
 	months = moment.months(); // List of each month
 
@@ -226,16 +217,16 @@ class CSchedule extends React.Component{
 
 
 	idToName = (id) => {
-		for (let n = 0; n < this.state.callList.length; n++){
-			if (this.state.callList[n].id === id){
-				return this.state.callList[n].name;
+		for (let n = 0; n < this.props.callList.length; n++){
+			if (this.props.callList[n].id === id){
+				return this.props.callList[n].name;
 			}
 		}
 	}
 
 	render(){
-		const {dateContext, show, holiDays, nrHolidayList, render, callSked, callList, day} = this.state;
-		const {today, user} = this.props;
+		const {dateContext, show, holiDays, nrHolidayList, render, callSked, day} = this.state;
+		const {today, user, callList} = this.props;
 		let yearSelect = [];
 
 		let fYear = today.year();
