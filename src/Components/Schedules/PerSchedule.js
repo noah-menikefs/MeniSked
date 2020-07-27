@@ -37,7 +37,8 @@ class PerSchedule extends React.Component{
 			personalDays: [],
 			render: false,
 			pending: [],
-			loaded: false
+			loaded: false,
+			depts: []
 		}
 	}
 
@@ -47,6 +48,7 @@ class PerSchedule extends React.Component{
    		this.props.loadCallTypes();
    		this.loadrHolidays();
    		this.loadnrHolidays();
+   		this.loadDepts();
   	}
 
 	loadrHolidays = () => {
@@ -142,6 +144,12 @@ class PerSchedule extends React.Component{
       		.then(response => response.json())
       		.then(messages => this.setState({pending: messages.filter((message => message.status === 'pending'))}));
 	}
+
+	loadDepts = () => {
+   		fetch('http://localhost:3000/departments')
+			.then(response => response.json())
+			.then(departments => this.setState({depts: departments}));
+   	}
 
 	onDayClick = (e,day) => {
 		const id = this.state.entries[this.state.entryIndex].id;
@@ -463,7 +471,7 @@ class PerSchedule extends React.Component{
 	
 
 	render(){
-		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, holiDays, nrHolidayList, render, personalDays, pending, loaded} = this.state;
+		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, holiDays, nrHolidayList, render, personalDays, pending, loaded, depts} = this.state;
 		const {user, today, callList} = this.props;
 		if (user.id && !loaded){
 			this.loadPending();
@@ -510,7 +518,6 @@ class PerSchedule extends React.Component{
 		}
 
 		let yearSelect = [];
-
 		let fYear = today.year();
 
 		for (let i = 2020; i <= fYear + 10; i++){
@@ -641,7 +648,7 @@ class PerSchedule extends React.Component{
 					<Calendar pending={pending} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>

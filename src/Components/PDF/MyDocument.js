@@ -68,10 +68,10 @@ class MyDocument extends React.Component{
     super(props);
     this.state = {
     }
-  }
+  } 
 
   render(){
-    const {user, type, dateContext, holiDays, personalDays, entries, callList, callSked, sked, numNotes, iNotes, vNotes} = this.props;
+    const {user, type, dateContext, holiDays, personalDays, entries, callList, callSked, sked, numNotes, iNotes, vNotes, depts} = this.props;
     let firstDay = dateContext.startOf('month').format('d'); //Day of week 0-6
     let daysInMonth = dateContext.daysInMonth();
     let ctr = 1;
@@ -85,7 +85,6 @@ class MyDocument extends React.Component{
     let vNote = '';
 
     let listType = [];
-
 
     if (callSked){
       listType = [...callSked];
@@ -186,10 +185,11 @@ class MyDocument extends React.Component{
     }
 
     let dept = user.department.replace(' Admin', '');
-    if (dept === 'ST-JOES-A'){
-      dept = "Dept. of Anesthesia, St. Joseph's Health Centre";
+    for (let i = 0; i < depts.length; i++){
+      if (depts[i].code === dept){
+        dept = depts[i].name;
+      }
     }
-
 
     return (
       <Document>

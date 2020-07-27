@@ -35,7 +35,8 @@ class PubSchedule extends React.Component{
 			sked: [],
 			entryList: [],
 			day: -1,
-			published: -1
+			published: -1,
+			depts: []
 		}
 	}
 
@@ -47,7 +48,7 @@ class PubSchedule extends React.Component{
    		this.props.loadCallTypes();
    		this.loadSked();
    		this.loadPublished();
-   		
+   		this.loadDepts();
   	}
 
   	loadPublished = () => {
@@ -91,6 +92,12 @@ class PubSchedule extends React.Component{
       			this.setState({sked: arr})
       		});
   	}
+
+  	loadDepts = () => {
+   		fetch('http://localhost:3000/departments')
+			.then(response => response.json())
+			.then(departments => this.setState({depts: departments}));
+   	}
 
   	priorityCheck = (id) => {
   		const {callList} = this.props;
@@ -435,7 +442,7 @@ class PubSchedule extends React.Component{
 	}
 
 	render(){
-		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, day} = this.state;
+		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, day, depts} = this.state;
 		const {today, user, callList} = this.props;
 
 		let modalList = [];
@@ -511,7 +518,7 @@ class PubSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
-					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>

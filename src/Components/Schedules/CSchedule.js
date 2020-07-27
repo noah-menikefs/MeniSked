@@ -28,7 +28,8 @@ class CSchedule extends React.Component{
 			nrHolidayList: [],
 			render: false,
 			callSked:[],
-			day: -1
+			day: -1,
+			depts: []
 		}
 	}
 
@@ -37,6 +38,7 @@ class CSchedule extends React.Component{
    		this.loadnrHolidays();
    		this.props.loadCallTypes();
    		this.loadCallSked();
+   		this.loadDepts();
   	}
 
   	loadCallSked = () => {
@@ -117,6 +119,12 @@ class CSchedule extends React.Component{
 			render: true}
 		);
 	}
+
+	loadDepts = () => {
+   		fetch('http://localhost:3000/departments')
+			.then(response => response.json())
+			.then(departments => this.setState({depts: departments}));
+   	}
 
 	onDayClick = (e,day) => {
 		let dateContext = Object.assign({}, this.state.dateContext);
@@ -225,7 +233,7 @@ class CSchedule extends React.Component{
 	}
 
 	render(){
-		const {dateContext, show, holiDays, nrHolidayList, render, callSked, day} = this.state;
+		const {dateContext, show, holiDays, nrHolidayList, render, callSked, day, depts} = this.state;
 		const {today, user, callList} = this.props;
 		let yearSelect = [];
 
@@ -296,7 +304,7 @@ class CSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
-					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>
