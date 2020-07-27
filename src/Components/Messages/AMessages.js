@@ -108,10 +108,11 @@ class AMessages extends React.Component{
 	}
 
 	docIdToName = (id) => {
+		const {peopleList} = this.state;
 		id = parseInt(id,10);
-		for (let i = 0; i < this.state.peopleList.length; i++){
-			if (id === this.state.peopleList[i].id){
-				return this.state.peopleList[i].firstname + ' ' + this.state.peopleList[i].lastname;
+		for (let i = 0; i < peopleList.length; i++){
+			if (id === peopleList[i].id){
+				return peopleList[i].firstname + ' ' + peopleList[i].lastname;
 			}
 		}
 	}

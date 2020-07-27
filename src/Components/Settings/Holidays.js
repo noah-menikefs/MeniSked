@@ -53,15 +53,16 @@ class Holidays extends React.Component{
 	}
 
 	onNewRHoliday = () => {
-		if (this.state.name.length > 0){
+		const {name, isactive, month, day} = this.state;
+		if (name.length > 0){
 			fetch('http://localhost:3000/holiday/r', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					name: this.state.name,
-					isactive: this.state.isactive,
-					month: this.state.month,
-					day: parseInt(this.state.day,10)
+					name: name,
+					isactive: isactive,
+					month: month,
+					day: parseInt(day,10)
 
 				})
 			})
@@ -76,12 +77,13 @@ class Holidays extends React.Component{
 	}
 
 	onNewNRHoliday = () => {
-		if (this.state.name.length > 0){
+		const {name} = this.state;
+		if (name.length > 0){
 			fetch('http://localhost:3000/holiday/nr', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					name: this.state.name,
+					name: name,
 				})
 			})
 				.then(response => response.json())
@@ -95,14 +97,15 @@ class Holidays extends React.Component{
 	}
 
 	onEditRHoliday = () => {
+		const {name, isactive, month, day} = this.state;
 		fetch('http://localhost:3000/holiday/r', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				name: this.state.name,
-				isactive: this.state.isactive,
-				month: this.state.month,
-				day: parseInt(this.state.day,10)
+				name: name,
+				isactive: isactive,
+				month: month,
+				day: parseInt(day,10)
 
 			})
 		})
@@ -147,14 +150,15 @@ class Holidays extends React.Component{
 	}
 
 	onSkedHoliday = (e) => {
+		const {name, dateContext, day} = this.state;
 		fetch('http://localhost:3000/holiday/snr', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				name: this.state.name,
-				year: this.state.dateContext.format('Y'),
-				month: this.state.dateContext.format('MM'),
-				day: parseInt(this.state.day,10)
+				name: name,
+				year: dateContext.format('Y'),
+				month: dateContext.format('MM'),
+				day: parseInt(day,10)
 			})
 		})
 			.then(response => response.json())
@@ -212,20 +216,20 @@ class Holidays extends React.Component{
 	}
 
 	toggleRShow = (e) => {
-		
+		const {rHolidayList} = this.state;
 		if (e && e.target.parentNode.id){
 			if (e.target.className.includes('add')){
 				this.setState({add: true});
 			}
 			else{
 				this.setState({add: false});
-				for (let i = 0; i < this.state.rHolidayList.length; i++){
-					if (this.state.rHolidayList[i].name === e.target.parentNode.id){
+				for (let i = 0; i < rHolidayList.length; i++){
+					if (rHolidayList[i].name === e.target.parentNode.id){
 						this.setState({
-							name: this.state.rHolidayList[i].name,
-							month: this.state.rHolidayList[i].month,
-							day: this.state.rHolidayList[i].day,
-							isactive: this.state.rHolidayList[i].isactive
+							name: rHolidayList[i].name,
+							month: rHolidayList[i].month,
+							day: rHolidayList[i].day,
+							isactive: rHolidayList[i].isactive
 						});
 					}
 				}

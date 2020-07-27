@@ -16,34 +16,53 @@ class Register extends React.Component{
 			cPassword: '',
 			code: '',
 			errorShow: false,
-			msg: ''
+			msg: '',
+			depts: []
 
 		}
 	}
+
+	componentDidMount = () => {
+   		this.loadDepts();
+   	}
+
+   	loadDepts = () => {
+   		fetch('http://localhost:3000/departments')
+			.then(response => response.json())
+			.then(departments => this.setState({depts: departments}));
+   	}
 
 	onChange = (event, type) => {
 		this.setState({[type]: event.target.value})
 	}
 
 	onSubmitRegister = () => {
-		if (this.state.password !== this.state.cPassword){
+		const {password, cPassword, depts, code, firstname, lastname, email} = this.state;
+		if (password !== cPassword){
 			this.toggleErrorShow('dp');
 			return false;
 		}
-		if (this.state.code !== ('ST-JOES-A') && this.state.code !== ("ST-JOES-A Admin")){
+		let flag1 = false;
+		let rCode = code.replace(' Admin','');
+		for (let i = 0; i < depts.length; i++){
+			if (rCode === depts[i].code){
+				flag1 = true;
+			}
+		}
+		if (!flag1){
 			this.toggleErrorShow('code');
 			return false;
 		}
 		else if (
-			this.state.firstname.length > 0 && 
-			this.state.lastname.length > 0 &&
-			this.props.validateEmail(this.state.email) &&
-			this.state.password.length > 0 &&
-			this.state.code.length > 0
+			firstname.length > 0 && 
+			lastname.length > 0 &&
+			this.props.validateEmail(email) &&
+			password.length > 0 &&
+			code.length > 0
 		){
 
 			let isadmin = false;
-			if (this.state.code.includes("Admin")){
+			if (code.includes("Admin")){
 				isadmin = true;
 			}
 			
@@ -51,11 +70,11 @@ class Register extends React.Component{
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					email: this.state.email,
-					password: this.state.password,
-					firstname: this.state.firstname,
-					lastname: this.state.lastname,
-					department: this.state.code,
+					email: email,
+					password: password,
+					firstname: firstname,
+					lastname: lastname,
+					department: code,
 					isadmin: isadmin,
 				})
 			})

@@ -36,13 +36,14 @@ class Entries extends React.Component{
 	}
 
 	addEntry = () => {
-		if (this.state.entryName.length > 0){
+		const {entryName, isactive} = this.state;
+		if (entryName.length > 0){
 			fetch('http://localhost:3000/entries', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					name: this.state.entryName,
-					active: this.state.isactive
+					name: entryName,
+					active: isactive
 				})
 			})
 				.then(response => response.json())
@@ -81,14 +82,15 @@ class Entries extends React.Component{
 	}
 	
 	editEntry = () => {
-		if (this.state.entryName.length > 0){
+		const {entryName, isactive, id} = this.state;
+		if (entryName.length > 0){
 			fetch('http://localhost:3000/entries', {
 				method: 'put',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					name: this.state.entryName,
-					active: this.state.isactive,
-					id: parseInt(this.state.id,10)
+					name: entryName,
+					active: isactive,
+					id: parseInt(id,10)
 				})
 			})
 				.then(response => response.json())
@@ -115,12 +117,13 @@ class Entries extends React.Component{
 	}
 
 	onEdit = (e) => {
+		const {entryList} = this.state;
 		const id = parseInt(e.target.parentNode.id,10)
-		for (let i = 0; i < this.state.entryList.length; i++){
-			if (this.state.entryList[i].id === id){
+		for (let i = 0; i < entryList.length; i++){
+			if (entryList[i].id === id){
 				this.setState({
-					entryName: this.state.entryList[i].name,
-					isactive: this.state.entryList[i].isactive,
+					entryName: entryList[i].name,
+					isactive: entryList[i].isactive,
 					add: false,
 					id: id
 				})

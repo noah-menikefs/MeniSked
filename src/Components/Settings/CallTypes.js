@@ -42,14 +42,15 @@ class CallTypes extends React.Component{
 	}
 
 	addCall = () => {
-		if (this.state.callName.length > 0){
+		const {callName, isactive, priority} = this.state;
+		if (callName.length > 0){
 			fetch('http://localhost:3000/callTypes', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					name: this.state.callName,
-					active: this.state.isactive,
-					priority: parseInt(this.state.priority, 10)
+					name: callName,
+					active: isactive,
+					priority: parseInt(priority, 10)
 
 				})
 			})
@@ -84,15 +85,16 @@ class CallTypes extends React.Component{
 	}
 	
 	editCall = () => {
-		if (this.state.callName.length > 0){
+		const {callName, isactive, priority, id} = this.state;
+		if (callName.length > 0){
 			fetch('http://localhost:3000/callTypes', {
 				method: 'put',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					name: this.state.callName,
-					active: this.state.isactive,
-					priority: parseInt(this.state.priority, 10),
-					id: parseInt(this.state.id,10)
+					name: callName,
+					active: isactive,
+					priority: parseInt(priority, 10),
+					id: parseInt(id,10)
 				})
 			})
 				.then(response => response.json())
@@ -124,13 +126,14 @@ class CallTypes extends React.Component{
 	}
 
 	onEdit = (e) => {
+		const {callList} = this.state;
 		const id = parseInt(e.target.parentNode.id,10)
-		for (let i = 0; i < this.state.callList.length; i++){
-			if (this.state.callList[i].id === id){
+		for (let i = 0; i < callList.length; i++){
+			if (callList[i].id === id){
 				this.setState({
-					callName: this.state.callList[i].name,
-					priority: this.state.callList[i].priority,
-					isactive: this.state.callList[i].isactive,
+					callName: callList[i].name,
+					priority: callList[i].priority,
+					isactive: callList[i].isactive,
 					add: false,
 					id: id
 				})

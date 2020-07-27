@@ -223,27 +223,29 @@ class PerSchedule extends React.Component{
 	}
 
 	assignOrDelete = (typeId, day = this.state.day) => {
+		const {dateContext, personalDays, pending} = this.state;
+		const {user} = this.props;
 		if (typeId !== -1){
 			const typeID = parseInt(typeId,10);
-			const date = this.state.dateContext.format('MM')+'/'+day+'/'+this.state.dateContext.format('YYYY');
-			if (this.props.user.isadmin){
+			const date = dateContext.format('MM')+'/'+day+'/'+dateContext.format('YYYY');
+			if (user.isadmin){
 				let method = 'post';
-				for (let i = 0;  i < this.state.personalDays.length; i++){
-					if (this.state.personalDays[i].date === date && typeID === this.state.personalDays[i].id){
+				for (let i = 0;  i < personalDays.length; i++){
+					if (personalDays[i].date === date && typeID === personalDays[i].id){
 						method = 'delete';
 						break;
 					}
 				}
 				this.assignCall(typeID, method, date);
 			}
-			else if (!this.props.user.isadmin){
+			else if (!user.isadmin){
 				let flag = false;
 				let flag2 = false;
 
-				for (let j = 0; j < this.state.pending.length; j++){
-					for (let n = 0; n < this.state.pending[j].dates.length; n++){
-						if (this.state.pending[j].dates[n] === date){
-							if (parseInt(this.state.pending[j].entryid,10) === typeID){
+				for (let j = 0; j < pending.length; j++){
+					for (let n = 0; n < pending[j].dates.length; n++){
+						if (pending[j].dates[n] === date){
+							if (parseInt(pending[j].entryid,10) === typeID){
 								flag2 = true;
 							}
 							this.deleteCall(typeID, date);
@@ -253,8 +255,8 @@ class PerSchedule extends React.Component{
 				}
 
 				if (!flag2){
-					for (let i = 0; i < this.state.pending.length; i++){
-						if (this.props.user.id === parseInt(this.state.pending[i].docid,10) && typeID === parseInt(this.state.pending[i].entryid,10)){
+					for (let i = 0; i < pending.length; i++){
+						if (user.id === parseInt(pending[i].docid,10) && typeID === parseInt(pending[i].entryid,10)){
 							flag = true;
 						}
 					}
@@ -295,7 +297,6 @@ class PerSchedule extends React.Component{
 				dateContext: dateContext,
 			});
 			this.loadNewDays(dateContext);
-			this.props.onNextMonth && this.props.onNextMonth();
 		}
 	}
 
@@ -307,35 +308,36 @@ class PerSchedule extends React.Component{
 				dateContext: dateContext,
 			});
 			this.loadNewDays(dateContext);
-			this.props.onPrevMonth && this.props.onPrevMonth();
 		}
 
 	}
 
 	nextDoc = () => {
-		let i = this.state.docIndex;
-		if (i !== (this.state.activeDocs.length - 1)){
+		const {activeDocs, docIndex} = this.state;
+		let i = docIndex;
+		if (i !== (activeDocs.length - 1)){
 			this.loadPersonalDays(i+1);
-			this.loadPending(this.state.activeDocs[i+1].id);
+			this.loadPending(activeDocs[i+1].id);
 			this.setState({docIndex: (i+1)});
 		}
 		else{
 			this.loadPersonalDays(0);
-			this.loadPending(this.state.activeDocs[0].id);
+			this.loadPending(activeDocs[0].id);
 			this.setState({docIndex: 0});
 		}
 	}
 	prevDoc = () => {
-		let i = this.state.docIndex;
+		const {docIndex, activeDocs} = this.state;
+		let i = docIndex;
 		if (i !== 0){
 			this.loadPersonalDays(i-1);
-			this.loadPending(this.state.activeDocs[i-1].id);
+			this.loadPending(activeDocs[i-1].id);
 			this.setState({docIndex: (i-1)});
 		}
 		else{
-			this.loadPersonalDays(this.state.activeDocs.length - 1);
-			this.loadPending(this.state.activeDocs[this.state.activeDocs.length - 1].id);
-			this.setState({docIndex: (this.state.activeDocs.length - 1)});
+			this.loadPersonalDays(activeDocs.length - 1);
+			this.loadPending(activeDocs[activeDocs.length - 1].id);
+			this.setState({docIndex: (activeDocs.length - 1)});
 		}
 	}
 	nextEntry = () => {
@@ -367,7 +369,6 @@ class PerSchedule extends React.Component{
 				dateContext: dateContext
 			});
 			this.loadNewDays(dateContext);
-			this.props.onNextYear && this.props.onNextYear();
 		}
 	}
 
@@ -379,7 +380,6 @@ class PerSchedule extends React.Component{
 				dateContext: dateContext
 			});
 			this.loadNewDays(dateContext);
-			this.props.onPrevYear && this.props.onPrevYear();
 		}
 	}
 
@@ -393,28 +393,30 @@ class PerSchedule extends React.Component{
 	}
 
 	onPhysicianChange = (event) => {
+		const {activeDocs} = this.state;
 		if (event.target.key){
 			this.loadPersonalDays(event.target.key);
 			this.setState({docIndex: event.target.key})
 		}
 		else{
 			let index = -1;
-			for (let i = 0; i < this.state.activeDocs.length; i++){
-				if (this.state.activeDocs[i].lastname === event.target.value){
+			for (let i = 0; i < activeDocs.length; i++){
+				if (activeDocs[i].lastname === event.target.value){
 					index = i;
 					break;
 				}
 			}
 			this.loadPersonalDays(index);
-			this.loadPending(this.state.activeDocs[index].id);
+			this.loadPending(activeDocs[index].id);
 			this.setState({docIndex: index})
 		}
 	}
 
 	onEntryChange = (event) => {
+		const {entries} = this.state;
 		let index = -1;
-		for (let i = 0; i < this.state.entries.length; i++){
-			if (this.state.entries[i].name === event.target.value){
+		for (let i = 0; i < entries.length; i++){
+			if (entries[i].name === event.target.value){
 				index = i;
 				break;
 			}
@@ -432,9 +434,7 @@ class PerSchedule extends React.Component{
 	}
 
 	radioChange = (event) => {
-		
 		this.setState({radio: event.target.id})
-
 	}
 
 	toggleShow = () => {
@@ -456,8 +456,9 @@ class PerSchedule extends React.Component{
 	}
 
 	reset = () => {
-		this.setState({dateContext: this.props.today});
-		this.loadNewDays(this.props.today);
+		const {today} = this.props;
+		this.setState({dateContext: today});
+		this.loadNewDays(today);
 	}
 	
 

@@ -95,23 +95,24 @@ class Account extends React.Component {
 				show: false
 			})
 		}
-		
 	}
 
 	onSubmitBasic = () => {
+		const {firstname, lastname, email} = this.state;
+
 		if (
-			this.state.firstname.length > 0 && 
-			this.state.lastname.length > 0 &&
-			this.props.validateEmail(this.state.email)
+			firstname.length > 0 && 
+			lastname.length > 0 &&
+			this.props.validateEmail(email)
 		){
 			
 			fetch('http://localhost:3000/account/'+this.props.user.id, {
 				method: 'put',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					email: this.state.email,
-					firstname: this.state.firstname,
-					lastname: this.state.lastname
+					email: email,
+					firstname: firstname,
+					lastname: lastname
 				})
 			})
 				.then(response => response.json())
@@ -130,26 +131,27 @@ class Account extends React.Component {
 					}
 				})
 		}
-		else if (!this.props.validateEmail(this.state.email)){
+		else if (!this.props.validateEmail(email)){
 			this.toggleShow('email');
 		}
-		else if (this.state.firstname.length === 0 || this.state.lastname.length === 0){
+		else if (firstname.length === 0 || lastname.length === 0){
 			this.toggleShow('name');
 		}
 	}
 
 	onSubmitAll = () => {
+		const {cPassword, nPassword, cNPassword} = this.state;
 		if(	
-			this.state.cPassword.length > 0 && 
-			this.state.nPassword.length > 0 &&
-			this.state.nPassword === this.state.cNPassword
+			cPassword.length > 0 && 
+			nPassword.length > 0 &&
+			nPassword === cNPassword
 		){			
 			fetch('http://localhost:3000/account/'+this.props.user.id, {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					oldPassword: this.state.cPassword,
-					newPassword: this.state.nPassword
+					oldPassword: cPassword,
+					newPassword: nPassword
 				})
 			})
 				.then(response => response.json())
@@ -167,10 +169,10 @@ class Account extends React.Component {
 					}
 				})
 		}
-		else if (this.state.nPassword !== this.state.cNPassword){
+		else if (nPassword !== cNPassword){
 			this.toggleShow('different');
 		}
-		else if (this.state.nPassword.length === 0){
+		else if (nPassword.length === 0){
 			this.toggleShow('pass');
 		}
 	}

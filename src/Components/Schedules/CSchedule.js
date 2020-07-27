@@ -40,13 +40,14 @@ class CSchedule extends React.Component{
   	}
 
   	loadCallSked = () => {
+  		const {callList} = this.props;
     	fetch('http://localhost:3000/people')
       		.then(response => response.json())
       		.then(docs => {
       			let arr = [];
       			let callIds = [];
-      			for (let n = 0; n < this.props.callList.length; n++){
-      				callIds.push(this.props.callList[n].id);
+      			for (let n = 0; n < callList.length; n++){
+      				callIds.push(callList[n].id);
       			}
       			for (let i = 0; i < docs.length; i++){
       				for (let j = 0; j < docs[i].worksked.length; j++){
@@ -69,9 +70,10 @@ class CSchedule extends React.Component{
   	}
 
   	priorityCheck = (id) => {
-		for (let n = 0; n < this.props.callList.length; n++){
-			if (this.props.callList[n].id === id){
-				return this.props.callList[n].priority;
+  		const {callList} = this.props;
+		for (let n = 0; n < callList.length; n++){
+			if (callList[n].id === id){
+				return callList[n].priority;
 			}
 		}
   	}
@@ -152,7 +154,6 @@ class CSchedule extends React.Component{
 				dateContext: dateContext,
 			});
 			this.loadNewDays(dateContext);
-			this.props.onNextMonth && this.props.onNextMonth();
 		}
 	}
 
@@ -164,7 +165,6 @@ class CSchedule extends React.Component{
 				dateContext: dateContext,
 			});
 			this.loadNewDays(dateContext);
-			this.props.onPrevMonth && this.props.onPrevMonth();
 		}
 	}
 
@@ -176,7 +176,6 @@ class CSchedule extends React.Component{
 				dateContext: dateContext
 			});
 			this.loadNewDays(dateContext);
-			this.props.onNextYear && this.props.onNextYear();	
 		}
 	}
 
@@ -188,7 +187,6 @@ class CSchedule extends React.Component{
 				dateContext: dateContext
 			});
 			this.loadNewDays(dateContext);
-			this.props.onPrevYear && this.props.onPrevYear();
 		}
 	}
 
@@ -211,15 +209,17 @@ class CSchedule extends React.Component{
 	}
 	
 	reset = () => {
-		this.setState({dateContext: this.props.today});
-		this.loadNewDays(this.props.today);
+		const {today} = this.props;
+		this.setState({dateContext: today});
+		this.loadNewDays(today);
 	}
 
 
 	idToName = (id) => {
-		for (let n = 0; n < this.props.callList.length; n++){
-			if (this.props.callList[n].id === id){
-				return this.props.callList[n].name;
+		const {callList} = this.props;
+		for (let n = 0; n < callList.length; n++){
+			if (callList[n].id === id){
+				return callList[n].name;
 			}
 		}
 	}

@@ -93,15 +93,16 @@ class PubSchedule extends React.Component{
   	}
 
   	priorityCheck = (id) => {
+  		const {callList} = this.props;
   		let index = -1;
-		for (let n = 0; n < this.props.callList.length; n++){
-			if (this.props.callList[n].id === id){
+		for (let n = 0; n < callList.length; n++){
+			if (callList[n].id === id){
 				index = n;
 				break;
 			}
 		}
 		if (index !== -1){
-			return this.props.callList[index].priority;
+			return callList[index].priority;
 		}
 		else{
 			return 1000;
@@ -204,7 +205,6 @@ class PubSchedule extends React.Component{
 					dateContext: dateContext
 				});
 				this.loadNewDays(dateContext);
-				this.props.onNextYear && this.props.onNextYear();
 			}
 			else if (dateContext.year() === nYear){
 				if (dateContext.month() <= nMonth){
@@ -212,7 +212,6 @@ class PubSchedule extends React.Component{
 						dateContext: dateContext,
 					});
 					this.loadNewDays(dateContext);
-					this.props.onNextMonth && this.props.onNextMonth();
 				}
 				
 			}
@@ -222,7 +221,6 @@ class PubSchedule extends React.Component{
 				dateContext: dateContext,
 			});
 			this.loadNewDays(dateContext);
-			this.props.onNextMonth && this.props.onNextMonth();
 		}
 	}
 
@@ -234,7 +232,6 @@ class PubSchedule extends React.Component{
 				dateContext: dateContext,
 			});
 			this.loadNewDays(dateContext);
-			this.props.onPrevMonth && this.props.onPrevMonth();
 		}
 	}
 
@@ -248,7 +245,6 @@ class PubSchedule extends React.Component{
 					dateContext: dateContext
 				});
 				this.loadNewDays(dateContext);
-				this.props.onNextYear && this.props.onNextYear();
 			}
 		}
 		else if ((this.state.dateContext.year() + 1) <= (this.props.today.year() + 10)){
@@ -258,7 +254,6 @@ class PubSchedule extends React.Component{
 				dateContext: dateContext
 			});
 			this.loadNewDays(dateContext);
-			this.props.onNextYear && this.props.onNextYear();
 		}
 	}
 
@@ -270,16 +265,16 @@ class PubSchedule extends React.Component{
 				dateContext: dateContext
 			});
 			this.loadNewDays(dateContext);
-			this.props.onPrevYear && this.props.onPrevYear();
 		}
 	}
 
 	setYear = (year) => {
+		const {published} = this.state;
 		let dateContext = Object.assign({}, this.state.dateContext);
 		dateContext = moment(dateContext).set("year",year);
 		if (!this.props.user.isadmin){
-			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
-			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
+			let nMonth = moment([2020, 5, 1]).add(published, 'month').month();
+			let nYear = moment([2020, 5, 1]).add(published, 'month').year();
 			if (dateContext.year() === nYear && nMonth < dateContext.month()){
 				dateContext = moment(dateContext).set("month",nMonth);
 			}
@@ -304,20 +299,21 @@ class PubSchedule extends React.Component{
 	}
 
 	onNotesSubmit = () => {
-		if (this.state.note.length > 0 && this.state.radio > 0){
+		const {note, radio, dateContext, day} = this.state;
+		if (note.length > 0 && radio > 0){
 			fetch('http://localhost:3000/sked/notes', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					date: this.state.dateContext.format('MM')+'/'+this.state.day+'/'+this.state.dateContext.format('Y'),
-					type: parseInt(this.state.radio,10),
-					msg: this.state.note
+					date: dateContext.format('MM')+'/'+day+'/'+dateContext.format('Y'),
+					type: parseInt(radio,10),
+					msg: note
 
 				})
 			})
 			.then(response => response.json())
-			.then(note => {
-				if (note.id){
+			.then(notes => {
+				if (notes.id){
 					this.loadAllNotes();
 				}
 			})
@@ -335,8 +331,9 @@ class PubSchedule extends React.Component{
 	}
 	
 	reset = () => {
-		this.setState({dateContext: this.props.today});
-		this.loadNewDays(this.props.today);
+		const {today} = this.props;
+		this.setState({dateContext: today});
+		this.loadNewDays(today);
 	}
 
 	
@@ -348,24 +345,24 @@ class PubSchedule extends React.Component{
 				arr.push(<option key={i} value={i}>{i}</option>);
 			}
 		}
-
 		else{
 			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
 			for (let i = 2020; i <= nYear; i++){
 				arr.push(<option key={i} value={i}>{i}</option>);
 			}
 		}
-		
 		return arr;
 	}
 
 	monthSelect = () => {
+		const {published, dateContext} = this.state;
+		const {user} = this.props;
 		let m = 11;
 		let arr = [];
-		if (!this.props.user.isadmin){
-			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
-			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
-			if (this.state.dateContext.year() === nYear){
+		if (!user.isadmin){
+			let nYear = moment([2020, 5, 1]).add(published, 'month').year();
+			let nMonth = moment([2020, 5, 1]).add(published, 'month').month();
+			if (dateContext.year() === nYear){
 				m = nMonth;
 			}
 		}
@@ -376,16 +373,18 @@ class PubSchedule extends React.Component{
 	}
 
 	publishShow = () => {
-		if (this.props.user.isadmin){
-			let nYear = moment([2020, 5, 1]).add(this.state.published, 'month').year();
-			let nMonth = moment([2020, 5, 1]).add(this.state.published, 'month').month();
+		const {published, dateContext} = this.state;
+		const {user} = this.props;
+		if (user.isadmin){
+			let nYear = moment([2020, 5, 1]).add(published, 'month').year();
+			let nMonth = moment([2020, 5, 1]).add(published, 'month').month();
 			let p = true
-			if (this.state.dateContext.year() === nYear){
-				if (this.state.dateContext.month() > nMonth){
+			if (dateContext.year() === nYear){
+				if (dateContext.month() > nMonth){
 					p = false;
 				}
 			}
-			else if (this.state.dateContext.year() > nYear){
+			else if (dateContext.year() > nYear){
 				p = false;
 			}
 			if (p){
@@ -421,14 +420,16 @@ class PubSchedule extends React.Component{
 	}
 
 	idToName = (id) => {
-		for (let n = 0; n < this.props.callList.length; n++){
-				if (this.props.callList[n].id === id){
-					return this.props.callList[n].name;
+		const {callList} = this.props;
+		const {entryList} = this.state;
+		for (let n = 0; n < callList.length; n++){
+				if (callList[n].id === id){
+					return callList[n].name;
 				}
 			}
-		for (let i = 0; i < this.state.entryList.length; i++){
-			if (this.state.entryList[i].id === id){
-				return this.state.entryList[i].name;
+		for (let i = 0; i < entryList.length; i++){
+			if (entryList[i].id === id){
+				return entryList[i].name;
 			}
 		}
 	}

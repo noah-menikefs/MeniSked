@@ -24,12 +24,13 @@ class Login extends React.Component{
 	}
 
 	onSLogin = () => {
+		const {loginEmail, loginPassword} = this.state;
 		fetch('http://localhost:3000/login', {
 			method: 'post',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				email: this.state.loginEmail,
-				password: this.state.loginPassword
+				email: loginEmail,
+				password: loginPassword
 			})
 		})
 			.then(response => response.json())

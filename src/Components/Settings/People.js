@@ -34,15 +34,16 @@ class People extends React.Component{
 
 	addPerson = () => {
 		const {fName, lName, email} = this.state;
+		const {department} = this.props;
 		if (fName.length > 0 && lName.length > 0 && email.length > 0){	
 			fetch('http://localhost:3000/people', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
-					firstname: this.state.fName,
-					lastname: this.state.lName,
-					email: this.state.email,
-					department: this.props.department.replace(" Admin",'')
+					firstname: fName,
+					lastname: lName,
+					email: email,
+					department: department.replace(" Admin",'')
 				})
 			})
 				.then(response => response.json())
@@ -80,11 +81,12 @@ class People extends React.Component{
 	}
 
 	deletePerson = () => {
+		const {peopleList} = this.state;
 		const id = parseInt(this.state.id,10);
 		let email = '';
-		for (let i = 0; i < this.state.peopleList.length; i++){
-			if (id === this.state.peopleList[i].id){
-				email = this.state.peopleList[i].email;
+		for (let i = 0; i < peopleList.length; i++){
+			if (id === peopleList[i].id){
+				email = peopleList[i].email;
 				break;
 			}
 		}

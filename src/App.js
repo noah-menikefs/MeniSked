@@ -59,29 +59,30 @@ class App extends Component {
 
   //used for rendering when signed in 
   inRenderSwitch(route){
+    const {callList, today, user} = this.state;
     switch(route){
       case "Personal Schedule": 
-        return <PerSchedule loadCallTypes={this.loadCallTypes} callList={this.state.callList} today={this.state.today} user={this.state.user}/>
+        return <PerSchedule loadCallTypes={this.loadCallTypes} callList={callList} today={today} user={user}/>
       case 'Published Schedule': 
-        return <PubSchedule loadCallTypes={this.loadCallTypes} callList={this.state.callList} today={this.state.today} user={this.state.user}/>
+        return <PubSchedule loadCallTypes={this.loadCallTypes} callList={callList} today={today} user={user}/>
       case 'Call Schedule': 
-        return <CSchedule loadCallTypes={this.loadCallTypes} callList={this.state.callList} today={this.state.today} user={this.state.user}/>
+        return <CSchedule loadCallTypes={this.loadCallTypes} callList={callList} today={today} user={user}/>
       case 'Account Information': 
-        return <Account loadUser={this.loadUser} user={this.state.user} validateEmail={this.validateEmail}/>
+        return <Account loadUser={this.loadUser} user={user} validateEmail={this.validateEmail}/>
       case 'Admin Messages': 
-        return <AMessages user={this.state.user} today={this.state.today} />
+        return <AMessages user={user} today={today} />
       case 'Messages': 
-        return <EMessages user={this.state.user}/>
+        return <EMessages user={user}/>
       case 'Holidays': 
-        return <Holidays today={this.state.today}/>
+        return <Holidays today={today}/>
       case 'Call Types': 
         return <CallTypes />
       case 'People': 
-        return <People department={this.state.user.department}/>
+        return <People department={user.department}/>
         case 'Entries': 
         return <Entries/>
       default:
-        return <PerSchedule today={this.state.today} user={this.state.user}/>
+        return <PerSchedule today={today} user={user}/>
     }
   }
 

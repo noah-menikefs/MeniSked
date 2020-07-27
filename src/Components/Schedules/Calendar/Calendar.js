@@ -45,7 +45,8 @@ class Calendar extends React.Component{
 	}
 
 	dayType = (d) => {
-		if (this.props.type === "Personal"){
+		const {type} = this.props;
+		if (type === "Personal"){
 			return (
 				<ul>
 					{this.personalToday(d)}
@@ -53,7 +54,7 @@ class Calendar extends React.Component{
 				</ul>
 			)
 		}
-		else if (this.props.type === "Call"){
+		else if (type === "Call"){
 			return (
 				<ul>
 					{this.callToday(d)}
@@ -82,10 +83,11 @@ class Calendar extends React.Component{
 
 	callToday = (d) => {
 		const arr = [...this.props.callSked];
+		const {dateContext} = this.props;
 		let list = [];
 		for (let i = 0; i < arr.length; i++){
 			const splitArr = arr[i].date.split('/');
-			if (splitArr[0] === this.props.dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === this.props.dateContext.format('YYYY')){	
+			if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === dateContext.format('YYYY')){	
 				list.push(<li key={i} className="call" id="call">{this.idToName(arr[i].id) + ' '}<span style={{backgroundColor:arr[i].colour}}>{arr[i].name}</span></li>);
 			}
 		}
@@ -94,9 +96,10 @@ class Calendar extends React.Component{
 
 	personalToday = (d) => {
 		const arr = [...this.props.personalDays];
+		const {dateContext} = this.props;
 		for (let i = 0; i < arr.length; i++){
 			const splitArr = arr[i].date.split('/');
-			if (splitArr[0] === this.props.dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === this.props.dateContext.format('YYYY')){	
+			if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === dateContext.format('YYYY')){	
 				return <li key={i} className="personal" id="personal">{this.idToName(arr[i].id)}</li>
 			}
 		}
@@ -104,10 +107,11 @@ class Calendar extends React.Component{
 
 	workToday = (d) => {
 		const arr = [...this.props.sked];
+		const {dateContext} = this.props;
 		let list = [];
 		for (let i = 0; i < arr.length; i++){
 			const splitArr = arr[i].date.split('/');
-			if (splitArr[0] === this.props.dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === this.props.dateContext.format('YYYY')){	
+			if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === dateContext.format('YYYY')){	
 				list.push(<li key={i} className="call" id="call">{this.idToName(arr[i].id) + ' '}<span style={{backgroundColor:arr[i].colour}}>{arr[i].name}</span></li>);
 			}
 		}
@@ -116,19 +120,20 @@ class Calendar extends React.Component{
 
 	noteToday = (d) => {
 		const arr = [...this.props.vNotes];
+		const {dateContext, testisadmin} = this.props;
 		let list = [];
 		for (let i = 0; i < arr.length; i++){
 			const splitArr = arr[i].date.split('/');
-			if (splitArr[0] === this.props.dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === this.props.dateContext.format('YYYY')){	
+			if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === dateContext.format('YYYY')){	
 				list.push(<li key={i} className="note" id="note">{arr[i].msg}</li>);
 			}
 		}
 
-		if (this.props.testisadmin){
+		if (testisadmin){
 			const arr2 = [...this.props.iNotes];
 			for (let i = 0; i < arr2.length; i++){
 				const splitArr2 = arr2[i].date.split('/');
-				if (splitArr2[0] === this.props.dateContext.format('MM') && parseInt(splitArr2[1],10) === d && splitArr2[2] === this.props.dateContext.format('YYYY')){	
+				if (splitArr2[0] === dateContext.format('MM') && parseInt(splitArr2[1],10) === d && splitArr2[2] === dateContext.format('YYYY')){	
 					list.push(<li key={-i-1} className="note" id="iNote">{arr2[i].msg}</li>);
 				}
 			}
@@ -137,12 +142,13 @@ class Calendar extends React.Component{
 	}
 
 	numToday = (d, id) => {
-		if (this.props.numNotes && this.props.testisadmin){
+		const {numNotes, testisadmin, dateContext} = this.props;
+		if (numNotes && testisadmin){
 			let idVar = 'num';
-			const arr = [...this.props.numNotes];
+			const arr = [...numNotes];
 			for (let i = 0; i < arr.length; i++){
 				const splitArr = arr[i].date.split('/');
-				if (splitArr[0] === this.props.dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === this.props.dateContext.format('YYYY')){	
+				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === dateContext.format('YYYY')){	
 					if (id){
 						idVar = 'num2'
 					}
@@ -153,24 +159,26 @@ class Calendar extends React.Component{
 	}
 
 	idToName = (id) => {
-		for (let n = 0; n < this.props.callList.length; n++){
-			if (this.props.callList[n].id === id){
-				return this.props.callList[n].name;
+		const {callList, entries} = this.props;
+		for (let n = 0; n < callList.length; n++){
+			if (callList[n].id === id){
+				return callList[n].name;
 			}
 		}
-		for (let i = 0; i < this.props.entries.length; i++){
-			if (this.props.entries[i].id === id){
-				return this.props.entries[i].name;
+		for (let i = 0; i < entries.length; i++){
+			if (entries[i].id === id){
+				return entries[i].name;
 			}
 		}
 	}
 
 	pendingToday = (d) => {
 		const arr = [...this.props.pending];
+		const {dateContext} = this.props;
 		for (let i = 0; i < arr.length; i++){
 			for (let n = 0; n < arr[i].dates.length; n++){
 				const splitArr = arr[i].dates[n].split('/');
-				if (splitArr[0] === this.props.dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === this.props.dateContext.format('YYYY')){
+				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === dateContext.format('YYYY')){
 					return <li key={i+n} className="pending" id="pending">{this.idToName(parseInt(arr[i].entryid,10))}</li>
 				}
 			}
