@@ -31,11 +31,6 @@
 	width: 100%;
 }
 
-h4 {
-	text-align: left;
-	padding-left: 25px;
-}
-
 .accept{
 	margin-right: 0.15em;
 }
@@ -50,6 +45,8 @@ h4 {
 
 .requests{
 	margin-top: 1em;
+	padding-left: 25px;
+	float: left;
 }
 
 .dates.list{
@@ -69,4 +66,21 @@ h4 {
 
 .showMore{
 	margin: 1em 0;
+}
+
+.past.requests {
+	display: inline-block;
+}
+
+.filter{
+	float: right;
+	margin: 2em 2em 0 0;
+}
+
+.filtertitle, .dropdownfilter{
+	display: inline-block;
+}
+
+.filtertitle{
+	padding-right: 0.25em;
 }

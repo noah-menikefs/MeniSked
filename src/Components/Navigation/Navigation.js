@@ -8,6 +8,8 @@ import './Navigation.css';
 class Navigation extends React.Component {
   constructor(props){
     super(props);
+    this.state = {
+    }
   }
 
   adminNavbar(){
@@ -22,7 +24,6 @@ class Navigation extends React.Component {
       );
     }
   }
-
 
   render(){
     const {testisadmin, onRouteChange} = this.props;

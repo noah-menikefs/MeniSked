@@ -143,7 +143,7 @@ class MyDocument extends React.Component{
               today.push((<Text key={b} style={styles.tableCellList}>{' - '+vNote}</Text>))
             }
           }
-          if (user.isadmin){
+          if (user.isadmin && sked){
              for (let a = 0; a < iNotes.length; a++){
               if (iNotes[a].date === dateContext.format('MM')+'/'+ctr+'/'+dateContext.format('YYYY')){
                 iNote = iNotes[a].msg;
@@ -160,7 +160,7 @@ class MyDocument extends React.Component{
 
           ctr++;
         }
-        if (user.isadmin){
+        if (user.isadmin && sked){
           tableCols.push(
             <View key={j} style={styles.tableCol}>
               <View key={-j-1} style={styles.tableCell}>

@@ -111,31 +111,75 @@ class EMessages extends React.Component{
 	
 	}
 
+	sortDates = (arr) => {
+		let list = [...arr];
+		let index = 0;
+		let currDate = [];
+		let newDate = [];
+		let temp;
+		let len = list.length;
+		let flag = false;
+
+		for (let i = 0; i < len - 1; i++){
+			index = i;
+			currDate = list[i].stamp.split('/');
+			for (let j = i+1; j < len; j++){
+				flag = false;
+				newDate = list[j].stamp.split('/');
+				if (parseInt(newDate[2],10) > parseInt(currDate[2],10)){
+					flag = true;
+				}
+				else if (parseInt(newDate[2],10) === parseInt(currDate[2],10)){
+					if (parseInt(newDate[0],10) > parseInt(currDate[0],10)){
+						flag = true;
+					}
+					else if (parseInt(newDate[0],10) === parseInt(currDate[0],10) && parseInt(newDate[1],10) > parseInt(currDate[1],10)){
+						flag = true;
+					}
+				}
+
+				if (flag){
+					index = j;
+					currDate = list[j].stamp.split('/');
+				}
+			}
+			if (index !== i){
+				temp = list[i];
+				list[i] = list[index];
+				list[index] = temp;
+			}
+		}
+		return list;
+	}
+
 	render(){
 		const {show, msg, messages, ctr} = this.state;
 
+		let msgs = [...messages]
+
+		msgs = this.sortDates(msgs);
+
 		let msgList = [];
 
-		for (let j = (Math.min(messages.length,ctr)) - 1; j >= 0; j--){
-			if (messages[j].status === 'accepted'){
+		for (let j = 0; j < (Math.min(msgs.length,ctr)); j++){
+			if (msgs[j].status === 'accepted'){
 				msgList.push(
 					<ListGroup key={j} horizontal>
-						<ListGroup.Item className='pend list' action disabled>Peter Menikefs <span className={messages[j].status}>{messages[j].status}</span> your request for {this.entryIdToName(messages[j].entryid)} {this.dateStyler(messages[j].dates)}
+						<ListGroup.Item className='pend list' action disabled>Peter Menikefs <span className={msgs[j].status}>{msgs[j].status}</span> your request for {this.entryIdToName(msgs[j].entryid)} {this.dateStyler(msgs[j].dates)}
 						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>{messages[j].stamp}</ListGroup.Item>
+						<ListGroup.Item className='edates list'>{msgs[j].stamp}</ListGroup.Item>
 					</ListGroup>
 				)
 			}
 			else{
 				msgList.push(
 					<ListGroup key={j} horizontal>
-						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow(messages[j].msg)}>Peter Menikefs <span className={messages[j].status}>{messages[j].status}</span> your request for {this.entryIdToName(messages[j].entryid)} {this.dateStyler(messages[j].dates)}
+						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow(msgs[j].msg)}>Peter Menikefs <span className={msgs[j].status}>{msgs[j].status}</span> your request for {this.entryIdToName(msgs[j].entryid)} {this.dateStyler(msgs[j].dates)}
 						</ListGroup.Item>
-						<ListGroup.Item className='edates list'>{messages[j].stamp}</ListGroup.Item>
+						<ListGroup.Item className='edates list'>{msgs[j].stamp}</ListGroup.Item>
 					</ListGroup>
 				)
 			}
-			
 		}
 
 		return(

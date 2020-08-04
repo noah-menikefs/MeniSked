@@ -15,12 +15,15 @@ class Holidays extends React.Component{
 			newNRshow: false,
 			newRshow: false,
 			sShow: false,
+			eShow: false,
 			add: false,
 			name: '',
 			month: "January",
 			day: 1,
 			isactive: false,
-			dateContext: moment()
+			dateContext: moment(),
+			todelete: [],
+			editsked: false
 		}
 	}
 
@@ -247,6 +250,23 @@ class Holidays extends React.Component{
 		this.setState({newRshow: !this.state.newRshow});
 	}
 
+	toggleEShow = (e) => {
+		if (e && e.target.parentNode.id){
+			this.setState({
+				name: e.target.parentNode.id,
+				editsked: true
+			})
+		}
+		else{
+			this.setState({
+				name: '',
+				todelete: [],
+				editsked: false
+			})
+		}
+		this.setState({eShow: !this.state.eShow});
+	}
+
 	toggleSShow = (e) => {
 		if (e && e.target.parentNode.id){
 			this.setState({name: e.target.parentNode.id});
@@ -269,8 +289,86 @@ class Holidays extends React.Component{
 		return <h5>{this.state.name}</h5>;
 	}
 
+	skedList = () => {
+		const {nrHolidayList, name, editsked} = this.state;
+		if (editsked){
+			let holiday;
+			for (let i = 0; i < nrHolidayList.length; i++){
+				if (nrHolidayList[i].name === name){
+					holiday = nrHolidayList[i];
+				}
+			}
+			let checkSelect = [];
+			let arr = [...holiday.eventsked];
+			for (let j = 0; j < arr.length; j++){
+				checkSelect.push(
+					<Form.Check key={j} id={j} name="skeddates" onChange={this.addtodelete} type="checkbox" value={arr[j]} label={arr[j]}/>
+				)
+			}
+			return checkSelect;
+		}
+	}
+
+	addtodelete = (e) => {
+		let arr = [...this.state.todelete]
+		let index = -1;
+		for (let i = 0; i < arr.length; i++){
+			if (arr[i] === e.target.value){
+				index = i;
+			}
+		}
+		if (index !== -1){
+			arr.splice(index,1);
+		}
+		else{
+			arr.push(e.target.value);
+		}
+		this.setState({todelete: arr});
+	}
+
+	deleteSked = () => {
+		const {name, todelete, nrHolidayList} = this.state;
+		let eventschedule = [];
+		let id = -1;
+		for (let i = 0; i < nrHolidayList.length; i++){
+			if (nrHolidayList[i].name === name){
+				id = nrHolidayList[i].id;
+				eventschedule = [...nrHolidayList[i].eventsked];
+			}
+		}
+		let indexes = [];
+		for (let j = 0; j < todelete.length; j++){
+			for (let i = 0; i < eventschedule.length; i++){
+				if (eventschedule[i] === todelete[j]){
+					indexes.push(i);
+				}
+			}
+		}
+		indexes.sort(function(a, b){return a - b})
+		for (let i = indexes.length - 1; i >= 0; i--){
+			eventschedule.splice(indexes[i],1);
+		}
+		fetch('http://localhost:3000/holiday/esnr', {
+			method: 'put',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				id: id,
+				arr: eventschedule
+			})
+		})
+		.then(response => response.json())
+		.then(holiday => {
+			if (holiday){
+				this.loadnrHolidays();
+			}
+		})
+		this.toggleEShow();
+	}
+	
+
+
 	render(){
-		const {rHolidayList, nrHolidayList, newNRshow, newRshow, sShow, dateContext, name, month, day, isactive} = this.state;
+		const {rHolidayList, nrHolidayList, newNRshow, newRshow, eShow, sShow, dateContext, name, month, day, isactive} = this.state;
 		const {today} = this.props;
 		
 		let daySelect = [];
@@ -302,7 +400,8 @@ class Holidays extends React.Component{
 			nrList.push(
 				<li key={nrHolidayList[n].name} id={nrHolidayList[n].name}>
 					{nrHolidayList[n].name}
-					<Button key={n} onClick={this.toggleSShow} className="sked butn" size="sm" variant="secondary">Schedule</Button>
+					<Button key={n*100+1} onClick={this.toggleEShow} className="edit butn" size="sm" variant="secondary">Edit</Button>
+					<Button key={n} onClick={this.toggleSShow} className="sked butn" size="sm" variant="warning">Schedule</Button>
 					<Button key={-n-1} onClick={this.onDeleteNRHoliday} className="delete butn" size="sm" variant="danger">Delete</Button>
 				</li>
 			)
@@ -311,7 +410,6 @@ class Holidays extends React.Component{
 		return(
 			<div className="body">
 				<div className="left">
-					
 					<div id="t" className="top">
 						<h4 className="subtitle">Recurring Holidays</h4>
 						<Button className="add" onClick={this.toggleRShow} variant="primary">Add Recurring Holiday</Button>
@@ -330,8 +428,6 @@ class Holidays extends React.Component{
 					<Scroll>
 						<ul className="setList">
 							{nrList}
-
-
 						</ul>
 					</Scroll>
 				</div>
@@ -418,11 +514,10 @@ class Holidays extends React.Component{
 	  								<option value="29">29</option>
 	  								<option value="30">30</option>
 	  								<option value="31">31</option>
-
 							    </Form.Control>
 							</Form.Group>
-							<Form.Group onChange={this.onActiveChange} id="activeCheck" controlId="formBasicCheckbox">
-						    	<Form.Check checked={isactive} type="checkbox" label="Active"/>
+							<Form.Group /*onChange={this.onActiveChange}*/ id="activeCheck" controlId="formBasicCheckbox">
+						    	<Form.Check onChange={this.onActiveChange} checked={isactive} type="checkbox" label="Active"/>
 						 	 </Form.Group>
         				</Modal.Body>
         				<Modal.Footer>
@@ -481,6 +576,29 @@ class Holidays extends React.Component{
             					Cancel
           					</Button>
           					 <Button onClick={this.onSkedHoliday}variant="primary">
+            					Submit
+          					</Button>
+	        			</Modal.Footer>
+	        			</Form>
+      				</Modal>
+				</div>
+				<div className='modal'>
+					<Modal show={eShow} onHide={this.toggleEShow}>
+        				<Modal.Header closeButton>
+          					<Modal.Title id='modalTitle'>Edit {name} Schedule</Modal.Title>
+       	 				</Modal.Header>
+        				<Form>
+        					<Modal.Body>
+        					<Form.Label>Choose dates to delete</Form.Label>
+        					<Form.Group /*onChange={this.onActiveChange} id="activeCheck"*/ controlId="formBasicCheckbox">
+						    	{this.skedList()}
+						 	 </Form.Group>
+        				</Modal.Body>
+        				<Modal.Footer>
+          					<Button onClick={this.toggleEShow} variant="secondary" >
+            					Close
+          					</Button>
+          					 <Button onClick={this.deleteSked} variant="primary" >
             					Submit
           					</Button>
 	        			</Modal.Footer>

@@ -226,8 +226,26 @@ class PerSchedule extends React.Component{
 		}
 	}
 
-	deleteCall = (typeID, date) => {
-	
+	deleteCall = (typeID, date, docid = parseInt(this.props.user.id,10)) => {
+		fetch('http://localhost:3000/drequest', {
+			method: 'put',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				docid: docid,
+				entryid: parseInt(typeID,10),
+				date: date,
+				pending: this.state.pending
+			})
+		})
+		.then(response => response.json())
+		.then(messages => {
+			if (messages){
+				this.loadPending();
+			}
+		})
+		if (this.state.radio !== -1){
+			this.toggleShow();
+		}
 	}
 
 	assignOrDelete = (typeId, day = this.state.day) => {
@@ -245,6 +263,15 @@ class PerSchedule extends React.Component{
 					}
 				}
 				this.assignCall(typeID, method, date);
+				for (let j = 0; j < pending.length; j++){
+					for (let n = 0; n < pending[j].dates.length; n++){
+						if (pending[j].dates[n] === date){
+							this.deleteCall(pending[j].entryid, date, this.state.activeDocs[this.state.docIndex].id);
+							break;
+						}
+					}
+				}
+
 			}
 			else if (!user.isadmin){
 				let flag = false;
@@ -473,6 +500,7 @@ class PerSchedule extends React.Component{
 	render(){
 		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, holiDays, nrHolidayList, render, personalDays, pending, loaded, depts} = this.state;
 		const {user, today, callList} = this.props;
+
 		if (user.id && !loaded){
 			this.loadPending();
 			this.setState({loaded: true})
@@ -498,10 +526,12 @@ class PerSchedule extends React.Component{
 			}
 		}
 
-		let entrySelect = entries.map((entry, i) => {
-			if (entry.isactive){
-				return <option key={i} value={entry.name}>{entry.name}</option>
-			}
+		let entryFilter = entries.filter((entry) => {
+			return entry.isactive;
+		})
+
+		let entrySelect = entryFilter.map((entry, i) => {
+			return <option key={i} value={entry.name}>{entry.name}</option>
 		})
 
 		let eSelect = () => {

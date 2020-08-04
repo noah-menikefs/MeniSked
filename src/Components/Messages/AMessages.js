@@ -15,6 +15,7 @@ class AMessages extends React.Component{
 			msg: '',
 			dshow: false,
 			messages: [],
+			filteredMsgs: [],
 			peopleList: [],
 			entryList: [],
 			callList: [],
@@ -36,7 +37,8 @@ class AMessages extends React.Component{
 		fetch('http://localhost:3000/amessages')
 			.then(response => response.json())
 			.then(messages => this.setState({
-				messages: messages
+				messages: messages,
+				filteredMsgs: messages
 			}));
 	}
 
@@ -85,7 +87,19 @@ class AMessages extends React.Component{
 	}
 
 	accept = (id) => {
-
+		fetch('http://localhost:3000/arequest', {
+			method: 'put',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				id: id
+			})
+		})
+			.then(response => response.json())
+			.then(user => {
+				if (user.lastname){
+					this.loadMessages();
+				}
+			})
 	}
 
 	toggleShow = (id = -1) => {
@@ -178,8 +192,77 @@ class AMessages extends React.Component{
 		}
 	}
 
+	sortDates = (arr) => {
+		let list = [...arr];
+		let index = 0;
+		let currDate = [];
+		let newDate = [];
+		let temp;
+		let len = list.length;
+		let flag = false;
+
+		for (let i = 0; i < len - 1; i++){
+			index = i;
+			currDate = list[i].stamp.split('/');
+			for (let j = i+1; j < len; j++){
+				flag = false;
+				newDate = list[j].stamp.split('/');
+				if (parseInt(newDate[2],10) > parseInt(currDate[2],10)){
+					flag = true;
+				}
+				else if (parseInt(newDate[2],10) === parseInt(currDate[2],10)){
+					if (parseInt(newDate[0],10) > parseInt(currDate[0],10)){
+						flag = true;
+					}
+					else if (parseInt(newDate[0],10) === parseInt(currDate[0],10) && parseInt(newDate[1],10) > parseInt(currDate[1],10)){
+						flag = true;
+					}
+				}
+
+				if (flag){
+					index = j;
+					currDate = list[j].stamp.split('/');
+				}
+			}
+			if (index !== i){
+				temp = list[i];
+				list[i] = list[index];
+				list[index] = temp;
+			}
+		}
+		return list;
+	}
+
+	onPhysicianChange = (event) => {
+		const {peopleList} = this.state;
+		if (event.target.value !== 'All'){
+			let index = -1;
+			for (let i = 0; i < peopleList.length; i++){
+				if (peopleList[i].lastname === event.target.value){
+					index = i;
+					break;
+				}
+			}
+			this.filter(peopleList[index])
+		}
+		else{
+			this.filter('All');
+		}
+	}
+
+	filter = (doc) => {
+		const {messages} = this.state;
+		if (doc === 'All'){
+			this.setState({filteredMsgs: messages})
+		}
+		else{
+			console.log(messages);
+			this.setState({filteredMsgs: messages.filter((message => parseInt(message.docid,10) === doc.id))});
+		}
+	}
+
 	render(){
-		const {show, dshow, msg, messages, ctr} = this.state;
+		const {show, dshow, msg, messages, ctr, peopleList, filteredMsgs} = this.state;
 		let pendingList = [];
 		let pastList = [];
 		let pends = [];
@@ -188,10 +271,16 @@ class AMessages extends React.Component{
 			if (messages[i].status === 'pending'){
 				pends.push(messages[i]);
 			}
-			else{
-				past.push(messages[i]);
+		}
+		for (let i = 0; i < filteredMsgs.length; i++){
+			if (filteredMsgs[i].status !== 'pending'){
+				past.push(filteredMsgs[i]);
 			}
 		}
+
+		pends = this.sortDates(pends);
+		past = this.sortDates(past);
+
 
 		for (let n = 0; n < pends.length; n++){
 			pendingList.push(
@@ -205,7 +294,7 @@ class AMessages extends React.Component{
 			)
 		}
 
-		for (let j = (Math.min(past.length,ctr)) - 1; j >= 0; j--){
+		for (let j = 0; j < (Math.min(past.length,ctr)); j++){
 			if (past[j].status === 'accepted'){
 				pastList.push(
 					<ListGroup key={j} horizontal>
@@ -228,13 +317,27 @@ class AMessages extends React.Component{
 			}
 		}
 
+		let docSelect = peopleList.map((doc,i) => {
+			return <option key={i} value={doc.lastname}>{doc.lastname}</option>
+		})
+
+		docSelect.unshift(<option key={-1} value='All'>All</option>);
+
 		return(
 			<div>
 				<h4 className="requests">Pending</h4>
 				<div className="listStyleA">
 					{pendingList}
 				</div>
-				<h4 className="requests">Past Requests</h4>
+				<div className="titleDropdown">
+					<h4 className="past requests">Past Requests</h4>
+					<span className="filter">
+						<h5 className="filtertitle" >Filter: </h5>
+						<select onChange={this.onPhysicianChange} className="dropdownfilter">
+  							{docSelect}
+						</select>
+					</span>
+				</div>
 				<div className='listStyleE'>
 					{pastList}
 				</div>
