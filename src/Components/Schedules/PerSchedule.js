@@ -52,19 +52,19 @@ class PerSchedule extends React.Component{
   	}
 
 	loadrHolidays = () => {
-		fetch('http://localhost:3000/holiday/r')
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/r')
 			.then(response => response.json())
 			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isactive === true))}));
 	}
 
 	loadnrHolidays = () => {
-		fetch('http://localhost:3000/holiday/nr')
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/nr')
 			.then(response => response.json())
 			.then(holidays => this.setState({nrHolidayList: holidays}));
 	}
 
   	loadActiveDocs = () => {
-    	fetch('http://localhost:3000/sked/docs')
+    	fetch('https://secure-earth-82827.herokuapp.com/sked/docs')
       		.then(response => response.json())
       		.then(docs => {
       			if (!this.state.render){
@@ -84,7 +84,7 @@ class PerSchedule extends React.Component{
   	}
 
   	loadEntries = () => {
-  		fetch('http://localhost:3000/sked/entries')
+  		fetch('https://secure-earth-82827.herokuapp.com/sked/entries')
       		.then(response => response.json())
       		.then(entries => this.setState({entries: entries.filter((entry => entry.isactive === true))}));
   	}
@@ -140,13 +140,13 @@ class PerSchedule extends React.Component{
 	}
 
 	loadPending = (userid = this.props.user.id) => {
-		fetch('http://localhost:3000/emessages/'+userid)
+		fetch('https://secure-earth-82827.herokuapp.com/emessages/'+userid)
       		.then(response => response.json())
       		.then(messages => this.setState({pending: messages.filter((message => message.status === 'pending'))}));
 	}
 
 	loadDepts = () => {
-   		fetch('http://localhost:3000/departments')
+   		fetch('https://secure-earth-82827.herokuapp.com/departments')
 			.then(response => response.json())
 			.then(departments => this.setState({depts: departments}));
    	}
@@ -163,7 +163,7 @@ class PerSchedule extends React.Component{
 	}
 
 	assignCall = (typeID, method, date) => {
-		fetch('http://localhost:3000/sked/assign', {
+		fetch('https://secure-earth-82827.herokuapp.com/sked/assign', {
 			method: method,
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -184,7 +184,7 @@ class PerSchedule extends React.Component{
 	}
 
 	requestCall = (typeID, date) => {
-		fetch('http://localhost:3000/request', {
+		fetch('https://secure-earth-82827.herokuapp.com/request', {
 			method: 'post',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -206,7 +206,7 @@ class PerSchedule extends React.Component{
 	}
 
 	editCall = (typeID, date) => {
-		fetch('http://localhost:3000/request', {
+		fetch('https://secure-earth-82827.herokuapp.com/request', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -227,7 +227,7 @@ class PerSchedule extends React.Component{
 	}
 
 	deleteCall = (typeID, date, docid = parseInt(this.props.user.id,10)) => {
-		fetch('http://localhost:3000/drequest', {
+		fetch('https://secure-earth-82827.herokuapp.com/drequest', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({

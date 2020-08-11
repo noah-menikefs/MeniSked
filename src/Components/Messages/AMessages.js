@@ -34,7 +34,7 @@ class AMessages extends React.Component{
 	months = moment.months(); // List of each month
 
 	loadMessages = () => {
-		fetch('http://localhost:3000/amessages')
+		fetch('https://secure-earth-82827.herokuapp.com/amessages')
 			.then(response => response.json())
 			.then(messages => this.setState({
 				messages: messages,
@@ -43,25 +43,25 @@ class AMessages extends React.Component{
 	}
 
 	loadUsers = () => {
-		fetch('http://localhost:3000/people')
+		fetch('https://secure-earth-82827.herokuapp.com/people')
 			.then(response => response.json())
 			.then(users => this.setState({peopleList: users}));
 	}
 
 	loadEntries = () => {
-		fetch('http://localhost:3000/sked/entries')
+		fetch('https://secure-earth-82827.herokuapp.com/sked/entries')
 			.then(response => response.json())
 			.then(entries => this.setState({entryList: entries}));
 	}
 
 	loadCallTypes = () => {
-		fetch('http://localhost:3000/callTypes')
+		fetch('https://secure-earth-82827.herokuapp.com/callTypes')
 			.then(response => response.json())
 			.then(calls => this.setState({callList: calls}));
 	}
 	
 	respond = (id, status) => {
-		fetch('http://localhost:3000/amessages', {
+		fetch('https://secure-earth-82827.herokuapp.com/amessages', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -87,7 +87,7 @@ class AMessages extends React.Component{
 	}
 
 	accept = (id) => {
-		fetch('http://localhost:3000/arequest', {
+		fetch('https://secure-earth-82827.herokuapp.com/arequest', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({

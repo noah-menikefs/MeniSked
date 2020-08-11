@@ -43,7 +43,7 @@ class CSchedule extends React.Component{
 
   	loadCallSked = () => {
   		const {callList} = this.props;
-    	fetch('http://localhost:3000/people')
+    	fetch('https://secure-earth-82827.herokuapp.com/people')
       		.then(response => response.json())
       		.then(docs => {
       			let arr = [];
@@ -81,13 +81,13 @@ class CSchedule extends React.Component{
   	}
 
 	loadrHolidays = () => {
-		fetch('http://localhost:3000/holiday/r')
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/r')
 			.then(response => response.json())
 			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isactive === true))}));
 	}
 
 	loadnrHolidays = () => {
-		fetch('http://localhost:3000/holiday/nr')
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/nr')
 			.then(response => response.json())
 			.then(holidays => this.setState({nrHolidayList: holidays}));
 	}
@@ -121,7 +121,7 @@ class CSchedule extends React.Component{
 	}
 
 	loadDepts = () => {
-   		fetch('http://localhost:3000/departments')
+   		fetch('https://secure-earth-82827.herokuapp.com/departments')
 			.then(response => response.json())
 			.then(departments => this.setState({depts: departments}));
    	}

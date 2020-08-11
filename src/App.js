@@ -52,7 +52,7 @@ class App extends Component {
   }
 
   loadCallTypes = () => {
-    fetch('http://localhost:3000/callTypes')
+    fetch('https://secure-earth-82827.herokuapp.com/callTypes')
       .then(response => response.json())
       .then(calls => this.setState({callList: calls.sort(function(a, b){return a.priority - b.priority})}));
   }

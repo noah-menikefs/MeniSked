@@ -21,7 +21,7 @@ class Entries extends React.Component{
 	}
 
 	loadEntries = () => {
-		fetch('http://localhost:3000/sked/entries')
+		fetch('https://secure-earth-82827.herokuapp.com/sked/entries')
 			.then(response => response.json())
 			.then(entries => this.setState({entryList: entries}));
 	}
@@ -38,7 +38,7 @@ class Entries extends React.Component{
 	addEntry = () => {
 		const {entryName, isactive} = this.state;
 		if (entryName.length > 0){
-			fetch('http://localhost:3000/entries', {
+			fetch('https://secure-earth-82827.herokuapp.com/entries', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -60,7 +60,7 @@ class Entries extends React.Component{
 	}
 
 	deleteCall = (e) => {
-		fetch('http://localhost:3000/entries', {
+		fetch('https://secure-earth-82827.herokuapp.com/entries', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -84,7 +84,7 @@ class Entries extends React.Component{
 	editEntry = () => {
 		const {entryName, isactive, id} = this.state;
 		if (entryName.length > 0){
-			fetch('http://localhost:3000/entries', {
+			fetch('https://secure-earth-82827.herokuapp.com/entries', {
 				method: 'put',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({

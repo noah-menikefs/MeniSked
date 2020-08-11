@@ -27,7 +27,7 @@ class People extends React.Component{
 	}
 
 	loadAllUsers = () => {
-		fetch('http://localhost:3000/people')
+		fetch('https://secure-earth-82827.herokuapp.com/people')
 			.then(response => response.json())
 			.then(users => this.setState({peopleList: users}));
 	}
@@ -36,7 +36,7 @@ class People extends React.Component{
 		const {fName, lName, email} = this.state;
 		const {department} = this.props;
 		if (fName.length > 0 && lName.length > 0 && email.length > 0){	
-			fetch('http://localhost:3000/people', {
+			fetch('https://secure-earth-82827.herokuapp.com/people', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -64,7 +64,7 @@ class People extends React.Component{
 	}
 
 	activeChange = (e) => {
-		fetch('http://localhost:3000/people', {
+		fetch('https://secure-earth-82827.herokuapp.com/people', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -91,7 +91,7 @@ class People extends React.Component{
 			}
 		}
 
-		fetch('http://localhost:3000/people', {
+		fetch('https://secure-earth-82827.herokuapp.com/people', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({

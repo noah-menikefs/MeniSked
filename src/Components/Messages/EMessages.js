@@ -25,19 +25,19 @@ class EMessages extends React.Component{
 	}
 
 	loadMessages = () => {
-		fetch('http://localhost:3000/emessages/'+this.props.user.id)
+		fetch('https://secure-earth-82827.herokuapp.com/emessages/'+this.props.user.id)
       		.then(response => response.json())
       		.then(messages => this.setState({messages: messages.filter((message => message.status !== 'pending'))}));
 	}
 
 	loadEntries = () => {
-		fetch('http://localhost:3000/sked/entries')
+		fetch('https://secure-earth-82827.herokuapp.com/sked/entries')
 			.then(response => response.json())
 			.then(entries => this.setState({entryList: entries}));
 	}
 
 	loadCallTypes = () => {
-		fetch('http://localhost:3000/callTypes')
+		fetch('https://secure-earth-82827.herokuapp.com/callTypes')
 			.then(response => response.json())
 			.then(calls => this.setState({callList: calls}));
 	}

@@ -52,7 +52,7 @@ class PubSchedule extends React.Component{
   	}
 
   	loadPublished = () => {
-  		fetch('http://localhost:3000/published')
+  		fetch('https://secure-earth-82827.herokuapp.com/published')
       		.then(response => response.json())
       		.then(num => this.setState({published: num}));
   	}
@@ -61,7 +61,7 @@ class PubSchedule extends React.Component{
 		var a = moment([2020, 5, 1]);
 		var b = this.state.dateContext;
 		const num = b.diff(a, 'months');
-		fetch('http://localhost:3000/published', {
+		fetch('https://secure-earth-82827.herokuapp.com/published', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -73,7 +73,7 @@ class PubSchedule extends React.Component{
   	}
 
   	loadSked = () => {
-    	fetch('http://localhost:3000/people')
+    	fetch('https://secure-earth-82827.herokuapp.com/people')
       		.then(response => response.json())
       		.then(docs => {
       			let arr = [];
@@ -94,7 +94,7 @@ class PubSchedule extends React.Component{
   	}
 
   	loadDepts = () => {
-   		fetch('http://localhost:3000/departments')
+   		fetch('https://secure-earth-82827.herokuapp.com/departments')
 			.then(response => response.json())
 			.then(departments => this.setState({depts: departments}));
    	}
@@ -117,13 +117,13 @@ class PubSchedule extends React.Component{
   	}
 
   	loadEntries = () => {
-  		fetch('http://localhost:3000/sked/entries')
+  		fetch('https://secure-earth-82827.herokuapp.com/sked/entries')
       		.then(response => response.json())
       		.then(entries => this.setState({entryList: entries.filter((entry => entry.isactive === true))}));
   	}
 
   	loadAllNotes = () => {
-    	fetch('http://localhost:3000/sked/allNotes')
+    	fetch('https://secure-earth-82827.herokuapp.com/sked/allNotes')
       		.then(response => response.json())
       		.then(notes => this.setState({
       			numNotes: notes.filter((note => note.type === 1)),
@@ -134,13 +134,13 @@ class PubSchedule extends React.Component{
   	}
 
   	loadrHolidays = () => {
-		fetch('http://localhost:3000/holiday/r')
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/r')
 			.then(response => response.json())
 			.then(holidays => this.setState({rHolidayList: holidays.filter((holiday => holiday.isactive === true))}));
 	}
 
 	loadnrHolidays = () => {
-		fetch('http://localhost:3000/holiday/nr')
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/nr')
 			.then(response => response.json())
 			.then(holidays => this.setState({nrHolidayList: holidays}));
 	}
@@ -308,7 +308,7 @@ class PubSchedule extends React.Component{
 	onNotesSubmit = () => {
 		const {note, radio, dateContext, day} = this.state;
 		if (note.length > 0 && radio > 0){
-			fetch('http://localhost:3000/sked/notes', {
+			fetch('https://secure-earth-82827.herokuapp.com/sked/notes', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({

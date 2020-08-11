@@ -33,13 +33,13 @@ class Holidays extends React.Component{
 	}
 
 	loadrHolidays = () => {
-		fetch('http://localhost:3000/holiday/r')
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/r')
 			.then(response => response.json())
 			.then(holidays => this.setState({rHolidayList: holidays}));
 	}
 
 	loadnrHolidays = () => {
-		fetch('http://localhost:3000/holiday/nr')
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/nr')
 			.then(response => response.json())
 			.then(holidays => this.setState({nrHolidayList: holidays}));
 	}
@@ -58,7 +58,7 @@ class Holidays extends React.Component{
 	onNewRHoliday = () => {
 		const {name, isactive, month, day} = this.state;
 		if (name.length > 0){
-			fetch('http://localhost:3000/holiday/r', {
+			fetch('https://secure-earth-82827.herokuapp.com/holiday/r', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -82,7 +82,7 @@ class Holidays extends React.Component{
 	onNewNRHoliday = () => {
 		const {name} = this.state;
 		if (name.length > 0){
-			fetch('http://localhost:3000/holiday/nr', {
+			fetch('https://secure-earth-82827.herokuapp.com/holiday/nr', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -101,7 +101,7 @@ class Holidays extends React.Component{
 
 	onEditRHoliday = () => {
 		const {name, isactive, month, day} = this.state;
-		fetch('http://localhost:3000/holiday/r', {
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/r', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -121,7 +121,7 @@ class Holidays extends React.Component{
 		this.toggleRShow();
 	}
 	onDeleteRHoliday = (e) => {
-		fetch('http://localhost:3000/holiday/r', {
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/r', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -137,7 +137,7 @@ class Holidays extends React.Component{
 	}
 
 	onDeleteNRHoliday = (e) => {
-		fetch('http://localhost:3000/holiday/nr', {
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/nr', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -154,7 +154,7 @@ class Holidays extends React.Component{
 
 	onSkedHoliday = (e) => {
 		const {name, dateContext, day} = this.state;
-		fetch('http://localhost:3000/holiday/snr', {
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/snr', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -348,7 +348,7 @@ class Holidays extends React.Component{
 		for (let i = indexes.length - 1; i >= 0; i--){
 			eventschedule.splice(indexes[i],1);
 		}
-		fetch('http://localhost:3000/holiday/esnr', {
+		fetch('https://secure-earth-82827.herokuapp.com/holiday/esnr', {
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({

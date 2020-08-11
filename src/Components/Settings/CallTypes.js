@@ -22,7 +22,7 @@ class CallTypes extends React.Component{
 	}
 
 	loadCallTypes = () => {
-		fetch('http://localhost:3000/callTypes')
+		fetch('https://secure-earth-82827.herokuapp.com/callTypes')
 			.then(response => response.json())
 			.then(calls => this.setState({callList: calls.sort(function(a, b){return a.priority - b.priority})}));
 	}
@@ -44,7 +44,7 @@ class CallTypes extends React.Component{
 	addCall = () => {
 		const {callName, isactive, priority} = this.state;
 		if (callName.length > 0){
-			fetch('http://localhost:3000/callTypes', {
+			fetch('https://secure-earth-82827.herokuapp.com/callTypes', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -69,7 +69,7 @@ class CallTypes extends React.Component{
 	}
 
 	deleteCall = (e) => {
-		fetch('http://localhost:3000/callTypes', {
+		fetch('https://secure-earth-82827.herokuapp.com/callTypes', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -87,7 +87,7 @@ class CallTypes extends React.Component{
 	editCall = () => {
 		const {callName, isactive, priority, id} = this.state;
 		if (callName.length > 0){
-			fetch('http://localhost:3000/callTypes', {
+			fetch('https://secure-earth-82827.herokuapp.com/callTypes', {
 				method: 'put',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({

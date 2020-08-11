@@ -25,7 +25,7 @@ class Login extends React.Component{
 
 	onSLogin = () => {
 		const {loginEmail, loginPassword} = this.state;
-		fetch('http://localhost:3000/login', {
+		fetch('https://secure-earth-82827.herokuapp.com/login', {
 			method: 'post',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
@@ -65,7 +65,7 @@ class Login extends React.Component{
 	}
 
 	forgotPassword = () => {
-		fetch('http://localhost:3000/forgot', {
+		fetch('https://secure-earth-82827.herokuapp.com/forgot', {
 			method: 'post',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({

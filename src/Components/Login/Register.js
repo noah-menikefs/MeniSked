@@ -27,7 +27,7 @@ class Register extends React.Component{
    	}
 
    	loadDepts = () => {
-   		fetch('http://localhost:3000/departments')
+   		fetch('https://secure-earth-82827.herokuapp.com/departments')
 			.then(response => response.json())
 			.then(departments => this.setState({depts: departments}));
    	}
@@ -66,7 +66,7 @@ class Register extends React.Component{
 				isadmin = true;
 			}
 			
-			fetch('http://localhost:3000/register', {
+			fetch('https://secure-earth-82827.herokuapp.com/register', {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
