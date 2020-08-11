@@ -503,6 +503,8 @@ class PerSchedule extends React.Component{
 
 		let stamp = moment().format("YYYY-MM-DD h:mm:ss a");
 
+		console.log(stamp);
+
 		if (user.id && !loaded){
 			this.loadPending();
 			this.setState({loaded: true})
