@@ -480,8 +480,8 @@ class PerSchedule extends React.Component{
 		if (this.props.user.isadmin){
 			return (
 			<div>
-				<Button onClick={this.prevDoc} className="arrow top-child" variant="secondary">&#9668;</Button>
-				<Button onClick={this.nextDoc} className="arrow top-child" variant="secondary">&#9658;</Button>
+				<Button onClick={this.prevDoc} className="arrow top-child" variant="secondary">&#x25C0;</Button>
+				<Button onClick={this.nextDoc} className="arrow top-child" variant="secondary">&#x25B6;</Button>
 			</div>
 			);
 		}
@@ -600,15 +600,15 @@ class PerSchedule extends React.Component{
 					</Col>
 					<Col>
 						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#x25C0;</Button>
-						<Button onClick={this.nextEntry} className="arrow top-child"variant="secondary">&#9658;</Button>
+						<Button onClick={this.nextEntry} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 					</Col>
 					<Col >
-						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
+						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 					</Col>
 					<Col>
-						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
+						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 					</Col>
 					<Col>
 						<p className="vis top-child"></p>
@@ -628,8 +628,8 @@ class PerSchedule extends React.Component{
 						{this.adminButton()}
 					</Col>
 					<Col>
-						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button onClick={this.nextEntry} className="arrow top-child"variant="secondary">&#9658;</Button>
+						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+						<Button onClick={this.nextEntry} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 					</Col>
 				</Row>
 				<Row className="labels2">
@@ -657,12 +657,12 @@ class PerSchedule extends React.Component{
 				</Row>
 				<Row className="subheader2">
 					<Col >
-						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
+						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 					</Col>
 					<Col>
-						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
+						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 					</Col>
 				</Row>
 				<div className="curr">
@@ -678,7 +678,7 @@ class PerSchedule extends React.Component{
 					<Calendar pending={pending} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument today={today} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>

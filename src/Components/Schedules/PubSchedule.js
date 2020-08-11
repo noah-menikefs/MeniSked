@@ -494,12 +494,12 @@ class PubSchedule extends React.Component{
 							<p></p>
 						</Col>
 						<Col>
-							<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
-							<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
+							<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+							<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#x25C0;</Button>
 						</Col>
 						<Col>
-							<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
-							<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
+							<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+							<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 						</Col>
 						<Col >
 							<p></p>
@@ -517,8 +517,7 @@ class PubSchedule extends React.Component{
 					<Calendar testisadmin={user.isadmin} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} callList={callList} entries={entryList} sked={sked} holiDays={holiDays} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
-					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument today={today} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>

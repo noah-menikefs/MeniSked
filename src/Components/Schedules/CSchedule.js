@@ -281,12 +281,12 @@ class CSchedule extends React.Component{
 				</Row>
 				<Row className="csubheader">
 					<Col>
-						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#9658;</Button>
+						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 					</Col>
 					<Col>
-						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#9668;</Button>
-						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#9658;</Button>
+						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 					</Col>
 					<Col>
 						<p className="vis top-child"></p>
@@ -303,7 +303,6 @@ class CSchedule extends React.Component{
 					<Calendar callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					{/*<Col ><Button onClick={this.createPDF} variant="primary">Download as PDF</Button></Col>*/}
 					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>

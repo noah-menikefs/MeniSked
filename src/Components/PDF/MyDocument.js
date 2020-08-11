@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     borderStyle: "solid", 
     borderWidth: 1, 
     borderLeftWidth: 0, 
-    height: 128,
+    height: 120,
     borderTopWidth: 0 
   }, 
   tableCell: { 
