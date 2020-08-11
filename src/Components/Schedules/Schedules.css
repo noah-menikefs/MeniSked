@@ -68,7 +68,6 @@
 	left: 20%;
 }
 
-
 /*When resolution <= 750px, hide full text and show short text*/
 @media (max-width: 750px) {
     .labels1.row, .header1.row, .subheader1.row, .labels2.row, .header2.row, .subheader2.row, #today1 { display: flex; }
