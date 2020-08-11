@@ -684,7 +684,7 @@ class PerSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
-      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onClick={this.generateStamp}>Download as PDF</span>)}
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onClick={() => this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")})}>Download as PDF</span>)}
     				</PDFDownloadLink></Col>
 				</div>
 
