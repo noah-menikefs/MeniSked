@@ -3,6 +3,10 @@
 	display: none;
 }
 
+.vis.labels-child{
+	max-height: 10px;
+}
+
 .arrow.top-child{
 	font-size: 11px;
 	padding: 0 0.5em;
