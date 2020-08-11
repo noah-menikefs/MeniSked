@@ -599,7 +599,7 @@ class PerSchedule extends React.Component{
 						{this.adminButton()}
 					</Col>
 					<Col>
-						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#9658;</Button>
+						<Button onClick={this.prevEntry} className="arrow top-child"variant="secondary">&#x25C0;</Button>
 						<Button onClick={this.nextEntry} className="arrow top-child"variant="secondary">&#9658;</Button>
 					</Col>
 					<Col >
