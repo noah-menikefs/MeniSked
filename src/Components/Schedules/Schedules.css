@@ -7,6 +7,10 @@
 	height: 20px;
 }
 
+#entriesP{
+	margin-bottom: 0;
+}
+
 .arrow.top-child{
 	font-size: 11px;
 	padding: 0 0.5em;
