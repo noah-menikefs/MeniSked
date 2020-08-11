@@ -3,8 +3,8 @@
 	display: none;
 }
 
-.vis.labels-child{
-	max-height: 10px;
+#smallCol{
+	height: 20px;
 }
 
 .arrow.top-child{

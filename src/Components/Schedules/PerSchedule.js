@@ -592,7 +592,7 @@ class PerSchedule extends React.Component{
 					<Col ><select value={dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
 					{yearSelect}
 					</select></Col>
-					<Col><p className="vis labels-child"></p></Col>
+					<Col id="smallCol"><p className="vis labels-child"></p></Col>
 				</Row>
 				<Row className="subheader">
 					<Col>
