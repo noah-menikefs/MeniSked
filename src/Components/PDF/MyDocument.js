@@ -72,6 +72,9 @@ class MyDocument extends React.Component{
 
   render(){
     const {user, type, dateContext, holiDays, personalDays, entries, callList, callSked, sked, numNotes, iNotes, vNotes, depts, stamp} = this.props;
+    
+    console.log(stamp);
+
     let firstDay = dateContext.startOf('month').format('d'); //Day of week 0-6
     let daysInMonth = dateContext.daysInMonth();
     let ctr = 1;
