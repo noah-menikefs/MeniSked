@@ -498,6 +498,7 @@ class PerSchedule extends React.Component{
 	}
 
 	generateStamp = () => {
+		console.log(moment().format("YYYY-MM-DD h:mm:ss a"));
 		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")});
 	}
 	
