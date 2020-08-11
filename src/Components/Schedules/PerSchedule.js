@@ -38,7 +38,8 @@ class PerSchedule extends React.Component{
 			render: false,
 			pending: [],
 			loaded: false,
-			depts: []
+			depts: [],
+			click: false
 		}
 	}
 
@@ -498,12 +499,13 @@ class PerSchedule extends React.Component{
 	
 
 	render(){
-		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, holiDays, nrHolidayList, render, personalDays, pending, loaded, depts} = this.state;
+		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, holiDays, nrHolidayList, render, personalDays, pending, loaded, depts, click} = this.state;
 		const {user, today, callList} = this.props;
 
 		let stamp = moment().format("YYYY-MM-DD h:mm:ss a");
 
 		console.log(stamp);
+		console.log(click);
 
 		if (user.id && !loaded){
 			this.loadPending();
@@ -683,7 +685,7 @@ class PerSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
-      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onClick={() => console.log('click')}>'Download as PDF'</span>)}
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onClick={() => this.setState({click: true})>'Download as PDF'</span>)}
     				</PDFDownloadLink></Col>
 				</div>
 
