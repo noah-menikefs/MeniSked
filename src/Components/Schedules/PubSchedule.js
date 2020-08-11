@@ -36,7 +36,8 @@ class PubSchedule extends React.Component{
 			entryList: [],
 			day: -1,
 			published: -1,
-			depts: []
+			depts: [],
+			stamp: ''
 		}
 	}
 
@@ -441,8 +442,12 @@ class PubSchedule extends React.Component{
 		}
 	}
 
+	generateStamp = () => {
+		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")});
+	}
+
 	render(){
-		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, day, depts} = this.state;
+		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, day, depts, stamp} = this.state;
 		const {today, user, callList} = this.props;
 
 		let modalList = [];
@@ -517,7 +522,7 @@ class PubSchedule extends React.Component{
 					<Calendar testisadmin={user.isadmin} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} callList={callList} entries={entryList} sked={sked} holiDays={holiDays} type="Published" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument today={today} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink onClick={this.generateStamp} document={<MyDocument stamp={stamp} today={today} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>

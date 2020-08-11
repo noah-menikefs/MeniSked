@@ -1,11 +1,6 @@
 import React from 'react';
 import { Page, Text, Document, StyleSheet, View } from '@react-pdf/renderer';
 
-// Font.register({
-//   family: 'Source Sans Pro',
-//   src: "https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap"
-// });
-
 // Create styles
 const styles = StyleSheet.create({
   header: {
@@ -46,7 +41,7 @@ const styles = StyleSheet.create({
     borderStyle: "solid", 
     borderWidth: 1, 
     borderLeftWidth: 0, 
-    height: 120,
+    height: 125,
     borderTopWidth: 0 
   }, 
   tableCell: { 
@@ -59,8 +54,12 @@ const styles = StyleSheet.create({
   tableCellList: {   
     fontSize: 8,
     paddingLeft: 1
-  }  
-
+  },
+  footer: {
+    fontSize: 12,
+    textAlign: 'center',
+    color: 'grey',
+  }
 });
 // Create Document Component
 class MyDocument extends React.Component{ 
@@ -71,7 +70,7 @@ class MyDocument extends React.Component{
   } 
 
   render(){
-    const {user, type, dateContext, holiDays, personalDays, entries, callList, callSked, sked, numNotes, iNotes, vNotes, depts} = this.props;
+    const {user, type, dateContext, holiDays, personalDays, entries, callList, callSked, sked, numNotes, iNotes, vNotes, depts, stamp} = this.props;
     let firstDay = dateContext.startOf('month').format('d'); //Day of week 0-6
     let daysInMonth = dateContext.daysInMonth();
     let ctr = 1;
@@ -225,6 +224,9 @@ class MyDocument extends React.Component{
                 </View> 
               </View>
             </View>
+             <Text style={styles.footer}>  
+              {'Created: '+stamp}
+            </Text>
           </Page>
       </Document>
     );

@@ -29,7 +29,8 @@ class CSchedule extends React.Component{
 			render: false,
 			callSked:[],
 			day: -1,
-			depts: []
+			depts: [],
+			stamp: ''
 		}
 	}
 
@@ -232,8 +233,12 @@ class CSchedule extends React.Component{
 		}
 	}
 
+	generateStamp = () => {
+		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")});
+	}
+
 	render(){
-		const {dateContext, show, holiDays, nrHolidayList, render, callSked, day, depts} = this.state;
+		const {dateContext, show, holiDays, nrHolidayList, render, callSked, day, depts, stamp} = this.state;
 		const {today, user, callList} = this.props;
 		let yearSelect = [];
 
@@ -303,7 +308,7 @@ class CSchedule extends React.Component{
 					<Calendar callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink onClick={this.generateStamp} document={<MyDocument stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>

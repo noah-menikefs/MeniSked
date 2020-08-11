@@ -38,7 +38,8 @@ class PerSchedule extends React.Component{
 			render: false,
 			pending: [],
 			loaded: false,
-			depts: []
+			depts: [],
+			stamp: ''
 		}
 	}
 
@@ -495,10 +496,14 @@ class PerSchedule extends React.Component{
 		this.setState({dateContext: today});
 		this.loadNewDays(today);
 	}
+
+	generateStamp = () => {
+		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")});
+	}
 	
 
 	render(){
-		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, holiDays, nrHolidayList, render, personalDays, pending, loaded, depts} = this.state;
+		const {show, dateContext, activeDocs, docIndex, entries, entryIndex, holiDays, nrHolidayList, render, personalDays, pending, loaded, depts, stamp} = this.state;
 		const {user, today, callList} = this.props;
 
 		if (user.id && !loaded){
@@ -678,7 +683,7 @@ class PerSchedule extends React.Component{
 					<Calendar pending={pending} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument today={today} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
+					<Col id='downloadLink'><PDFDownloadLink onClick={this.generateStamp} document={<MyDocument stamp={stamp} today={today} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
     				</PDFDownloadLink></Col>
 				</div>
