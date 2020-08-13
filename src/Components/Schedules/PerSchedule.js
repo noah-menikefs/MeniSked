@@ -39,7 +39,7 @@ class PerSchedule extends React.Component{
 			pending: [],
 			loaded: false,
 			depts: [],
-			stamp: ''
+			stamp: moment().format("YYYY-MM-DD h:mm:ss a")
 		}
 	}
 
