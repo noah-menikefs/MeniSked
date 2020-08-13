@@ -495,13 +495,6 @@ class PerSchedule extends React.Component{
 		this.setState({dateContext: today});
 		this.loadNewDays(today);
 	}
-
-	getDoc = () => {
-		const {depts, entries, personalDays, holiDays, dateContext, style} = this.state;
-		const {user, today, callList} = this.props;
-
-		return <MyDocument stamp={moment().format("YYYY-MM-DD h:mm:ss a")} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={user}/>
-	}
 	
 
 	render(){
@@ -685,8 +678,8 @@ class PerSchedule extends React.Component{
 					<Calendar pending={pending} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type="Personal" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					<Col id='downloadLink'><PDFDownloadLink document={this.getDoc()} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
-      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download as PDF')}
+					<Col id='downloadLink'><PDFDownloadLink onmouseover={() => console.log('hover')} document={<MyDocument stamp={moment().format("YYYY-MM-DD h:mm:ss a")} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={entries} callList={callList} personalDays={personalDays} holiDays={holiDays} type={user.firstname+' '+user.lastname+"'s Personal"} dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)} user={this.props.user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'pesonalsked.pdf'}>
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onmouseover={() => console.log('span hover')}>'Download as PDF'</span>)}
     				</PDFDownloadLink></Col>
 				</div>
 
