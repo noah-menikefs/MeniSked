@@ -25,7 +25,7 @@ class Account extends React.Component {
 	}
 
 	loadAccount = () => {
-		fetch('https://secure-earth-82827.herokuapp.com/'+this.props.user.id)
+		fetch('https://secure-earth-82827.herokuapp.com/account/'+this.props.user.id)
 			.then(response => response.json())
 			.then(user => this.setState({
 				email: user.email,
@@ -106,7 +106,7 @@ class Account extends React.Component {
 			this.props.validateEmail(email)
 		){
 			
-			fetch('https://secure-earth-82827.herokuapp.com/'+this.props.user.id, {
+			fetch('https://secure-earth-82827.herokuapp.com/account/'+this.props.user.id, {
 				method: 'put',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
@@ -146,7 +146,7 @@ class Account extends React.Component {
 			nPassword.length > 0 &&
 			nPassword === cNPassword
 		){			
-			fetch('https://secure-earth-82827.herokuapp.com/'+this.props.user.id, {
+			fetch('https://secure-earth-82827.herokuapp.com/account/'+this.props.user.id, {
 				method: 'post',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
