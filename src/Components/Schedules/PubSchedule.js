@@ -442,9 +442,8 @@ class PubSchedule extends React.Component{
 		}
 	}
 
-	generateStamp = () => {
-		console.log(moment().format("YYYY-MM-DD h:mm:ss a"));
-		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")});
+	hoverSpan = () => {
+		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")})
 	}
 
 	render(){
@@ -524,7 +523,7 @@ class PubSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument stamp={stamp} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
-      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onClick={this.generateStamp}>Download as PDF</span>)}
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as PDF</span>)}
     				</PDFDownloadLink></Col>
 				</div>
 

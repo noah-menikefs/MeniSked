@@ -233,8 +233,8 @@ class CSchedule extends React.Component{
 		}
 	}
 
-	generateStamp = () => {
-		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")});
+	hoverSpan = () => {
+		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")})
 	}
 
 	render(){
@@ -309,7 +309,7 @@ class CSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					<Col id='downloadLink'><PDFDownloadLink  document={<MyDocument stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
-      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onClick={this.generateStamp}>Download as PDF</span>)}
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as PDF</span>)}
     				</PDFDownloadLink></Col>
 				</div>
 				<div className='modal'>
