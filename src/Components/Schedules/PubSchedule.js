@@ -448,7 +448,7 @@ class PubSchedule extends React.Component{
 
 	adminDownload = () => {
 		if (this.props.user.isadmin){
-			const {stamp, depts, numNotes, vNotes, iNotes, holiDays, entryList, dateContext} = this.state;
+			const {stamp, depts, numNotes, vNotes, iNotes, holiDays, entryList, dateContext, sked} = this.state;
 			const {callList} = this.props;
 
 			let user = Object.assign({}, this.props.user);
