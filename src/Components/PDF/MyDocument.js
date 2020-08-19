@@ -123,6 +123,7 @@ class MyDocument extends React.Component{
                   name = entries[x].name;
                   if (listType[m].name){
                     name2 = listType[m].name;
+                    console.log(listType[m].colour);
                     colour = listType[m].colour;
                   }
                   break;
@@ -133,6 +134,7 @@ class MyDocument extends React.Component{
                   name = callList[t].name;
                   if (listType[m].name){
                     name2 = listType[m].name;
+                    console.log(listType[m].colour);
                     colour = listType[m].colour;
                   }
                   break;
