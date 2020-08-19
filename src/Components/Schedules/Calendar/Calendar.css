@@ -95,3 +95,7 @@ td > hr {
 #num2{
     padding: 0 15% 0 5%;
 }
+
+#idVar{
+    white-space: pre-wrap;
+}

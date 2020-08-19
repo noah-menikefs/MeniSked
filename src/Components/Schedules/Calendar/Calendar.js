@@ -152,7 +152,6 @@ class Calendar extends React.Component{
 					if (id){
 						idVar = 'num2'
 					}
-					console.log(arr[i].msg);
 					return <span key={i} id={idVar}>{arr[i].msg}</span>
 				}
 			}
