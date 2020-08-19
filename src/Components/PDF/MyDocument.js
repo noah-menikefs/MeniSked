@@ -60,9 +60,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     textAlign: 'center',
     color: 'grey',
-  },
-  highlight: {
-    backgroundColor: 'tomato'
   }
 });
 // Create Document Component
@@ -88,6 +85,7 @@ class MyDocument extends React.Component{
     let numNote = '';
     let iNote = '';
     let vNote = '';
+    let colour = '';
 
     let listType = [];
 
@@ -125,6 +123,7 @@ class MyDocument extends React.Component{
                   name = entries[x].name;
                   if (listType[m].name){
                     name2 = listType[m].name;
+                    colour = listType[m].colour;
                   }
                   break;
                 }
@@ -134,12 +133,13 @@ class MyDocument extends React.Component{
                   name = callList[t].name;
                   if (listType[m].name){
                     name2 = listType[m].name;
+                    colour = listType[m].colour;
                   }
                   break;
                 }
               }
 
-              today.push(<Text key={m} style={styles.tableCellList}>{name} <Text style={styles.highlight}>{name2}</Text></Text>);
+              today.push(<Text key={m} style={styles.tableCellList}>{name} <Text style={{backgroundColor: colour}}>{name2}</Text></Text>);
             }
           }
           for (let b = 0; b < vNotes.length; b++){
