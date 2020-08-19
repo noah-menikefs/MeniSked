@@ -466,8 +466,6 @@ class PubSchedule extends React.Component{
 		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, day, depts, stamp} = this.state;
 		const {today, user, callList} = this.props;
 
-		console.log(numNotes);
-
 		let modalList = [];
 		for (let i = 0; i < sked.length; i++){
 			const splitArr = sked[i].date.split('/');

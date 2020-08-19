@@ -146,8 +146,11 @@ class Calendar extends React.Component{
 		if (numNotes && testisadmin){
 			let idVar = 'num';
 			const arr = [...numNotes];
+			console.log(arr);
 			for (let i = 0; i < arr.length; i++){
+				console.log(arr[i]);
 				const splitArr = arr[i].date.split('/');
+				console.log(splitArr);
 				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === dateContext.format('YYYY')){	
 					if (id){
 						idVar = 'num2'
