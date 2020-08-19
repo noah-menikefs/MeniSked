@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 10,
     textAlign: 'center',
-    color: 'grey',
+    color: '#808080',
   },
   title: {
     fontSize: 20,
@@ -141,7 +141,7 @@ class MyDocument extends React.Component{
                 }
               }
 
-              today.push(<Text key={m} style={styles.tableCellList}>{name} <Text style={{backgroundColor: colour}}>{name2}</Text></Text>);
+              today.push(<Text key={m} style={styles.tableCellList}>{name} <Text style={{backgroundColor: "'"+colour+"'"}}>{name2}</Text></Text>);
             }
           }
           for (let b = 0; b < vNotes.length; b++){
