@@ -141,7 +141,7 @@ class MyDocument extends React.Component{
                 }
               }
 
-              today.push(<Text key={m} style={styles.tableCellList}>{name} <Text style={{backgroundColor: "'"+colour+"'"}}>{name2}</Text></Text>);
+              today.push(<Text key={m} style={styles.tableCellList}>{name} <Text style={{backgroundColor: ''+colour}}>{name2}</Text></Text>);
             }
           }
           for (let b = 0; b < vNotes.length; b++){
