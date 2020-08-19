@@ -43,12 +43,12 @@ class Navigation extends React.Component {
             <NavDropdown className="full-text" title="Schedules" id="collasible-nav-dropdown">
          			<NavDropdown.Item onClick={() => onRouteChange("Personal Schedule")} /*href="#p"*/>Personal</NavDropdown.Item>
           		<NavDropdown.Item onClick={() => onRouteChange("Call Schedule")} /*href="#c"*/>Call</NavDropdown.Item>
-         			<NavDropdown.Item onClick={() => onRouteChange("Published Schedule")} /*href="#pu"*/>Published</NavDropdown.Item>
+         			<NavDropdown.Item onClick={() => onRouteChange("Master Schedule")} /*href="#pu"*/>Master</NavDropdown.Item>
        			</NavDropdown>
             <NavDropdown className="logo" title="Skeds" id="collasible-nav-dropdown">
               <NavDropdown.Item onClick={() => onRouteChange("Personal Schedule")} /*href="#p"*/>Personal</NavDropdown.Item>
               <NavDropdown.Item onClick={() => onRouteChange("Call Schedule")} /*href="#c"*/>Call</NavDropdown.Item>
-              <NavDropdown.Item onClick={() => onRouteChange("Published Schedule")} /*href="#pu"*/>Published</NavDropdown.Item>
+              <NavDropdown.Item onClick={() => onRouteChange("Master Schedule")} /*href="#pu"*/>Master</NavDropdown.Item>
             </NavDropdown>
             <Nav.Link onClick={() => this.props.onRouteChange(ad+"Messages")} className="full-text linky" /*href="#m"*/>Messages</Nav.Link>
             <img onClick={() => this.props.onRouteChange(ad+"Messages")} alt="Messages" src="https://img.icons8.com/material-rounded/96/000000/important-mail.png" width="30" height="30" className="logo linky"/>

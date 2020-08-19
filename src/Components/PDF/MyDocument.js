@@ -6,6 +6,7 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 12,
     marginBottom: 10,
+    marginTop: 5,
     textAlign: 'center',
     color: 'grey',
   },
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
   }, 
   tableBody:{
        paddingRight: 5,
-       paddingLeft: 5 
+       paddingLeft: 7 
   },
   tableRow: { 
     margin: "auto", 
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
     borderStyle: "solid", 
     borderWidth: 1, 
     borderLeftWidth: 0, 
-    height: 125,
+    height: 110,
     borderTopWidth: 0 
   }, 
   tableCell: { 

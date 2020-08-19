@@ -37,7 +37,7 @@ class PubSchedule extends React.Component{
 			day: -1,
 			published: -1,
 			depts: [],
-			stamp: ''
+			stamp: moment().format("YYYY-MM-DD HH:mm")
 		}
 	}
 
@@ -443,7 +443,23 @@ class PubSchedule extends React.Component{
 	}
 
 	hoverSpan = () => {
-		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")})
+		this.setState({stamp: moment().format("YYYY-MM-DD HH:mm")})
+	}
+
+	adminDownload = () => {
+		if (this.props.user.isadmin){
+			const {stamp, depts, numNotes, vNotes, iNotes, holiDays, entryList, dateContext} = this.state;
+			const {callList} = this.props;
+
+			let user = Object.assign({}, this.props.user);
+			user.isadmin = false;
+
+			return (
+				<Col id='downloadLink'><PDFDownloadLink document={<MyDocument stamp={stamp} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as PDF</span>)}
+    			</PDFDownloadLink></Col>	
+    		)
+		}
 	}
 
 	render(){
@@ -500,7 +516,7 @@ class PubSchedule extends React.Component{
 						</Col>
 						<Col>
 							<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#x25C0;</Button>
-							<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+							<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 						</Col>
 						<Col>
 							<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#x25C0;</Button>
@@ -525,6 +541,7 @@ class PubSchedule extends React.Component{
 					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument stamp={stamp} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as PDF</span>)}
     				</PDFDownloadLink></Col>
+    				{this.adminDownload()}
 				</div>
 
 				<div className='modal'>

@@ -30,7 +30,7 @@ class CSchedule extends React.Component{
 			callSked:[],
 			day: -1,
 			depts: [],
-			stamp: ''
+			stamp: moment().format("YYYY-MM-DD HH:mm")
 		}
 	}
 
@@ -234,7 +234,7 @@ class CSchedule extends React.Component{
 	}
 
 	hoverSpan = () => {
-		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")})
+		this.setState({stamp: moment().format("YYYY-MM-DD HH:mm")})
 	}
 
 	render(){
@@ -264,7 +264,10 @@ class CSchedule extends React.Component{
 					<Col><Button onClick={this.reset} id="today" className="top-child" variant="primary">Today</Button></Col>
 				</Row>
 				<Row className="cheader">
-				<Col><select value={dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
+					<Col ><select value={dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
+	  					{yearSelect}
+					</select></Col>
+					<Col><select value={dateContext.format('MMMM')} onChange={this.onMonthChange} className="top-child month selector">
 	  					<option value="January">January</option>
 	  					<option value="February">February</option>
 	  					<option value="March">March</option>
@@ -278,20 +281,17 @@ class CSchedule extends React.Component{
 	  					<option value="November">November</option>
 	  					<option value="December">December</option>
 					</select></Col>
-					<Col ><select value={dateContext.format('Y')} onChange={this.onYearChange} className="top-child year selector">
-	  					{yearSelect}
-					</select></Col>
 					<Col><p className="vis top-child"></p></Col>
 
 				</Row>
 				<Row className="csubheader">
 					<Col>
-						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#x25C0;</Button>
-						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#x25B6;</Button>
-					</Col>
-					<Col>
 						<Button onClick={this.prevYear} className="arrow top-child"variant="secondary">&#x25C0;</Button>
 						<Button onClick={this.nextYear} className="arrow top-child"variant="secondary">&#x25B6;</Button>
+					</Col>
+					<Col>
+						<Button onClick={this.prevMonth} className="arrow top-child"variant="secondary">&#x25C0;</Button>
+						<Button onClick={this.nextMonth} className="arrow top-child"variant="secondary">&#x25B6;</Button>
 					</Col>
 					<Col>
 						<p className="vis top-child"></p>

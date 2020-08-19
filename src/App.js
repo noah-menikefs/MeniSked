@@ -63,7 +63,7 @@ class App extends Component {
     switch(route){
       case "Personal Schedule": 
         return <PerSchedule loadCallTypes={this.loadCallTypes} callList={callList} today={today} user={user}/>
-      case 'Published Schedule': 
+      case 'Master Schedule': 
         return <PubSchedule loadCallTypes={this.loadCallTypes} callList={callList} today={today} user={user}/>
       case 'Call Schedule': 
         return <CSchedule loadCallTypes={this.loadCallTypes} callList={callList} today={today} user={user}/>

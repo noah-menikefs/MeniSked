@@ -39,7 +39,7 @@ class PerSchedule extends React.Component{
 			pending: [],
 			loaded: false,
 			depts: [],
-			stamp: moment().format("YYYY-MM-DD h:mm:ss a")
+			stamp: moment().format("YYYY-MM-DD HH:mm")
 		}
 	}
 
@@ -498,7 +498,7 @@ class PerSchedule extends React.Component{
 	}
 	
 	hoverSpan = () => {
-		this.setState({stamp: moment().format("YYYY-MM-DD h:mm:ss a")})
+		this.setState({stamp: moment().format("YYYY-MM-DD HH:mm")})
 	}
 
 	render(){
