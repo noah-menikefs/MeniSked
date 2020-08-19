@@ -259,8 +259,8 @@ class CSchedule extends React.Component{
 		return(
 			<div className="screen">
 				<Row className="clabels">
-					<Col><h5 className="labels-child">Month</h5></Col>
 					<Col><h5 className="labels-child">Year</h5></Col>
+					<Col><h5 className="labels-child">Month</h5></Col>
 					<Col><Button onClick={this.reset} id="today" className="top-child" variant="primary">Today</Button></Col>
 				</Row>
 				<Row className="cheader">
