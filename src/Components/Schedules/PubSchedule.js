@@ -455,12 +455,14 @@ class PubSchedule extends React.Component{
 			user.isadmin = false;
 
 			return (
-				<Col id='downloadLink'><PDFDownloadLink document={<MyDocument stamp={stamp} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
-      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Employee Black & White Download</span>)}
-    			</PDFDownloadLink></Col>
-    			<Col id='downloadLink'><PDFDownloadLink  document={<MyDocument stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
-      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Employee Colour Download</span>)}
-    				</PDFDownloadLink></Col>	
+				<div>
+					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument stamp={stamp} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
+	      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Employee Black & White Download</span>)}
+	    			</PDFDownloadLink></Col>
+	    			<Col id='downloadLink'><PDFDownloadLink  document={<MyDocument stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
+	      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Employee Colour Download</span>)}
+	    				</PDFDownloadLink></Col>	
+    			</div>
     		)
 		}
 	}
