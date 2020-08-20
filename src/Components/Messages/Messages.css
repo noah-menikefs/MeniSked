@@ -84,3 +84,7 @@
 .filtertitle{
 	padding-right: 0.25em;
 }
+
+.deletemsg{
+	float: right;
+}

@@ -300,7 +300,7 @@ class AMessages extends React.Component{
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='past list' action disabled>
 							You <span className='accepted'>accepted</span> {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
-							<Button className="deny" size="sm" variant="danger">Delete</Button>
+							<Button className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{past[j].stamp}</ListGroup.Item>
 					</ListGroup>
@@ -311,7 +311,7 @@ class AMessages extends React.Component{
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='past list' action onClick={() => this.toggleDShow(past[j].msg)}>
 							You <span className='denied'>denied</span> {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
-							<Button className="deny" size="sm" variant="danger">Delete</Button>
+							<Button className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{past[j].stamp}</ListGroup.Item>
 					</ListGroup>
