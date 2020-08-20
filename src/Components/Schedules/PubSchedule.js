@@ -549,9 +549,8 @@ class PubSchedule extends React.Component{
     				<Col id='downloadLink'><PDFDownloadLink document={<MyDocument colour={true} stamp={stamp} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
       					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as Colour PDF</span>)}
     				</PDFDownloadLink></Col>
-    				{this.adminDownload()}
 				</div>
-
+				{this.adminDownload()}
 				<div className='modal'>
 					<Modal show={show} onHide={this.toggleShow} >
         				<Modal.Header closeButton>
