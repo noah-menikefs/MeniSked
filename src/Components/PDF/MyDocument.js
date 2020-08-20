@@ -70,8 +70,8 @@ class MyDocument extends React.Component{
     }
   } 
 
-  determineColour = (name2) => {
-   
+  determineColour = (name2, colour) => {
+    
     if (this.props.colour){
       return <Text style={{backgroundColor: ''+colour}}>{name2}</Text>
     }
@@ -147,7 +147,7 @@ class MyDocument extends React.Component{
                 }
               }
 
-              today.push(<Text key={m} style={styles.tableCellList}>{name} {this.determineColour(name2)}</Text>);
+              today.push(<Text key={m} style={styles.tableCellList}>{name} {this.determineColour(name2,colour)}</Text>);
             }
           }
           for (let b = 0; b < vNotes.length; b++){
