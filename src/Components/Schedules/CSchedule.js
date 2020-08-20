@@ -308,8 +308,11 @@ class CSchedule extends React.Component{
 					<Calendar callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} today={today} style={style} onDayClick={(e,day) => this.onDayClick(e,day)}/>
 				</div>
 				<div className="bottom">
-					<Col id='downloadLink'><PDFDownloadLink  document={<MyDocument stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
-      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as PDF</span>)}
+					<Col id='downloadLink'><PDFDownloadLink  document={<MyDocument colour={false} stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as Black & White PDF</span>)}
+    				</PDFDownloadLink></Col>
+    				<Col id='downloadLink'><PDFDownloadLink  document={<MyDocument colour={true} stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as Colour PDF</span>)}
     				</PDFDownloadLink></Col>
 				</div>
 				<div className='modal'>

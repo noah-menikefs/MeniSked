@@ -70,6 +70,13 @@ class MyDocument extends React.Component{
     }
   } 
 
+  determineColour = () => {
+    if (this.props.colour){
+      return <Text style={{backgroundColor: ''+colour}}>{name2}</Text>
+    }
+    <Text>{name2}</Text>
+  }
+
   render(){
     const {user, type, dateContext, holiDays, personalDays, entries, callList, callSked, sked, numNotes, iNotes, vNotes, depts, stamp} = this.props;
 
@@ -123,7 +130,6 @@ class MyDocument extends React.Component{
                   name = entries[x].name;
                   if (listType[m].name){
                     name2 = listType[m].name;
-                    console.log(listType[m].colour.substring(0,7));
                     colour = listType[m].colour.substring(0,7);
                   }
                   break;
@@ -134,14 +140,13 @@ class MyDocument extends React.Component{
                   name = callList[t].name;
                   if (listType[m].name){
                     name2 = listType[m].name;
-                    console.log(listType[m].colour.substring(0,7));
                     colour = listType[m].colour.substring(0,7);
                   }
                   break;
                 }
               }
 
-              today.push(<Text key={m} style={styles.tableCellList}>{name} <Text style={{backgroundColor: ''+colour}}>{name2}</Text></Text>);
+              today.push(<Text key={m} style={styles.tableCellList}>{name} {this.determineColour()}</Text>);
             }
           }
           for (let b = 0; b < vNotes.length; b++){

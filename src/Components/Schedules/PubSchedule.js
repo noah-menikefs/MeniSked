@@ -456,8 +456,11 @@ class PubSchedule extends React.Component{
 
 			return (
 				<Col id='downloadLink'><PDFDownloadLink document={<MyDocument stamp={stamp} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
-      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Employee Download</span>)}
-    			</PDFDownloadLink></Col>	
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Employee Black & White Download</span>)}
+    			</PDFDownloadLink></Col>
+    			<Col id='downloadLink'><PDFDownloadLink  document={<MyDocument stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Employee Colour Download</span>)}
+    				</PDFDownloadLink></Col>	
     		)
 		}
 	}
@@ -539,7 +542,10 @@ class PubSchedule extends React.Component{
 				</div>
 				<div className="bottom">
 					<Col id='downloadLink'><PDFDownloadLink document={<MyDocument stamp={stamp} depts={depts} numNotes={numNotes} vNotes={vNotes} iNotes={iNotes} holiDays={holiDays} callList={callList} entries={entryList} sked={sked} type="Published" dateContext={dateContext} user={user} />} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'publishedsked.pdf'}>
-      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as PDF</span>)}
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as Black & White PDF</span>)}
+    				</PDFDownloadLink></Col>
+    				<Col id='downloadLink'><PDFDownloadLink  document={<MyDocument stamp={stamp} depts={depts} numNotes={[]} vNotes={[]} iNotes={[]} entries={[]} callList={callList} callSked={callSked} holiDays={holiDays} type="Call" dateContext={dateContext} user={user}/>} fileName={dateContext.format('MMMM')+dateContext.format('Y')+'callsked.pdf'}>
+      					{({ blob, url, loading, error }) => (loading ? 'Loading document...' : <span onMouseOver={this.hoverSpan}>Download as Colour PDF</span>)}
     				</PDFDownloadLink></Col>
     				{this.adminDownload()}
 				</div>
