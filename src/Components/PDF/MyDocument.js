@@ -75,7 +75,7 @@ class MyDocument extends React.Component{
     if (this.props.colour){
       return <Text style={{backgroundColor: ''+colour}}>{name2}</Text>
     }
-    <Text>{name2}</Text>
+    return <Text>{name2}</Text>
   }
 
   render(){
