@@ -261,12 +261,14 @@ class AMessages extends React.Component{
 		}
 	}
 
-	deleteMessage = (id) => {
+	deleteMessage = (id, deleted) => {
 		fetch('https://secure-earth-82827.herokuapp.com/messages', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				id: id
+				id: id,
+				deleted: deleted,
+				user: 'E'
 			})
 		})
 			.then(response => response.json())
@@ -316,7 +318,7 @@ class AMessages extends React.Component{
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='past list' action disabled>
 							You <span className='accepted'>accepted</span> {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
-							<Button onClick={() => this.deleteMessage(past[j].id)} className="deletemsg" size="sm" variant="danger">Delete</Button>
+							<Button onClick={() => this.deleteMessage(past[j].id, past[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{past[j].stamp}</ListGroup.Item>
 					</ListGroup>
@@ -327,7 +329,7 @@ class AMessages extends React.Component{
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='past list' action onClick={() => this.toggleDShow(past[j].msg)}>
 							You <span className='denied'>denied</span> {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
-							<Button onClick={() => this.deleteMessage(past[j].id)} className="deletemsg" size="sm" variant="danger">Delete</Button>
+							<Button onClick={() => this.deleteMessage(past[j].id, past[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{past[j].stamp}</ListGroup.Item>
 					</ListGroup>

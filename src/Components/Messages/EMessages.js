@@ -152,12 +152,15 @@ class EMessages extends React.Component{
 		return list;
 	}
 
-	deleteMessage = (id) => {
+	deleteMessage = (id, deleted) => {
 		fetch('https://secure-earth-82827.herokuapp.com/messages', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				id: id
+				id: id,
+				deleted: deleted,
+				user: 'E'
+
 			})
 		})
 			.then(response => response.json())
@@ -182,7 +185,7 @@ class EMessages extends React.Component{
 				msgList.push(
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='pend list' action disabled>Peter Menikefs <span className={msgs[j].status}>{msgs[j].status}</span> your request for {this.entryIdToName(msgs[j].entryid)} {this.dateStyler(msgs[j].dates)}
-						<Button onClick={() => this.deleteMessage(msgs[j].id)} className="deletemsg" size="sm" variant="danger">Delete</Button>
+						<Button onClick={() => this.deleteMessage(msgs[j].id, msgs[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{msgs[j].stamp}</ListGroup.Item>
 					</ListGroup>
@@ -192,7 +195,7 @@ class EMessages extends React.Component{
 				msgList.push(
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow(msgs[j].msg)}>Peter Menikefs <span className={msgs[j].status}>{msgs[j].status}</span> your request for {this.entryIdToName(msgs[j].entryid)} {this.dateStyler(msgs[j].dates)}
-						<Button onClick={() => this.deleteMessage(msgs[j].id)} className="deletemsg" size="sm" variant="danger">Delete</Button>
+						<Button onClick={() => this.deleteMessage(msgs[j].id, msgs[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{msgs[j].stamp}</ListGroup.Item>
 					</ListGroup>
