@@ -321,9 +321,9 @@ class AMessages extends React.Component{
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='past list' action>
 							You <span className='accepted'>accepted</span> {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
-							<Button onClick={() => this.deleteMessage(past[j].id, past[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{past[j].stamp}</ListGroup.Item>
+						<ListGroup.Item ><Button onClick={() => this.deleteMessage(past[j].id, past[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button></ListGroup.Item>
 					</ListGroup>
 				);
 			}
@@ -335,6 +335,7 @@ class AMessages extends React.Component{
 							<Button onClick={() => this.deleteMessage(past[j].id, past[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{past[j].stamp}</ListGroup.Item>
+						<ListGroup.Item ><Button onClick={() => this.deleteMessage(past[j].id, past[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button></ListGroup.Item>
 					</ListGroup>
 				);
 			}

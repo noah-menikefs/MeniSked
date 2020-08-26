@@ -186,9 +186,9 @@ class EMessages extends React.Component{
 				msgList.push(
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='pend list' action>Peter Menikefs <span className={msgs[j].status}>{msgs[j].status}</span> your request for {this.entryIdToName(msgs[j].entryid)} {this.dateStyler(msgs[j].dates)}
-						<Button onClick={() => this.deleteMessage(msgs[j].id, msgs[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{msgs[j].stamp}</ListGroup.Item>
+						<ListGroup.Item ><Button onClick={() => this.deleteMessage(msgs[j].id, msgs[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button></ListGroup.Item>
 					</ListGroup>
 				)
 			}
@@ -199,6 +199,7 @@ class EMessages extends React.Component{
 						<Button onClick={() => this.deleteMessage(msgs[j].id, msgs[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{msgs[j].stamp}</ListGroup.Item>
+						<ListGroup.Item ><Button onClick={() => this.deleteMessage(msgs[j].id, msgs[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button></ListGroup.Item>
 					</ListGroup>
 				)
 			}
