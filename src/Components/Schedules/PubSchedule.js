@@ -25,6 +25,7 @@ class PubSchedule extends React.Component{
 			vNotes: [],
 			iNotes: [],
 			show: false,
+			nShow: false,
 			dateContext: moment(),
 			note: '',
 			radio: 0,
@@ -37,7 +38,9 @@ class PubSchedule extends React.Component{
 			day: -1,
 			published: -1,
 			depts: [],
-			stamp: moment().format("YYYY-MM-DD HH:mm")
+			stamp: moment().format("YYYY-MM-DD HH:mm"),
+			msg: '',
+			id: -1
 		}
 	}
 
@@ -471,7 +474,8 @@ class PubSchedule extends React.Component{
 			method: 'put',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				id: id
+				id: id,
+				msg: this.state.msg
 			})
 		})
 		.then(response => response.json())
@@ -481,6 +485,7 @@ class PubSchedule extends React.Component{
 				this.loadAllNotes();
 			}
 		})
+		this.toggleNote(-1,'');
 	}
 
 	deleteNote = (id) => {
@@ -499,8 +504,20 @@ class PubSchedule extends React.Component{
 		})
 	}
 
+	toggleNote = (id, msg) => {
+		this.setState({
+			msg: msg,
+			id: id,
+			nShow: !this.state.nShow
+		})
+	}
+
+	onMsgChange = (e) => {
+		this.setState({msg: e.target.value});
+	}
+
 	render(){
-		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, day, depts, stamp} = this.state;
+		const {show, dateContext, numNotes, vNotes, iNotes, nrHolidayList, render, holiDays, sked, entryList, day, depts, stamp, nShow, id, msg} = this.state;
 		const {today, user, callList} = this.props;
 
 		let modalList = [];
@@ -520,7 +537,7 @@ class PubSchedule extends React.Component{
 					noteList.push(
 						<li key={n} id="numNotes">
 							{numNotes[n].msg}
-							<Button key={n} onClick={() => this.editNote(numNotes[n].id)} className="edit butn" size="sm" variant="secondary">Edit</Button>
+							<Button key={n} onClick={() => this.toggleNote(numNotes[n].id, numNotes[n].msg)} className="edit butn" size="sm" variant="secondary">Edit</Button>
 							<Button key={-n-1} onClick={() => this.deleteNote(numNotes[n].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
 						</li>
 					);
@@ -532,7 +549,7 @@ class PubSchedule extends React.Component{
 					noteList.push(
 						<li key={i} id="iNotes">
 							{iNotes[i].msg}
-							<Button key={i} onClick={() => this.editNote(iNotes[i].id)} className="edit butn" size="sm" variant="secondary">Edit</Button>
+							<Button key={i} onClick={() => this.toggleNote(iNotes[i].id, iNotes[i].msg)} className="edit butn" size="sm" variant="secondary">Edit</Button>
 							<Button key={-i-1} onClick={() => this.deleteNote(iNotes[i].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
 						</li>
 					);
@@ -546,7 +563,7 @@ class PubSchedule extends React.Component{
 				noteList.push(
 					<li key={i} id="notes">
 						{vNotes[i].msg}
-						<Button key={i} onClick={() => this.editNote(vNotes[i].id)} className="edit butn" size="sm" variant="secondary">Edit</Button>
+						<Button key={i} onClick={() => this.toggleNote(vNotes[i].id, vNotes[i].msg)} className="edit butn" size="sm" variant="secondary">Edit</Button>
 						<Button key={-i-1} onClick={() => this.deleteNote(vNotes[i].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
 					</li>
 				);
@@ -629,6 +646,28 @@ class PubSchedule extends React.Component{
             					Close
           					</Button>
 	        			</Modal.Footer>
+      				</Modal>
+				</div>
+				<div className='modal'>
+					<Modal show={nShow} onHide={this.toggleNote} >
+        				<Modal.Header closeButton>
+          					<Modal.Title id='modalTitle'>Edit Note</Modal.Title>
+       	 				</Modal.Header>
+       	 				<Form>
+	        				<Modal.Body>
+		        				<Form.Group id="note">
+									<Form.Control required value={msg} onChange={this.onMsgChange} type="text" placeholder="Note" />
+								</Form.Group>
+	        				</Modal.Body>
+	        				<Modal.Footer>
+	          					<Button variant="secondary" onClick={this.toggleNote}>
+	            					Close
+	          					</Button>
+	          					<Button onClick={() => this.editNote(id)} variant="primary" >
+	            					Submit
+	          					</Button>
+		        			</Modal.Footer>
+	        			</Form>
       				</Modal>
 				</div>
 
