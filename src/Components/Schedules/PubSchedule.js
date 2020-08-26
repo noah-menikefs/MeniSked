@@ -555,20 +555,33 @@ class PubSchedule extends React.Component{
 					);
 				}
 			}
-		}
-
-		for (let i = 0; i < vNotes.length; i++){
-			const splitArr = vNotes[i].date.split('/');
-			if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
-				noteList.push(
-					<li key={i} id="notes">
-						{vNotes[i].msg}
-						<Button key={i} onClick={() => this.toggleNote(vNotes[i].id, vNotes[i].msg)} className="edit butn" size="sm" variant="secondary">Edit</Button>
-						<Button key={-i-1} onClick={() => this.deleteNote(vNotes[i].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
-					</li>
-				);
+			for (let i = 0; i < vNotes.length; i++){
+				const splitArr = vNotes[i].date.split('/');
+				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
+					noteList.push(
+						<li key={i} id="notes">
+							{vNotes[i].msg}	
+							<Button key={i} onClick={() => this.toggleNote(vNotes[i].id, vNotes[i].msg)} className="edit butn" size="sm" variant="secondary">Edit</Button>
+							<Button key={-i-1} onClick={() => this.deleteNote(vNotes[i].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
+						</li>
+					);
+				}
 			}
 		}
+		else{
+			for (let i = 0; i < vNotes.length; i++){
+				const splitArr = vNotes[i].date.split('/');
+				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
+					noteList.push(
+						<li key={i} id="notes">
+							{vNotes[i].msg}	
+						</li>
+					);
+				}
+			}
+		}
+
+
 		
 
 
