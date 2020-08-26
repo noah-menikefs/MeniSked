@@ -262,21 +262,24 @@ class AMessages extends React.Component{
 	}
 
 	deleteMessage = (id, deleted) => {
+		console.log(deleted);
 		fetch('https://secure-earth-82827.herokuapp.com/messages', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
 				id: id,
 				deleted: deleted,
-				user: 'E'
+				user: 'A'
 			})
 		})
 			.then(response => response.json())
 			.then(message => {
+				console.log(message);
 				if (message){
 					this.loadMessages();
 				}
 			})
+		this.toggleDShow('');
 	}
 
 	render(){
@@ -316,7 +319,7 @@ class AMessages extends React.Component{
 			if (past[j].status === 'accepted'){
 				pastList.push(
 					<ListGroup key={j} horizontal>
-						<ListGroup.Item className='past list' action disabled>
+						<ListGroup.Item className='past list' action>
 							You <span className='accepted'>accepted</span> {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
 							<Button onClick={() => this.deleteMessage(past[j].id, past[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>

@@ -131,7 +131,6 @@ class PubSchedule extends React.Component{
       			vNotes: notes.filter((note => note.type === 2)),
       			iNotes: notes.filter((note => note.type === 3))
       		}));
-
   	}
 
   	loadrHolidays = () => {
@@ -465,6 +464,40 @@ class PubSchedule extends React.Component{
     			</Row>
     		)
 		}
+	}
+
+	editNote = (id) => {
+		fetch('https://secure-earth-82827.herokuapp.com/sked/editNote', {
+			method: 'put',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				id: id
+			})
+		})
+		.then(response => response.json())
+		.then(notes => {
+			console.log(notes);
+			if (notes.id){
+				this.loadAllNotes();
+			}
+		})
+	}
+
+	deleteNote = (id) => {
+		fetch('https://secure-earth-82827.herokuapp.com/sked/deleteNote', {
+			method: 'delete',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				id: id
+			})
+		})
+		.then(response => response.json())
+		.then(notes => {
+			console.log(notes);
+			if (notes.id){
+				this.loadAllNotes();
+			}
+		})
 	}
 
 	render(){

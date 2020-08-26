@@ -153,6 +153,7 @@ class EMessages extends React.Component{
 	}
 
 	deleteMessage = (id, deleted) => {
+		console.log(deleted);
 		fetch('https://secure-earth-82827.herokuapp.com/messages', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
@@ -165,6 +166,7 @@ class EMessages extends React.Component{
 		})
 			.then(response => response.json())
 			.then(message => {
+				console.log(message);
 				if (message){
 					this.loadMessages();
 				}
@@ -184,7 +186,7 @@ class EMessages extends React.Component{
 			if (msgs[j].status === 'accepted'){
 				msgList.push(
 					<ListGroup key={j} horizontal>
-						<ListGroup.Item className='pend list' action disabled>Peter Menikefs <span className={msgs[j].status}>{msgs[j].status}</span> your request for {this.entryIdToName(msgs[j].entryid)} {this.dateStyler(msgs[j].dates)}
+						<ListGroup.Item className='pend list' action>Peter Menikefs <span className={msgs[j].status}>{msgs[j].status}</span> your request for {this.entryIdToName(msgs[j].entryid)} {this.dateStyler(msgs[j].dates)}
 						<Button onClick={() => this.deleteMessage(msgs[j].id, msgs[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{msgs[j].stamp}</ListGroup.Item>
