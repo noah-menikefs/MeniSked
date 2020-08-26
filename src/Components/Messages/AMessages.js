@@ -262,7 +262,6 @@ class AMessages extends React.Component{
 	}
 
 	deleteMessage = (id, deleted) => {
-		console.log(deleted);
 		fetch('https://secure-earth-82827.herokuapp.com/messages', {
 			method: 'delete',
 			headers: {'Content-Type': 'application/json'},
@@ -274,14 +273,12 @@ class AMessages extends React.Component{
 		})
 			.then(response => response.json())
 			.then(message => {
-				console.log(message);
 				if (message){
 					this.loadMessages();
 				}
 			})
 		this.setState({
-			show: false,
-			dshow: false
+			dshow: true
 		})
 	}
 
