@@ -279,7 +279,10 @@ class AMessages extends React.Component{
 					this.loadMessages();
 				}
 			})
-		this.toggleDShow('');
+		this.setState({
+			show: false,
+			dshow: false
+		})
 	}
 
 	render(){

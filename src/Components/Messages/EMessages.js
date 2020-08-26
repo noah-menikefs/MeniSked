@@ -171,6 +171,7 @@ class EMessages extends React.Component{
 					this.loadMessages();
 				}
 			})
+		this.setState({show: false})
 	}
 
 	render(){
