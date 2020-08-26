@@ -277,9 +277,6 @@ class AMessages extends React.Component{
 					this.loadMessages();
 				}
 			})
-		this.setState({
-			dshow: true
-		})
 	}
 
 	render(){
