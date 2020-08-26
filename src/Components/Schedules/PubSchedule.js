@@ -493,7 +493,6 @@ class PubSchedule extends React.Component{
 		})
 		.then(response => response.json())
 		.then(notes => {
-			console.log(notes);
 			if (notes.id){
 				this.loadAllNotes();
 			}
@@ -533,8 +532,8 @@ class PubSchedule extends React.Component{
 					noteList.push(
 						<li key={i} id="iNotes">
 							{iNotes[i].msg}
-							<Button key={i} onClick={() => this.editNote(numNotes[i].id)} className="edit butn" size="sm" variant="secondary">Edit</Button>
-							<Button key={-i-1} onClick={() => this.deleteNote(numNotes[i].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
+							<Button key={i} onClick={() => this.editNote(iNotes[i].id)} className="edit butn" size="sm" variant="secondary">Edit</Button>
+							<Button key={-i-1} onClick={() => this.deleteNote(iNotes[i].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
 						</li>
 					);
 				}
@@ -547,8 +546,8 @@ class PubSchedule extends React.Component{
 				noteList.push(
 					<li key={i} id="notes">
 						{vNotes[i].msg}
-						<Button key={i} onClick={() => this.editNote(numNotes[i].id)} className="edit butn" size="sm" variant="secondary">Edit</Button>
-						<Button key={-i-1} onClick={() => this.deleteNote(numNotes[i].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
+						<Button key={i} onClick={() => this.editNote(vNotes[i].id)} className="edit butn" size="sm" variant="secondary">Edit</Button>
+						<Button key={-i-1} onClick={() => this.deleteNote(vNotes[i].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
 					</li>
 				);
 			}
