@@ -521,8 +521,8 @@ class PubSchedule extends React.Component{
 					noteList.push(
 						<li key={n} id="numNotes">
 							{numNotes[n].msg}
-							<Button key={n} onClick={() => console.log('edit')} className="" size="sm" variant="secondary">Edit</Button>
-							<Button key={-n-1} onClick={() => console.log('delete')} className="" size="sm" variant="danger">Delete</Button>
+							<Button key={n} onClick={() => this.editNote(numNotes[n].id)} className="edit butn" size="sm" variant="secondary">Edit</Button>
+							<Button key={-n-1} onClick={() => this.deleteNote(numNotes[n].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
 						</li>
 					);
 				}
@@ -533,8 +533,8 @@ class PubSchedule extends React.Component{
 					noteList.push(
 						<li key={i} id="iNotes">
 							{iNotes[i].msg}
-							<Button key={i} onClick={() => console.log('edit')} className="" size="sm" variant="secondary">Edit</Button>
-							<Button key={-i-1} onClick={() => console.log('delete')} className="" size="sm" variant="danger">Delete</Button>
+							<Button key={i} onClick={() => this.editNote(numNotes[i].id)} className="edit butn" size="sm" variant="secondary">Edit</Button>
+							<Button key={-i-1} onClick={() => this.deleteNote(numNotes[i].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
 						</li>
 					);
 				}
@@ -547,8 +547,8 @@ class PubSchedule extends React.Component{
 				noteList.push(
 					<li key={i} id="notes">
 						{vNotes[i].msg}
-						<Button key={i} onClick={() => console.log('edit')} className="" size="sm" variant="secondary">Edit</Button>
-						<Button key={-i-1} onClick={() => console.log('delete')} className="" size="sm" variant="danger">Delete</Button>
+						<Button key={i} onClick={() => this.editNote(numNotes[i].id)} className="edit butn" size="sm" variant="secondary">Edit</Button>
+						<Button key={-i-1} onClick={() => this.deleteNote(numNotes[i].id)} className="delete butn" size="sm" variant="danger">Delete</Button>
 					</li>
 				);
 			}
