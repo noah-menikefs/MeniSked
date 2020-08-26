@@ -513,20 +513,29 @@ class PubSchedule extends React.Component{
 		}
 
 		let noteList = [];
-		for (let i = 0; i < vNotes.length; i++){
-			const splitArr = vNotes[i].date.split('/');
-			if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
-				noteList.push(<li key={i} id="notes">{vNotes[i].msg}</li>);
-			}
-		}
+
 		if (user.isadmin){
+			for (let n = 0; n < numNotes.length; n++){
+				const split = numNotes[n].date.split('/');
+				if (split[0] === dateContext.format('MM') && parseInt(split[1],10) === day && split[2] === dateContext.format('YYYY')){
+					noteList.push(<li key={n} id="numNotes"><p>{numNotes[n].msg}</p></li>);
+				}
+			}
 			for (let i = 0; i < iNotes.length; i++){
 				const splitArr = iNotes[i].date.split('/');
 				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
-					noteList.push(<li key={i} id="iNotes">{iNotes[i].msg}</li>);
+					noteList.push(<li key={i} id="iNotes"><p>{iNotes[i].msg}</p></li>);
 				}
 			}
 		}
+
+		for (let i = 0; i < vNotes.length; i++){
+			const splitArr = vNotes[i].date.split('/');
+			if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
+				noteList.push(<li key={i} id="notes"><p>{vNotes[i].msg}</p></li>);
+			}
+		}
+		
 
 
 		return(
