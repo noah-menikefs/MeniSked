@@ -46,6 +46,10 @@
 	list-style-type: circle; 
 }
 
+#numNotes{
+	white-space: pre-wrap;
+}
+
 #downloadLink{
 	margin-bottom: 1em;
 }

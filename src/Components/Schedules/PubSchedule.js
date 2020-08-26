@@ -518,13 +518,25 @@ class PubSchedule extends React.Component{
 			for (let n = 0; n < numNotes.length; n++){
 				const split = numNotes[n].date.split('/');
 				if (split[0] === dateContext.format('MM') && parseInt(split[1],10) === day && split[2] === dateContext.format('YYYY')){
-					noteList.push(<li key={n} id="numNotes"><p>{numNotes[n].msg}</p></li>);
+					noteList.push(
+						<li key={n} id="numNotes">
+							{numNotes[n].msg}
+							<Button key={n} onClick={() => console.log('edit')} className="" size="sm" variant="secondary">Edit</Button>
+							<Button key={-n-1} onClick={() => console.log('delete')} className="" size="sm" variant="danger">Delete</Button>
+						</li>
+					);
 				}
 			}
 			for (let i = 0; i < iNotes.length; i++){
 				const splitArr = iNotes[i].date.split('/');
 				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
-					noteList.push(<li key={i} id="iNotes"><p>{iNotes[i].msg}</p></li>);
+					noteList.push(
+						<li key={i} id="iNotes">
+							{iNotes[i].msg}
+							<Button key={i} onClick={() => console.log('edit')} className="" size="sm" variant="secondary">Edit</Button>
+							<Button key={-i-1} onClick={() => console.log('delete')} className="" size="sm" variant="danger">Delete</Button>
+						</li>
+					);
 				}
 			}
 		}
@@ -532,7 +544,13 @@ class PubSchedule extends React.Component{
 		for (let i = 0; i < vNotes.length; i++){
 			const splitArr = vNotes[i].date.split('/');
 			if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === day && splitArr[2] === dateContext.format('YYYY')){
-				noteList.push(<li key={i} id="notes"><p>{vNotes[i].msg}</p></li>);
+				noteList.push(
+					<li key={i} id="notes">
+						{vNotes[i].msg}
+						<Button key={i} onClick={() => console.log('edit')} className="" size="sm" variant="secondary">Edit</Button>
+						<Button key={-i-1} onClick={() => console.log('delete')} className="" size="sm" variant="danger">Delete</Button>
+					</li>
+				);
 			}
 		}
 		
