@@ -12,12 +12,12 @@
 }
 
 .arrow.top-child{
-	font-size: 12px;
+	font-size: 12.25px;
 	padding: 0 1em;
 	border: 0;
 	position: relative;
-	bottom: 5px;
-	margin: 0 0.1em;
+	bottom: 4px;
+	margin: 0 0.3em;
 }
 
 .labels, .labels1, .labels2, .clabels{
