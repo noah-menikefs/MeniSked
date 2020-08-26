@@ -27,7 +27,7 @@ class EMessages extends React.Component{
 	loadMessages = () => {
 		fetch('https://secure-earth-82827.herokuapp.com/emessages/'+this.props.user.id)
       		.then(response => response.json())
-      		.then(messages => this.setState({messages: messages.filter((message => message.status !== 'pending'))}));
+      		.then(messages => this.setState({messages: messages.filter((message => (message.status !== 'pending') && (message.deleted !== 'E')))}));
 	}
 
 	loadEntries = () => {

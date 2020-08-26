@@ -37,8 +37,8 @@ class AMessages extends React.Component{
 		fetch('https://secure-earth-82827.herokuapp.com/amessages')
 			.then(response => response.json())
 			.then(messages => this.setState({
-				messages: messages,
-				filteredMsgs: messages
+				messages: messages.filter((message => message.deleted !== 'A')),
+				filteredMsgs: messages.filter((message => message.deleted !== 'A'))
 			}));
 	}
 
