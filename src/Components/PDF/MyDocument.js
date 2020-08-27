@@ -141,7 +141,6 @@ class MyDocument extends React.Component{
                   name = callList[t].name;
                   if (listType[m].name){
                     name2 = listType[m].name;
-                    console.log(listType[m]);
                     colour = listType[m].colour.substring(0,7);
                   }
                   break;
