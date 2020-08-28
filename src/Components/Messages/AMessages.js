@@ -342,7 +342,7 @@ class AMessages extends React.Component{
 						<ListGroup.Item className='pend list' action><p className="requestList">{this.docIdToName(pends[n].docid)} has requested {this.entryIdToName(pends[n].entryid)} {this.dateStyler(pends[n].dates)}</p>
 						  	<Button onClick={() => this.respond(pends[n].id,'accepted')} className="accept" size="sm" variant="success">Accept</Button>
 						  	<Button onClick={() => this.toggleShow(pends[n].id)} className="deny" size="sm" variant="danger">Deny</Button>
-						  	<Button onClick={() => this.toggleMShow(pends[n].id)} className="maybe" size="sm" variant="warning">Maybe</Button>
+						  	<Button onClick={() => this.toggleMShow(pends[n].id)} className="mby" size="sm" variant="warning">Maybe</Button>
 						</ListGroup.Item>
 						<ListGroup.Item className='dates list'>{pends[n].stamp}</ListGroup.Item>
 					</ListGroup>

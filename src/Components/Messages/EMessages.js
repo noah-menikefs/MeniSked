@@ -27,7 +27,7 @@ class EMessages extends React.Component{
 	loadMessages = () => {
 		fetch('https://secure-earth-82827.herokuapp.com/emessages/'+this.props.user.id)
       		.then(response => response.json())
-      		.then(messages => this.setState({messages: messages.filter((message => (message.status !== 'pending') && (message.deleted !== 'E')))}));
+      		.then(messages => this.setState({messages: messages.filter((message => (message.status !== 'pending' || message.maybe) && (message.deleted !== 'E')))}));
 	}
 
 	loadEntries = () => {
@@ -191,7 +191,7 @@ class EMessages extends React.Component{
 					</ListGroup>
 				)
 			}
-			else{
+			else if (msgs[j].status === 'denied'){
 				msgList.push(
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow(msgs[j].msg)}>Peter Menikefs <span className={msgs[j].status}>{msgs[j].status}</span> your request for {this.entryIdToName(msgs[j].entryid)} {this.dateStyler(msgs[j].dates)}
