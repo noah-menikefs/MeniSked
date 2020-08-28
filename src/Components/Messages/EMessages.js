@@ -201,7 +201,7 @@ class EMessages extends React.Component{
 					</ListGroup>
 				)
 			}
-			if (msgs[j].maybe){
+			else {
 				msgList.push(
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='pend list' action onClick={() => this.toggleShow(msgs[j].msg2)}>Peter Menikefs responded with <span className='maybed'>maybe</span> to your request for {this.entryIdToName(msgs[j].entryid)} {this.dateStyler(msgs[j].dates)}

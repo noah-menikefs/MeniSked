@@ -323,10 +323,7 @@ class AMessages extends React.Component{
 			}
 		}
 		for (let i = 0; i < filteredMsgs.length; i++){
-			if (filteredMsgs[i].status !== 'pending'){
-				past.push(filteredMsgs[i]);
-			}
-			if (filteredMsgs[i].maybe){
+			if (filteredMsgs[i].status !== 'pending' || filteredMsgs[i].maybe){
 				past.push(filteredMsgs[i]);
 			}
 		}
