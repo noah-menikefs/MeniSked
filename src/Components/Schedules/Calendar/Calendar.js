@@ -179,7 +179,12 @@ class Calendar extends React.Component{
 			for (let n = 0; n < arr[i].dates.length; n++){
 				const splitArr = arr[i].dates[n].split('/');
 				if (splitArr[0] === dateContext.format('MM') && parseInt(splitArr[1],10) === d && splitArr[2] === dateContext.format('YYYY')){
-					return <li key={i+n} className="pending" id="pending">{this.idToName(parseInt(arr[i].entryid,10))}</li>
+					if (arr[i].maybe){
+						return <li key={i+n} className="maybe" id="maybe">{this.idToName(parseInt(arr[i].entryid,10))}</li>
+					}
+					else {
+						return <li key={i+n} className="pending" id="pending">{this.idToName(parseInt(arr[i].entryid,10))}</li>
+					}
 				}
 			}
 			

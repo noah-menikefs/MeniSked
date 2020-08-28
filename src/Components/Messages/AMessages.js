@@ -20,7 +20,8 @@ class AMessages extends React.Component{
 			entryList: [],
 			callList: [],
 			ctr: 10,
-			id: -1
+			id: -1,
+			mshow: false
 		}
 	}
 
@@ -105,6 +106,14 @@ class AMessages extends React.Component{
 	toggleShow = (id = -1) => {
 		this.setState({
 			show: !this.state.show,
+			msg: '',
+			id: id
+		});
+	}
+
+	toggleMShow = (id = -1) => {
+		this.setState({
+			mshow: !this.state.mshow,
 			msg: '',
 			id: id
 		});
@@ -279,6 +288,29 @@ class AMessages extends React.Component{
 			})
 	}
 
+	maybeResponse = (id) => {
+		fetch('https://secure-earth-82827.herokuapp.com/messages', {
+			method: 'put',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				id: id,
+				msg2: this.state.msg,
+				stamp2: this.props.today.format('MM/DD/YYYY')
+			})
+		})
+			.then(response => response.json())
+			.then(message => {
+				if (message){
+					this.loadMessages();
+				}
+			})
+		this.setState({
+			msg: '',
+			mshow: false,
+			id: -1
+		})
+	}
+
 	render(){
 		const {show, dshow, msg, messages, ctr, peopleList, filteredMsgs} = this.state;
 		let pendingList = [];
@@ -294,6 +326,9 @@ class AMessages extends React.Component{
 			if (filteredMsgs[i].status !== 'pending'){
 				past.push(filteredMsgs[i]);
 			}
+			if (filteredMsgs[i].maybe){
+				past.push(filteredMsgs[i]);
+			}
 		}
 
 		pends = this.sortDates(pends);
@@ -306,6 +341,7 @@ class AMessages extends React.Component{
 					<ListGroup.Item className='pend list' action><p className="requestList">{this.docIdToName(pends[n].docid)} has requested {this.entryIdToName(pends[n].entryid)} {this.dateStyler(pends[n].dates)}</p>
 					  	<Button onClick={() => this.respond(pends[n].id,'accepted')} className="accept" size="sm" variant="success">Accept</Button>
 					  	<Button onClick={() => this.toggleShow(pends[n].id)} className="deny" size="sm" variant="danger">Deny</Button>
+					  	<Button onClick={() => this.toggleMShow(pends[n].id)} className="maybe" size="sm" variant="warning">Maybe</Button>
 					</ListGroup.Item>
 					<ListGroup.Item className='dates list'>{pends[n].stamp}</ListGroup.Item>
 				</ListGroup>
@@ -324,7 +360,7 @@ class AMessages extends React.Component{
 					</ListGroup>
 				);
 			}
-			else{
+			else if (past[j].status === 'denied'){
 				pastList.push(
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='past list' action onClick={() => this.toggleDShow(past[j].msg)}>
@@ -332,6 +368,16 @@ class AMessages extends React.Component{
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{past[j].stamp}</ListGroup.Item>
 						<ListGroup.Item ><Button onClick={() => this.deleteMessage(past[j].id, past[j].deleted)} className="deletemsg" size="sm" variant="danger">Delete</Button></ListGroup.Item>
+					</ListGroup>
+				);
+			}
+			else {
+				pastList.push(
+					<ListGroup key={j} horizontal>
+						<ListGroup.Item className='past list' action onClick={() => this.toggleDShow(past[j].msg2)}>
+							You responded with <span className='maybe'>maybe</span> to {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
+						</ListGroup.Item>
+						<ListGroup.Item className='edates list'>{past[j].stamp2}</ListGroup.Item>
 					</ListGroup>
 				);
 			}
@@ -389,7 +435,7 @@ class AMessages extends React.Component{
 				<div className='modal'>
 					<Modal show={dshow} onHide={() => this.toggleDShow('')}>
 						<Modal.Header closeButton>
-							<Modal.Title id='modalTitle'>Denied Request Explanation</Modal.Title>
+							<Modal.Title id='modalTitle'>Maybe/Denied Request Explanation</Modal.Title>
 						</Modal.Header>
 						<Modal.Body>
 							<p>{msg}</p>
@@ -400,6 +446,28 @@ class AMessages extends React.Component{
 							</Button>
 						</Modal.Footer>
 					</Modal>
+				</div>
+				<div className='modal'>
+					<Modal show={mshow} onHide={this.toggleMShow}>
+        				<Modal.Header closeButton>
+          					<Modal.Title id='modalTitle'>Maybe Request Explanation</Modal.Title>
+       	 				</Modal.Header>
+        				<Form>
+        					<Modal.Body>
+	        					<Form.Group controlId="exampleForm.ControlTextarea1">
+	    							<Form.Control onChange={this.onMsgChange} as="textarea" rows="4" />
+	  							</Form.Group>
+        					</Modal.Body>
+        					<Modal.Footer>
+          						<Button onClick={this.toggleMShow} variant="secondary" >
+            						Close
+          						</Button>
+          					 	<Button onClick={() => this.maybeResponse(this.state.id)} variant="primary" >
+            						Submit
+          						</Button>
+	        				</Modal.Footer>
+	        			</Form>
+      				</Modal>
 				</div>
 			</div>
 		);
