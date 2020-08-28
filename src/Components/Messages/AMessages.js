@@ -312,7 +312,7 @@ class AMessages extends React.Component{
 	}
 
 	render(){
-		const {show, dshow, msg, messages, ctr, peopleList, filteredMsgs} = this.state;
+		const {show, dshow, msg, messages, ctr, peopleList, filteredMsgs, mshow} = this.state;
 		let pendingList = [];
 		let pastList = [];
 		let pends = [];
