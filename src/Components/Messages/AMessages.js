@@ -336,16 +336,29 @@ class AMessages extends React.Component{
 
 
 		for (let n = 0; n < pends.length; n++){
-			pendingList.push(
-				<ListGroup key={n} horizontal>
-					<ListGroup.Item className='pend list' action><p className="requestList">{this.docIdToName(pends[n].docid)} has requested {this.entryIdToName(pends[n].entryid)} {this.dateStyler(pends[n].dates)}</p>
-					  	<Button onClick={() => this.respond(pends[n].id,'accepted')} className="accept" size="sm" variant="success">Accept</Button>
-					  	<Button onClick={() => this.toggleShow(pends[n].id)} className="deny" size="sm" variant="danger">Deny</Button>
-					  	<Button onClick={() => this.toggleMShow(pends[n].id)} className="maybe" size="sm" variant="warning">Maybe</Button>
-					</ListGroup.Item>
-					<ListGroup.Item className='dates list'>{pends[n].stamp}</ListGroup.Item>
-				</ListGroup>
-			)
+			if (!pends[n].maybe){
+				pendingList.push(
+					<ListGroup key={n} horizontal>
+						<ListGroup.Item className='pend list' action><p className="requestList">{this.docIdToName(pends[n].docid)} has requested {this.entryIdToName(pends[n].entryid)} {this.dateStyler(pends[n].dates)}</p>
+						  	<Button onClick={() => this.respond(pends[n].id,'accepted')} className="accept" size="sm" variant="success">Accept</Button>
+						  	<Button onClick={() => this.toggleShow(pends[n].id)} className="deny" size="sm" variant="danger">Deny</Button>
+						  	<Button onClick={() => this.toggleMShow(pends[n].id)} className="maybe" size="sm" variant="warning">Maybe</Button>
+						</ListGroup.Item>
+						<ListGroup.Item className='dates list'>{pends[n].stamp}</ListGroup.Item>
+					</ListGroup>
+				)
+			}
+			else{
+				pendingList.push(
+					<ListGroup key={n} horizontal>
+						<ListGroup.Item className='pend list' action><p className="requestList">{this.docIdToName(pends[n].docid)} has requested {this.entryIdToName(pends[n].entryid)} {this.dateStyler(pends[n].dates)}</p>
+						  	<Button onClick={() => this.respond(pends[n].id,'accepted')} className="accept" size="sm" variant="success">Accept</Button>
+						  	<Button onClick={() => this.toggleShow(pends[n].id)} className="deny" size="sm" variant="danger">Deny</Button>
+						</ListGroup.Item>
+						<ListGroup.Item className='dates list'>{pends[n].stamp}</ListGroup.Item>
+					</ListGroup>
+				)
+			}
 		}
 
 		for (let j = 0; j < (Math.min(past.length,ctr)); j++){
@@ -375,7 +388,7 @@ class AMessages extends React.Component{
 				pastList.push(
 					<ListGroup key={j} horizontal>
 						<ListGroup.Item className='past list' action onClick={() => this.toggleDShow(past[j].msg2)}>
-							You responded with <span className='maybe'>maybe</span> to {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
+							You responded with <span className='maybed'>maybe</span> to {this.docIdToName(past[j].docid)}'s request for {this.entryIdToName(past[j].entryid)} {this.dateStyler(past[j].dates)}
 						</ListGroup.Item>
 						<ListGroup.Item className='edates list'>{past[j].stamp2}</ListGroup.Item>
 					</ListGroup>
