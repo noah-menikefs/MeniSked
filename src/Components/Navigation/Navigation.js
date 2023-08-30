@@ -51,7 +51,7 @@ class Navigation extends React.Component {
               <NavDropdown.Item onClick={() => onRouteChange("Master Schedule")} /*href="#pu"*/>Master</NavDropdown.Item>
             </NavDropdown>
             <Nav.Link onClick={() => this.props.onRouteChange(ad+"Messages")} className="full-text linky" /*href="#m"*/>Messages</Nav.Link>
-            <img onClick={() => this.props.onRouteChange(ad+"Messages")} alt="Messages" src="https://img.icons8.com/material-rounded/96/000000/important-mail.png" width="30" height="30" className="logo linky"/>
+            <img onClick={() => this.props.onRouteChange(ad+"Messages")} alt="Messages" src="https://img.icons8.com/material-rounded/96/000000/mail.png" width="30" height="30" className="logo linky"/>
             <Nav.Link onClick={() => onRouteChange("Account Information")} className="full-text linky" /*href="#a"*/>Account</Nav.Link>
             <img onClick={() => onRouteChange("Account Information")} alt="Account" src="https://img.icons8.com/material-rounded/96/000000/user-male-circle.png" width="30" height="30" className="logo linky"/>
       		</Nav>
