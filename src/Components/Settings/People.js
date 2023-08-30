@@ -104,6 +104,7 @@ class People extends React.Component{
 					this.loadAllUsers();
 				}
 			})
+			.catch(err => console.log(err, response ?? 'no'));;
 
 		this.toggleDShow();
 	}
