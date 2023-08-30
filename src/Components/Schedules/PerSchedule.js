@@ -191,7 +191,7 @@ class PerSchedule extends React.Component{
 			body: JSON.stringify({
 				docid: this.props.user.id,
 				entryid: typeID,
-				date: [date],
+				date: date,
 				stamp: this.props.today.format('MM/DD/YYYY')
 			})
 		})
