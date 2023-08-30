@@ -480,7 +480,6 @@ class PubSchedule extends React.Component{
 		})
 		.then(response => response.json())
 		.then(notes => {
-			console.log(notes);
 			if (notes.id){
 				this.loadAllNotes();
 			}
