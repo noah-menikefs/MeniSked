@@ -155,6 +155,8 @@ class AMessages extends React.Component{
 		let flag = false;
 		console.log(dates);
 		if (dates.length === 1){
+			console.log(dates[0]);
+			console.log(dates[0].split('/'));
 			splitArr = dates[0].split('/');
 			return 'on ' + this.months[splitArr[0] - 1] + ' ' + splitArr[1] + ', ' + splitArr[2];
 		}
