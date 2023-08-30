@@ -297,6 +297,7 @@ class PerSchedule extends React.Component{
 						}
 					}
 					if (!flag){
+						console.log(date);
 						this.requestCall(typeID, date);
 					}
 					else{
