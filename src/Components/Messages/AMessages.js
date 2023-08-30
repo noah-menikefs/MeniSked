@@ -153,7 +153,7 @@ class AMessages extends React.Component{
 	dateStyler = (dates) => {
 		let splitArr = [];
 		let flag = false;
-
+		console.log(dates);
 		if (dates.length === 1){
 			splitArr = dates[0].split('/');
 			return 'on ' + this.months[splitArr[0] - 1] + ' ' + splitArr[1] + ', ' + splitArr[2];
