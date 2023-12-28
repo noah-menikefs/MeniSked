@@ -23,10 +23,11 @@ const styles = StyleSheet.create({
   table: { 
     display: "table", 
     width: "auto", 
-    borderStyle: "solid", 
+    borderStyle: "dashed", 
     borderWidth: 0.75, 
     borderRightWidth: 0, 
-    borderBottomWidth: 0
+    borderBottomWidth: 0,
+    borderLeftWidth: 0
   }, 
   tableBody:{
        paddingRight: 5,
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     marginTop: 1,  
     fontSize: 8,
     paddingLeft: 2,
-    borderStyle: "dashed",  
+    borderStyle: "solid",  
     borderBottomWidth: 0.5
   },
   tableCellList: {   
