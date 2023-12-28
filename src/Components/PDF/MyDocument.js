@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   }, 
   tableCol: { 
     width: "14%", 
-    borderStyle: "solid", 
+    borderStyle: "dotted", 
     borderWidth: 1, 
     borderLeftWidth: 0, 
     height: 125,
@@ -47,8 +47,8 @@ const styles = StyleSheet.create({
   tableCell: { 
     marginTop: 1,  
     fontSize: 8,
-    paddingLeft: 1,
-    borderStyle: "solid",  
+    paddingLeft: 2,
+    borderStyle: "dashed",  
     borderBottomWidth: 0.5
   },
   tableCellList: {   
