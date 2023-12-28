@@ -30,8 +30,8 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0
   }, 
   tableBody:{
-       paddingRight: 5,
-       paddingLeft: 5 
+       paddingRight: 10,
+       paddingLeft: 10 
   },
   tableRow: { 
     margin: "auto", 
