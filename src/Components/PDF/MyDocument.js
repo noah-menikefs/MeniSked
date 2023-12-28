@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     width: "14%", 
     borderStyle: "solid", 
     borderWidth: 1, 
-    borderLeftWidth: 0, 
+    borderLeftWidth: 1, 
     height: 125,
     borderTopWidth: 0 
   }, 
