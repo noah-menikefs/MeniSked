@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     width: "auto", 
     borderStyle: "dashed", 
     borderWidth: 0.75, 
-    //borderRightWidth: 0, 
+    borderRightWidth: 0, 
     borderBottomWidth: 0,
     borderLeftWidth: 0
   }, 
