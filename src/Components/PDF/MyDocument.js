@@ -25,9 +25,9 @@ const styles = StyleSheet.create({
     width: "auto", 
     borderStyle: "dashed", 
     borderWidth: 0.75, 
-    borderRightWidth: 0, 
-    borderBottomWidth: 0,
-    borderLeftWidth: 0
+    //borderRightWidth: 0, 
+    //borderBottomWidth: 0,
+    //borderLeftWidth: 0
   }, 
   tableBody:{
        paddingRight: 5,
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   }, 
   tableCol: { 
     width: "14%", 
-    borderStyle: "dotted", 
+    borderStyle: "solid", 
     borderWidth: 1, 
     borderLeftWidth: 0, 
     height: 125,
