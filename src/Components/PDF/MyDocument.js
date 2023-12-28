@@ -40,14 +40,14 @@ const styles = StyleSheet.create({
     width: "14%", 
     borderStyle: "solid", 
     borderWidth: 1, 
-    borderLeftWidth: 1, 
+    borderLeftWidth: 0, 
     height: 125,
     borderTopWidth: 0 
   }, 
   tableCell: { 
     marginTop: 1,  
     fontSize: 8,
-    paddingLeft: 2,
+    paddingLeft: 1,
     borderStyle: "solid",  
     borderBottomWidth: 0.5
   },
