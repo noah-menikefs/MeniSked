@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0
   }, 
   tableBody:{
-       //paddingRight: 5,
+       paddingRight: 5,
        //paddingLeft: 5 
   },
   tableRow: { 
