@@ -30,8 +30,8 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0
   }, 
   tableBody:{
-       paddingRight: 10,
-       paddingLeft: 10 
+       paddingRight: 5,
+       paddingLeft: 5 
   },
   tableRow: { 
     margin: "auto", 
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     width: "13.5%", 
     borderStyle: "solid", 
     borderWidth: 1, 
-    borderLeftWidth: 0, 
+    borderRightWidth: 0, 
     height: 125,
     borderTopWidth: 0 
   }, 
