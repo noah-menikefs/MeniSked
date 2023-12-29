@@ -23,9 +23,9 @@ const styles = StyleSheet.create({
   table: { 
     display: "table", 
     width: "auto", 
-    borderStyle: "dashed", 
+    borderStyle: "solid", 
     borderWidth: 0.75, 
-    borderRightWidth: 0, 
+    //borderRightWidth: 0, 
     borderBottomWidth: 0,
     borderLeftWidth: 0
   }, 
