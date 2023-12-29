@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
   },
   table: { 
     display: "table", 
-    width: "auto", 
+    width: "90%", 
     borderStyle: "solid", 
     borderWidth: 0.75, 
     //borderRightWidth: 0, 
