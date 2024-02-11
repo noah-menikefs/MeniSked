@@ -3,6 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Logo from '../../logo512.png';
+import { validateEmail } from '../../Utils/email';
 import './Login.css';
 
 class Register extends React.Component{
@@ -56,7 +57,7 @@ class Register extends React.Component{
 		else if (
 			firstname.length > 0 && 
 			lastname.length > 0 &&
-			this.props.validateEmail(email) &&
+			validateEmail(email) &&
 			password.length > 0 &&
 			code.length > 0
 		){
