@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Navigation from './Components/Navigation/Navigation';
 import Login from './Components/Login/Login';
-import Register from './Components/Login/Register';
+import RegisterComponent from './Components/Login/RegisterComponent';
 import PerSchedule from './Components/Schedules/PerSchedule';
 import PubSchedule from './Components/Schedules/PubSchedule';
 import CSchedule from './Components/Schedules/CSchedule';
@@ -89,7 +89,7 @@ class App extends Component {
 
   //Used for rendering when signed out
   outRenderSwitch(route){
-    return route === 'Login' ? <Login loadUser={this.loadUser} onRouteChange={this.onRouteChange}/> : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+    return route === 'Login' ? <Login loadUser={this.loadUser} onRouteChange={this.onRouteChange}/> : <RegisterComponent loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
   }
 
   onRouteChange = (route, isSignedIn = true) => {
