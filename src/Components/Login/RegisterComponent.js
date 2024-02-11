@@ -1,10 +1,6 @@
-import { React, useState, useEffect } from 'react';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Logo from '../../logo512.png';
+import { validateEmail } from '../../Utils/email';
 
-function RegisterComponent({ validateEmail, loadUser, onRouteChange }) {
+function RegisterComponent(loadUser, onRouteChange) {
   const [lastname, setLastname] = useState('');
   const [firstname, setFirstname] = useState('');
   const [email, setEmail] = useState('');
@@ -14,12 +10,6 @@ function RegisterComponent({ validateEmail, loadUser, onRouteChange }) {
   const [errorShow, setErrorShow] = useState(false);
   const [msg, setMsg] = useState('');
   const [depts, setDepts] = useState([]);
-
-  const loadDepts = () => {
-    fetch('https://secure-earth-82827.herokuapp.com/departments')
-      .then((response) => response.json())
-      .then((departments) => setDepts(departments));
-  };
 
   useEffect(() => {
     loadDepts();

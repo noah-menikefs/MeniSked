@@ -1,6 +1,7 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import { validateEmail } from '../../Utils/email';
 import './Account.css';
 
 
@@ -103,7 +104,7 @@ class Account extends React.Component {
 		if (
 			firstname.length > 0 && 
 			lastname.length > 0 &&
-			this.props.validateEmail(email)
+			validateEmail(email)
 		){
 			
 			fetch('https://secure-earth-82827.herokuapp.com/account/'+this.props.user.id, {
@@ -131,7 +132,7 @@ class Account extends React.Component {
 					}
 				})
 		}
-		else if (!this.props.validateEmail(email)){
+		else if (!validateEmail(email)){
 			this.toggleShow('email');
 		}
 		else if (firstname.length === 0 || lastname.length === 0){
