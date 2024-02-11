@@ -1,4 +1,6 @@
-const RegisterComponent = (validateEmail, loadUser, onRouteChange) => {
+import { validateEmail } from "../../Utils/email";
+
+const RegisterComponent = (loadUser, onRouteChange) => {
     const [lastname, setLastname] = useState('');
     const [firstname, setFirstname] = useState('');
     const [email, setEmail] = useState('');
