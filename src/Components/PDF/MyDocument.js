@@ -25,22 +25,23 @@ const styles = StyleSheet.create({
     width: "auto", 
     borderStyle: "solid", 
     borderWidth: 0.75, 
-    borderRightWidth: 0, 
-    borderBottomWidth: 0
+    //borderRightWidth: 0, 
+    borderBottomWidth: 0,
+    borderLeftWidth: 0
   }, 
   tableBody:{
-       paddingRight: 5,
-       paddingLeft: 5 
+    paddingRight: 8,
+    paddingLeft: 5 
   },
   tableRow: { 
     margin: "auto", 
     flexDirection: "row" 
   }, 
   tableCol: { 
-    width: "25%", 
+    width: "13.5%", 
     borderStyle: "solid", 
     borderWidth: 1, 
-    borderLeftWidth: 0, 
+    borderRightWidth: 0, 
     height: 125,
     borderTopWidth: 0 
   }, 
