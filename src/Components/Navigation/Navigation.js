@@ -19,7 +19,7 @@ class Navigation extends React.Component {
           <NavDropdown.Item onClick={() => this.props.onRouteChange("Holidays")} /*href="#h"*/>Holidays</NavDropdown.Item>
           <NavDropdown.Item onClick={() => this.props.onRouteChange("Call Types")} /*href="#ct"*/>Call Types</NavDropdown.Item>
           <NavDropdown.Item onClick={() => this.props.onRouteChange("People")} /*href="#pe"*/>People</NavDropdown.Item>
-           <NavDropdown.Item onClick={() => this.props.onRouteChange("Entries")} /*href="#e"*/>Entries</NavDropdown.Item>
+          <NavDropdown.Item onClick={() => this.props.onRouteChange("Entries")} /*href="#e"*/>Entries</NavDropdown.Item>
         </NavDropdown>
       );
     }
@@ -37,14 +37,14 @@ class Navigation extends React.Component {
           <img id='brand' alt="logo" src={Logo} width="50" height="50" className="d-inline-block align-top"/>
           <h1 id="brandTitle" className="d-inline-block align-top">MeniSked</h1>
         </Navbar.Brand>
-    		<div id="collapser">
-      	  <Nav className="">
-        		{this.adminNavbar()}
+        <div id="collapser">
+          <Nav className="">
+            {this.adminNavbar()}
             <NavDropdown className="full-text" title="Schedules" id="collasible-nav-dropdown">
-         			<NavDropdown.Item onClick={() => onRouteChange("Personal Schedule")} /*href="#p"*/>Personal</NavDropdown.Item>
-          		<NavDropdown.Item onClick={() => onRouteChange("Call Schedule")} /*href="#c"*/>Call</NavDropdown.Item>
-         			<NavDropdown.Item onClick={() => onRouteChange("Master Schedule")} /*href="#pu"*/>Master</NavDropdown.Item>
-       			</NavDropdown>
+              <NavDropdown.Item onClick={() => onRouteChange("Personal Schedule")} /*href="#p"*/>Personal</NavDropdown.Item>
+              <NavDropdown.Item onClick={() => onRouteChange("Call Schedule")} /*href="#c"*/>Call</NavDropdown.Item>
+              <NavDropdown.Item onClick={() => onRouteChange("Master Schedule")} /*href="#pu"*/>Master</NavDropdown.Item>
+            </NavDropdown>
             <NavDropdown className="logo" title="Skeds" id="collasible-nav-dropdown">
               <NavDropdown.Item onClick={() => onRouteChange("Personal Schedule")} /*href="#p"*/>Personal</NavDropdown.Item>
               <NavDropdown.Item onClick={() => onRouteChange("Call Schedule")} /*href="#c"*/>Call</NavDropdown.Item>
@@ -54,9 +54,9 @@ class Navigation extends React.Component {
             <img onClick={() => this.props.onRouteChange(ad+"Messages")} alt="Messages" src="https://img.icons8.com/material-rounded/96/000000/mail.png" width="30" height="30" className="logo linky"/>
             <Nav.Link onClick={() => onRouteChange("Account Information")} className="full-text linky" /*href="#a"*/>Account</Nav.Link>
             <img onClick={() => onRouteChange("Account Information")} alt="Account" src="https://img.icons8.com/material-rounded/96/000000/user-male-circle.png" width="30" height="30" className="logo linky"/>
-      		</Nav>
+          </Nav>
         </div>
-  		</Navbar>
+      </Navbar>
     );
   }
 }
