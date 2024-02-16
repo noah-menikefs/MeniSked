@@ -33,10 +33,7 @@ class Login extends React.Component{
 				password: loginPassword
 			})
 		})
-			.then(response => {
-				console.log(response);
-				return response.json();
-			})
+			.then(response => response.json())
 			.then(user => {
 				if (user.lastname){
 					this.props.onRouteChange("Personal Schedule");
@@ -46,9 +43,6 @@ class Login extends React.Component{
 					this.toggleErrorShow();
 				}
 			})
-			.catch(err => {console.log(
-				'error ' + err
-			)})
 	}
 
 	toggleShow = () => {
