@@ -33,7 +33,10 @@ class Login extends React.Component{
 				password: loginPassword
 			})
 		})
-			.then(response => response.json())
+			.then(response => {
+				console.log(response);
+				return response.json();
+			})
 			.then(user => {
 				if (user.lastname){
 					this.props.onRouteChange("Personal Schedule");
