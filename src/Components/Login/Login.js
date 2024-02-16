@@ -46,6 +46,9 @@ class Login extends React.Component{
 					this.toggleErrorShow();
 				}
 			})
+			.catch(err => {console.log(
+				'error ' + err
+			)})
 	}
 
 	toggleShow = () => {
