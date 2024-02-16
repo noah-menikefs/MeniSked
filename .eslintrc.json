@@ -4,8 +4,8 @@
         "es6": true
     },
     "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended"
+        "plugin:react/recommended",
+        "airbnb"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -22,9 +22,5 @@
         "react"
     ],
     "rules": {
-        "class-methods-use-this": "off",
-        "react/prop-types": 0,
-        "indent": ["error", 2],
-        "linebreak-style": 1
-    }    
+    }
 }
