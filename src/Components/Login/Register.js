@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Logo from "../../logo512.png";
 import "./Login.css";
+import { validateEmail } from "../../utils";
 
 const Register = (props) => {
   const [lastname, setLastname] = useState("");
@@ -74,7 +75,7 @@ const Register = (props) => {
     } else if (
       firstname.length > 0 &&
       lastname.length > 0 &&
-      props.validateEmail(email) &&
+      validateEmail(email) &&
       password.length > 0 &&
       code.length > 0
     ) {

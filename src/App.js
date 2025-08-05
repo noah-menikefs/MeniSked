@@ -13,7 +13,6 @@ import CallTypes from "./Components/Settings/CallTypes";
 import People from "./Components/Settings/People";
 import Entries from "./Components/Settings/Entries";
 import moment from "moment";
-import { validateEmail } from "./utils";
 import "./App.css";
 
 const initialUser = {
@@ -86,13 +85,7 @@ const App = () => {
           />
         );
       case "Account Information":
-        return (
-          <Account
-            loadUser={loadUser}
-            user={user}
-            validateEmail={validateEmail}
-          />
-        );
+        return <Account loadUser={loadUser} user={user} />;
       case "Admin Messages":
         return <AMessages user={user} today={today} />;
       case "Messages":
@@ -113,17 +106,9 @@ const App = () => {
   //Used for rendering when signed out
   const outRenderSwitch = (route) => {
     return route === "Login" ? (
-      <Login
-        validateEmail={validateEmail}
-        loadUser={loadUser}
-        onRouteChange={onRouteChange}
-      />
+      <Login loadUser={loadUser} onRouteChange={onRouteChange} />
     ) : (
-      <Register
-        validateEmail={validateEmail}
-        loadUser={loadUser}
-        onRouteChange={onRouteChange}
-      />
+      <Register loadUser={loadUser} onRouteChange={onRouteChange} />
     );
   };
 
