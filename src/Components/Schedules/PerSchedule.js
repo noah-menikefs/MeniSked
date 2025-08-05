@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Calendar from "./Calendar/Calendar";
 import MyDocument from "./../PDF/MyDocument";
 import Button from "react-bootstrap/Button";
@@ -38,20 +38,29 @@ const PerSchedule = (props) => {
 
   const { user, today, callList } = props;
   const months = moment.months(); // List of each month
+  const isMountedRef = useRef(true);
 
   // Load functions
   const loadrHolidays = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/r")
       .then((response) => response.json())
-      .then((holidays) =>
-        setRHolidayList(holidays.filter((holiday) => holiday.isactive === true))
-      );
+      .then((holidays) => {
+        if (isMountedRef.current) {
+          setRHolidayList(
+            holidays.filter((holiday) => holiday.isactive === true)
+          );
+        }
+      });
   }, []);
 
   const loadnrHolidays = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/nr")
       .then((response) => response.json())
-      .then((holidays) => setNrHolidayList(holidays));
+      .then((holidays) => {
+        if (isMountedRef.current) {
+          setNrHolidayList(holidays);
+        }
+      });
   }, []);
 
   const loadPersonalDays = useCallback(
@@ -65,25 +74,29 @@ const PerSchedule = (props) => {
     fetch("https://secure-earth-82827.herokuapp.com/sked/docs")
       .then((response) => response.json())
       .then((docs) => {
-        if (!render) {
-          const doctors = [...docs];
-          for (let i = 0; i < doctors.length; i++) {
-            if (doctors[i].id === user.id) {
-              loadPersonalDays(i, doctors);
-              setDocIndex(i);
+        if (isMountedRef.current) {
+          if (!render) {
+            const doctors = [...docs];
+            for (let i = 0; i < doctors.length; i++) {
+              if (doctors[i].id === user.id) {
+                loadPersonalDays(i, doctors);
+                setDocIndex(i);
+              }
             }
           }
+          setActiveDocs(docs);
         }
-        setActiveDocs(docs);
       });
   }, [render, user.id, loadPersonalDays]);
 
   const loadEntries = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/sked/entries")
       .then((response) => response.json())
-      .then((entries) =>
-        setEntries(entries.filter((entry) => entry.isactive === true))
-      );
+      .then((entries) => {
+        if (isMountedRef.current) {
+          setEntries(entries.filter((entry) => entry.isactive === true));
+        }
+      });
   }, []);
 
   const loadNewDays = useCallback(
@@ -138,9 +151,13 @@ const PerSchedule = (props) => {
     (userid = user.id) => {
       fetch("https://secure-earth-82827.herokuapp.com/emessages/" + userid)
         .then((response) => response.json())
-        .then((messages) =>
-          setPending(messages.filter((message) => message.status === "pending"))
-        );
+        .then((messages) => {
+          if (isMountedRef.current) {
+            setPending(
+              messages.filter((message) => message.status === "pending")
+            );
+          }
+        });
     },
     [user.id]
   );
@@ -148,7 +165,11 @@ const PerSchedule = (props) => {
   const loadDepts = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/departments")
       .then((response) => response.json())
-      .then((departments) => setDepts(departments));
+      .then((departments) => {
+        if (isMountedRef.current) {
+          setDepts(departments);
+        }
+      });
   }, []);
 
   const assignCall = useCallback(
@@ -563,6 +584,13 @@ const PerSchedule = (props) => {
       loadNewDays(today);
     }
   }, [nrHolidayList.length, render, loadNewDays, today]);
+
+  // Cleanup effect to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Render logic
   let docSelect = activeDocs.map((doc, i) => {
