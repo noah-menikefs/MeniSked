@@ -87,7 +87,7 @@ const App = () => {
       case "Account Information":
         return <Account loadUser={loadUser} user={user} />;
       case "Admin Messages":
-        return <AMessages user={user} today={today} />;
+        return <AMessages today={today} />;
       case "Messages":
         return <EMessages user={user} />;
       case "Holidays":

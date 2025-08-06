@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -6,179 +6,181 @@ import Form from "react-bootstrap/Form";
 import moment from "moment";
 import "./Messages.css";
 
-class AMessages extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      show: false,
-      msg: "",
-      dshow: false,
-      messages: [],
-      filteredMsgs: [],
-      peopleList: [],
-      entryList: [],
-      callList: [],
-      ctr: 10,
-      id: -1,
-      mshow: false,
-    };
-  }
+const AMessages = ({ today }) => {
+  const [show, setShow] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [dshow, setDShow] = useState(false);
+  const [mshow, setMShow] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [filteredMsgs, setFilteredMsgs] = useState([]);
+  const [peopleList, setPeopleList] = useState([]);
+  const [entryList, setEntryList] = useState([]);
+  const [callList, setCallList] = useState([]);
+  const [ctr, setCtr] = useState(10);
+  const [id, setId] = useState(-1);
 
-  componentDidMount = () => {
-    this.loadMessages();
-    this.loadUsers();
-    this.loadEntries();
-    this.loadCallTypes();
-  };
+  const months = moment.months();
 
-  months = moment.months(); // List of each month
+  useEffect(() => {
+    loadMessages();
+    loadUsers();
+    loadEntries();
+    loadCallTypes();
+  }, []);
 
-  loadMessages = () => {
+  const loadMessages = () => {
     fetch("https://secure-earth-82827.herokuapp.com/amessages")
       .then((response) => response.json())
-      .then((messages) =>
-        this.setState({
-          messages: messages.filter((message) => message.deleted !== "A"),
-          filteredMsgs: messages.filter((message) => message.deleted !== "A"),
-        })
-      );
+      .then((msgs) => {
+        const filtered = msgs.filter((message) => message.deleted !== "A");
+        setMessages(filtered);
+        setFilteredMsgs(filtered);
+      });
   };
 
-  loadUsers = () => {
+  const loadUsers = () => {
     fetch("https://secure-earth-82827.herokuapp.com/people")
       .then((response) => response.json())
-      .then((users) => this.setState({ peopleList: users }));
+      .then((users) => setPeopleList(users));
   };
 
-  loadEntries = () => {
+  const loadEntries = () => {
     fetch("https://secure-earth-82827.herokuapp.com/sked/entries")
       .then((response) => response.json())
-      .then((entries) => this.setState({ entryList: entries }));
+      .then((entries) => setEntryList(entries));
   };
 
-  loadCallTypes = () => {
+  const loadCallTypes = () => {
     fetch("https://secure-earth-82827.herokuapp.com/callTypes")
       .then((response) => response.json())
-      .then((calls) => this.setState({ callList: calls }));
+      .then((calls) => setCallList(calls));
   };
 
-  respond = (id, status) => {
+  const respond = (reqId, status) => {
     fetch("https://secure-earth-82827.herokuapp.com/amessages", {
       method: "put",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: id,
-        status: status,
-        msg: this.state.msg,
-        stamp: this.props.today.format("MM/DD/YYYY"),
+        id: reqId,
+        status,
+        msg,
+        stamp: today.format("MM/DD/YYYY"),
+      }),
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res) loadMessages();
+      });
+
+    if (status === "accepted") {
+      accept(reqId);
+    }
+
+    setMsg("");
+    setShow(false);
+  };
+
+  const accept = (reqId) => {
+    fetch("https://secure-earth-82827.herokuapp.com/arequest", {
+      method: "put",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: reqId }),
+    })
+      .then((response) => response.json())
+      .then((user) => {
+        if (user.lastname) loadMessages();
+      });
+  };
+
+  const maybeResponse = (id) => {
+    fetch("https://secure-earth-82827.herokuapp.com/messages", {
+      method: "put",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id,
+        msg2: msg, // from state
+        stamp2: today.format("MM/DD/YYYY"), // passed as prop
       }),
     })
       .then((response) => response.json())
       .then((message) => {
         if (message) {
-          this.loadMessages();
+          loadMessages();
         }
       });
-    if (status === "accepted") {
-      this.accept(id);
-    }
-    this.setState({
-      msg: "",
-      show: false,
-    });
+
+    setMsg(""); // reset msg
+    setMShow(false); // close modal
+    setId(-1); // reset selected message ID
   };
 
-  accept = (id) => {
-    fetch("https://secure-earth-82827.herokuapp.com/arequest", {
-      method: "put",
+  const deleteMessage = (id, deleted) => {
+    fetch("https://secure-earth-82827.herokuapp.com/messages", {
+      method: "delete",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: id,
+        id,
+        deleted,
+        user: "A",
       }),
     })
       .then((response) => response.json())
-      .then((user) => {
-        if (user.lastname) {
-          this.loadMessages();
+      .then((message) => {
+        if (message) {
+          loadMessages();
         }
       });
   };
 
-  toggleShow = (id = -1) => {
-    this.setState({
-      show: !this.state.show,
-      msg: "",
-      id: id,
-    });
+  const toggleShow = (newId = -1) => {
+    setShow((prev) => !prev);
+    setMsg("");
+    setId(newId);
   };
 
-  toggleMShow = (id = -1) => {
-    this.setState({
-      mshow: !this.state.mshow,
-      msg: "",
-      id: id,
-    });
+  const toggleMShow = (newId = -1) => {
+    setMShow((prev) => !prev);
+    setMsg("");
+    setId(newId);
   };
 
-  toggleDShow = (route) => {
-    this.setState({
-      dshow: !this.state.dshow,
-      msg: route,
-    });
+  const toggleDShow = (message = "") => {
+    setDShow((prev) => !prev);
+    setMsg(message);
   };
 
-  onMsgChange = (event) => {
-    this.setState({ msg: event.target.value });
+  const onMsgChange = (event) => {
+    setMsg(event.target.value);
   };
 
-  docIdToName = (id) => {
-    const { peopleList } = this.state;
-    id = parseInt(id, 10);
-    for (let i = 0; i < peopleList.length; i++) {
-      if (id === peopleList[i].id) {
-        return peopleList[i].firstname + " " + peopleList[i].lastname;
-      }
-    }
+  const docIdToName = (id) => {
+    const parsedId = parseInt(id, 10);
+    const person = peopleList.find((p) => p.id === parsedId);
+    return person ? `${person.firstname} ${person.lastname}` : "";
   };
 
-  entryIdToName = (id) => {
-    id = parseInt(id, 10);
-    const arr = [...this.state.entryList, ...this.state.callList];
-    for (let i = 0; i < arr.length; i++) {
-      if (id === arr[i].id) {
-        return arr[i].name;
-      }
-    }
+  const entryIdToName = (id) => {
+    const parsedId = parseInt(id, 10);
+    const combinedList = [...entryList, ...callList];
+    const entry = combinedList.find((e) => e.id === parsedId);
+    return entry ? entry.name : "";
   };
 
-  dateStyler = (dates) => {
+  const dateStyler = (dates) => {
     let splitArr = [];
     let flag = false;
+
     if (dates.length === 1) {
-      splitArr = dates[0].split("/");
-      return (
-        "on " +
-        this.months[splitArr[0] - 1] +
-        " " +
-        splitArr[1] +
-        ", " +
-        splitArr[2]
-      );
+      const [month, day, year] = dates[0].split("/");
+      return `on ${months[month - 1]} ${day}, ${year}`;
     }
 
-    for (let i = 0; i < dates.length; i++) {
-      if (dates[i].charAt(4) === "/") {
-        dates[i] = dates[i].substring(0, 3) + "0" + dates[i].substring(3);
-      }
-    }
+    const paddedDates = dates.map((d) =>
+      d.charAt(4) === "/" ? d.substring(0, 3) + "0" + d.substring(3) : d
+    );
 
-    dates.sort(function (a, b) {
-      return a.substring(3, 5) - b.substring(3, 5);
-    });
-
-    for (let i = 0; i < dates.length; i++) {
-      splitArr.push(dates[i].split("/"));
-    }
+    paddedDates.sort((a, b) => a.substring(3, 5) - b.substring(3, 5));
+    splitArr = paddedDates.map((d) => d.split("/"));
 
     for (let n = 1; n < splitArr.length; n++) {
       if (
@@ -192,279 +194,126 @@ class AMessages extends React.Component {
     }
 
     if (flag) {
-      let str =
+      return (
         "on " +
-        this.months[splitArr[0][0] - 1] +
-        " " +
-        splitArr[0][1] +
-        ", " +
-        splitArr[0][2];
-      for (let j = 1; j < splitArr.length; j++) {
-        str =
-          str +
-          ", " +
-          this.months[splitArr[j][0] - 1] +
-          " " +
-          splitArr[j][1] +
-          ", " +
-          splitArr[j][2];
-      }
-      return str;
+        splitArr.map((d) => `${months[d[0] - 1]} ${d[1]}, ${d[2]}`).join(", ")
+      );
     }
 
-    return (
-      "from " +
-      this.months[splitArr[0][0] - 1] +
-      " " +
-      splitArr[0][1] +
-      ", " +
-      splitArr[0][2] +
-      " - " +
-      this.months[splitArr[splitArr.length - 1][0] - 1] +
-      " " +
-      splitArr[splitArr.length - 1][1] +
-      ", " +
-      splitArr[splitArr.length - 1][2]
-    );
+    const first = splitArr[0];
+    const last = splitArr[splitArr.length - 1];
+    return `from ${months[first[0] - 1]} ${first[1]}, ${first[2]} - ${
+      months[last[0] - 1]
+    } ${last[1]}, ${last[2]}`;
   };
 
-  showMore = () => {
-    this.setState({ ctr: this.state.ctr + 10 });
+  const sortDates = (arr) => {
+    const list = [...arr];
+    return list.sort((a, b) => {
+      const [am, ad, ay] = a.stamp.split("/").map(Number);
+      const [bm, bd, by] = b.stamp.split("/").map(Number);
+      return by - ay || bm - am || bd - ad;
+    });
   };
 
-  showButton = (length) => {
-    if (this.state.ctr < length) {
+  const showMore = () => {
+    setCtr((prevCtr) => prevCtr + 10);
+  };
+
+  const showButton = (length) => {
+    console.log(ctr, length);
+    if (ctr < length) {
       return (
-        <Button onClick={this.showMore} className="showMore" variant="primary">
+        <Button onClick={showMore} className="showMore" variant="primary">
           Show More
         </Button>
       );
     }
   };
 
-  sortDates = (arr) => {
-    let list = [...arr];
-    let index = 0;
-    let currDate = [];
-    let newDate = [];
-    let temp;
-    let len = list.length;
-    let flag = false;
-
-    for (let i = 0; i < len - 1; i++) {
-      index = i;
-      currDate = list[i].stamp.split("/");
-      for (let j = i + 1; j < len; j++) {
-        flag = false;
-        newDate = list[j].stamp.split("/");
-        if (parseInt(newDate[2], 10) > parseInt(currDate[2], 10)) {
-          flag = true;
-        } else if (parseInt(newDate[2], 10) === parseInt(currDate[2], 10)) {
-          if (parseInt(newDate[0], 10) > parseInt(currDate[0], 10)) {
-            flag = true;
-          } else if (
-            parseInt(newDate[0], 10) === parseInt(currDate[0], 10) &&
-            parseInt(newDate[1], 10) > parseInt(currDate[1], 10)
-          ) {
-            flag = true;
-          }
-        }
-
-        if (flag) {
-          index = j;
-          currDate = list[j].stamp.split("/");
-        }
-      }
-      if (index !== i) {
-        temp = list[i];
-        list[i] = list[index];
-        list[index] = temp;
-      }
-    }
-    return list;
-  };
-
-  onPhysicianChange = (event) => {
-    const { peopleList } = this.state;
-    if (event.target.value !== "All") {
-      let index = -1;
-      for (let i = 0; i < peopleList.length; i++) {
-        if (peopleList[i].lastname === event.target.value) {
-          index = i;
-          break;
-        }
-      }
-      this.filter(peopleList[index]);
+  const onPhysicianChange = (event) => {
+    const selectedName = event.target.value;
+    if (selectedName !== "All") {
+      const selectedDoc = peopleList.find(
+        (person) => person.lastname === selectedName
+      );
+      filter(selectedDoc);
     } else {
-      this.filter("All");
+      filter("All");
     }
   };
 
-  filter = (doc) => {
-    const { messages } = this.state;
+  const filter = (doc) => {
     if (doc === "All") {
-      this.setState({ filteredMsgs: messages });
+      setFilteredMsgs(messages);
     } else {
-      this.setState({
-        filteredMsgs: messages.filter(
-          (message) => parseInt(message.docid, 10) === doc.id
-        ),
-      });
+      setFilteredMsgs(
+        messages.filter((message) => parseInt(message.docid, 10) === doc.id)
+      );
     }
   };
 
-  deleteMessage = (id, deleted) => {
-    fetch("https://secure-earth-82827.herokuapp.com/messages", {
-      method: "delete",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: id,
-        deleted: deleted,
-        user: "A",
-      }),
-    })
-      .then((response) => response.json())
-      .then((message) => {
-        if (message) {
-          this.loadMessages();
-        }
-      });
-  };
-
-  maybeResponse = (id) => {
-    fetch("https://secure-earth-82827.herokuapp.com/messages", {
-      method: "put",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: id,
-        msg2: this.state.msg,
-        stamp2: this.props.today.format("MM/DD/YYYY"),
-      }),
-    })
-      .then((response) => response.json())
-      .then((message) => {
-        if (message) {
-          this.loadMessages();
-        }
-      });
-    this.setState({
-      msg: "",
-      mshow: false,
-      id: -1,
-    });
-  };
-
-  render() {
-    const { show, dshow, msg, messages, ctr, peopleList, filteredMsgs, mshow } =
-      this.state;
-    let pendingList = [];
-    let pastList = [];
-    let pends = [];
-    let past = [];
-    for (let i = 0; i < messages.length; i++) {
-      if (messages[i].status === "pending") {
-        pends.push(messages[i]);
-      }
-    }
-    for (let i = 0; i < filteredMsgs.length; i++) {
-      if (filteredMsgs[i].status !== "pending" || filteredMsgs[i].maybe) {
-        past.push(filteredMsgs[i]);
-      }
-    }
-
-    pends = this.sortDates(pends);
-    past = this.sortDates(past);
-
-    for (let n = 0; n < pends.length; n++) {
-      if (!pends[n].maybe) {
-        pendingList.push(
-          <ListGroup key={n} horizontal>
-            <ListGroup.Item className="pend list" action>
-              <p className="requestList">
-                {this.docIdToName(pends[n].docid)} has requested{" "}
-                {this.entryIdToName(pends[n].entryid)}{" "}
-                {this.dateStyler(pends[n].dates)}
-              </p>
+  const generatePendingList = () => {
+    return sortDates(messages.filter((m) => m.status === "pending")).map(
+      (msg, i) => (
+        <ListGroup key={i} horizontal>
+          <ListGroup.Item className="pend list" action>
+            <p className="requestList">
+              {docIdToName(msg.docid)} has requested{" "}
+              {entryIdToName(msg.entryid)} {dateStyler(msg.dates)}
+            </p>
+            <Button
+              onClick={() => respond(msg.id, "accepted")}
+              className="accept"
+              size="sm"
+              variant="success"
+            >
+              Accept
+            </Button>
+            <Button
+              onClick={() => toggleShow(msg.id)}
+              className="deny"
+              size="sm"
+              variant="danger"
+            >
+              Deny
+            </Button>
+            {!msg.maybe && (
               <Button
-                onClick={() => this.respond(pends[n].id, "accepted")}
-                className="accept"
-                size="sm"
-                variant="success"
-              >
-                Accept
-              </Button>
-              <Button
-                onClick={() => this.toggleShow(pends[n].id)}
-                className="deny"
-                size="sm"
-                variant="danger"
-              >
-                Deny
-              </Button>
-              <Button
-                onClick={() => this.toggleMShow(pends[n].id)}
+                onClick={() => toggleMShow(msg.id)}
                 className="mby"
                 size="sm"
                 variant="warning"
               >
                 Maybe
               </Button>
-            </ListGroup.Item>
-            <ListGroup.Item className="dates list">
-              {pends[n].stamp}
-            </ListGroup.Item>
-          </ListGroup>
-        );
-      } else {
-        pendingList.push(
-          <ListGroup key={n} horizontal>
-            <ListGroup.Item className="pend list" action>
-              <p className="requestList">
-                {this.docIdToName(pends[n].docid)} has requested{" "}
-                {this.entryIdToName(pends[n].entryid)}{" "}
-                {this.dateStyler(pends[n].dates)}
-              </p>
-              <Button
-                onClick={() => this.respond(pends[n].id, "accepted")}
-                className="accept"
-                size="sm"
-                variant="success"
-              >
-                Accept
-              </Button>
-              <Button
-                onClick={() => this.toggleShow(pends[n].id)}
-                className="deny"
-                size="sm"
-                variant="danger"
-              >
-                Deny
-              </Button>
-            </ListGroup.Item>
-            <ListGroup.Item className="dates list">
-              {pends[n].stamp}
-            </ListGroup.Item>
-          </ListGroup>
-        );
-      }
-    }
+            )}
+          </ListGroup.Item>
+          <ListGroup.Item className="dates list">{msg.stamp}</ListGroup.Item>
+        </ListGroup>
+      )
+    );
+  };
 
-    for (let j = 0; j < Math.min(past.length, ctr); j++) {
-      if (past[j].status === "accepted") {
-        pastList.push(
-          <ListGroup key={j} horizontal>
+  const generatePastList = () => {
+    const past = filteredMsgs.filter((m) => m.status !== "pending" || m.maybe);
+
+    const sortedPast = sortDates(past);
+    const slicedPast = sortedPast.slice(0, ctr);
+
+    const pastList = slicedPast.map((msg, i) => {
+      if (msg.status === "accepted") {
+        return (
+          <ListGroup key={i} horizontal>
             <ListGroup.Item className="past list" action disabled>
               You <span className="accepted">accepted</span>{" "}
-              {this.docIdToName(past[j].docid)}'s request for{" "}
-              {this.entryIdToName(past[j].entryid)}{" "}
-              {this.dateStyler(past[j].dates)}
+              {docIdToName(msg.docid)}'s request for{" "}
+              {entryIdToName(msg.entryid)} {dateStyler(msg.dates)}
             </ListGroup.Item>
-            <ListGroup.Item className="edates list">
-              {past[j].stamp}
-            </ListGroup.Item>
+            <ListGroup.Item className="edates list">{msg.stamp}</ListGroup.Item>
             <ListGroup.Item>
               <Button
-                onClick={() => this.deleteMessage(past[j].id, past[j].deleted)}
+                onClick={() => deleteMessage(msg.id, msg.deleted)}
                 className="deletemsg"
                 size="sm"
                 variant="danger"
@@ -474,25 +323,22 @@ class AMessages extends React.Component {
             </ListGroup.Item>
           </ListGroup>
         );
-      } else if (past[j].status === "denied") {
-        pastList.push(
-          <ListGroup key={j} horizontal>
+      } else if (msg.status === "denied") {
+        return (
+          <ListGroup key={i} horizontal>
             <ListGroup.Item
               className="past list"
               action
-              onClick={() => this.toggleDShow(past[j].msg)}
+              onClick={() => toggleDShow(msg.msg)}
             >
               You <span className="denied">denied</span>{" "}
-              {this.docIdToName(past[j].docid)}'s request for{" "}
-              {this.entryIdToName(past[j].entryid)}{" "}
-              {this.dateStyler(past[j].dates)}
+              {docIdToName(msg.docid)}'s request for{" "}
+              {entryIdToName(msg.entryid)} {dateStyler(msg.dates)}
             </ListGroup.Item>
-            <ListGroup.Item className="edates list">
-              {past[j].stamp}
-            </ListGroup.Item>
+            <ListGroup.Item className="edates list">{msg.stamp}</ListGroup.Item>
             <ListGroup.Item>
               <Button
-                onClick={() => this.deleteMessage(past[j].id, past[j].deleted)}
+                onClick={() => deleteMessage(msg.id, msg.deleted)}
                 className="deletemsg"
                 size="sm"
                 variant="danger"
@@ -503,140 +349,127 @@ class AMessages extends React.Component {
           </ListGroup>
         );
       } else {
-        pastList.push(
-          <ListGroup key={j} horizontal>
+        return (
+          <ListGroup key={i} horizontal>
             <ListGroup.Item
               className="past list"
               action
-              onClick={() => this.toggleDShow(past[j].msg2)}
+              onClick={() => toggleDShow(msg.msg2)}
             >
               You responded with <span className="maybed">maybe</span> to{" "}
-              {this.docIdToName(past[j].docid)}'s request for{" "}
-              {this.entryIdToName(past[j].entryid)}{" "}
-              {this.dateStyler(past[j].dates)}
+              {docIdToName(msg.docid)}'s request for{" "}
+              {entryIdToName(msg.entryid)} {dateStyler(msg.dates)}
             </ListGroup.Item>
             <ListGroup.Item className="edates list">
-              {past[j].stamp2}
+              {msg.stamp2}
             </ListGroup.Item>
           </ListGroup>
         );
       }
-    }
+    });
 
-    let docSelect = peopleList.map((doc, i) => {
-      return (
+    return { pastList, pastLength: sortedPast.length };
+  };
+
+  const { pastList, pastLength } = generatePastList();
+
+  const generateDocOptions = () => {
+    return [
+      <option key={-1} value="All">
+        All
+      </option>,
+      ...peopleList.map((doc, i) => (
         <option key={i} value={doc.lastname}>
           {doc.lastname}
         </option>
-      );
-    });
+      )),
+    ];
+  };
 
-    docSelect.unshift(
-      <option key={-1} value="All">
-        All
-      </option>
-    );
+  return (
+    <div>
+      <h4 className="requests">Pending</h4>
+      <div className="listStyleA">{generatePendingList()}</div>
 
-    return (
-      <div>
-        <h4 className="requests">Pending</h4>
-        <div className="listStyleA">{pendingList}</div>
-        <div className="titleDropdown">
-          <h4 className="past requests">Past Requests</h4>
-          <span className="filter">
-            <h5 className="filtertitle">Filter: </h5>
-            <select
-              onChange={this.onPhysicianChange}
-              className="dropdownfilter"
-            >
-              {docSelect}
-            </select>
-          </span>
-        </div>
-        <div className="listStyleE">{pastList}</div>
-        <div>{this.showButton(past.length)}</div>
-        <div className="modal">
-          <Modal show={show} onHide={this.toggleShow}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">
-                Denied Request Explanation
-              </Modal.Title>
-            </Modal.Header>
-            <Form>
-              <Modal.Body>
-                <Form.Group controlId="exampleForm.ControlTextarea1">
-                  <Form.Control
-                    onChange={this.onMsgChange}
-                    as="textarea"
-                    rows="4"
-                  />
-                </Form.Group>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button onClick={this.toggleShow} variant="secondary">
-                  Close
-                </Button>
-                <Button
-                  onClick={() => this.respond(this.state.id, "denied")}
-                  variant="primary"
-                >
-                  Submit
-                </Button>
-              </Modal.Footer>
-            </Form>
-          </Modal>
-        </div>
-        <div className="modal">
-          <Modal show={dshow} onHide={() => this.toggleDShow("")}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">
-                Maybe/Denied Request Explanation
-              </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>{msg}</p>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button onClick={() => this.toggleDShow("")} variant="secondary">
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </div>
-        <div className="modal">
-          <Modal show={mshow} onHide={this.toggleMShow}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">
-                Maybe Request Explanation
-              </Modal.Title>
-            </Modal.Header>
-            <Form>
-              <Modal.Body>
-                <Form.Group controlId="exampleForm.ControlTextarea1">
-                  <Form.Control
-                    onChange={this.onMsgChange}
-                    as="textarea"
-                    rows="4"
-                  />
-                </Form.Group>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button onClick={this.toggleMShow} variant="secondary">
-                  Close
-                </Button>
-                <Button
-                  onClick={() => this.maybeResponse(this.state.id)}
-                  variant="primary"
-                >
-                  Submit
-                </Button>
-              </Modal.Footer>
-            </Form>
-          </Modal>
-        </div>
+      <div className="titleDropdown">
+        <h4 className="past requests">Past Requests</h4>
+        <span className="filter">
+          <h5 className="filtertitle">Filter: </h5>
+          <select onChange={onPhysicianChange} className="dropdownfilter">
+            {generateDocOptions()}
+          </select>
+        </span>
       </div>
-    );
-  }
-}
+
+      <div className="listStyleE">{pastList}</div>
+      <div>{showButton(pastLength)}</div>
+      <Modal show={show} onHide={toggleShow}>
+        <Modal.Header closeButton>
+          <Modal.Title id="modalTitle">Denied Request Explanation</Modal.Title>
+        </Modal.Header>
+        <Form>
+          <Modal.Body>
+            <Form.Group controlId="exampleForm.ControlTextarea1">
+              <Form.Control
+                onChange={onMsgChange}
+                as="textarea"
+                rows="4"
+                value={msg}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={toggleShow} variant="secondary">
+              Close
+            </Button>
+            <Button onClick={() => respond(id, "denied")} variant="primary">
+              Submit
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+      <Modal show={dshow} onHide={() => toggleDShow("")}>
+        <Modal.Header closeButton>
+          <Modal.Title id="modalTitle">
+            Maybe/Denied Request Explanation
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>{msg}</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={() => toggleDShow("")} variant="secondary">
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={mshow} onHide={toggleMShow}>
+        <Modal.Header closeButton>
+          <Modal.Title id="modalTitle">Maybe Request Explanation</Modal.Title>
+        </Modal.Header>
+        <Form>
+          <Modal.Body>
+            <Form.Group controlId="exampleForm.ControlTextarea1">
+              <Form.Control
+                onChange={onMsgChange}
+                as="textarea"
+                rows="4"
+                value={msg}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={toggleMShow} variant="secondary">
+              Close
+            </Button>
+            <Button onClick={() => maybeResponse(id)} variant="primary">
+              Submit
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
 
 export default AMessages;
