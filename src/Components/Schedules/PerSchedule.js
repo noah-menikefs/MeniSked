@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Calendar from "./Calendar/Calendar";
-import MyDocument from "./../PDF/MyDocument";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import MyDocument from "./../PDF/MyDocument";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -17,86 +17,131 @@ const style = {
   width: "90%",
 };
 
-const PerSchedule = (props) => {
+const PubSchedule = (props) => {
   // State management with hooks
-  const [activeDocs, setActiveDocs] = useState([]);
-  const [entries, setEntries] = useState([]);
-  const [docIndex, setDocIndex] = useState(0);
-  const [entryIndex, setEntryIndex] = useState(0);
+  const [numNotes, setNumNotes] = useState([]);
+  const [vNotes, setVNotes] = useState([]);
+  const [iNotes, setINotes] = useState([]);
   const [show, setShow] = useState(false);
+  const [nShow, setNShow] = useState(false);
   const [dateContext, setDateContext] = useState(moment());
-  const [radio, setRadio] = useState(-1);
-  const [day, setDay] = useState(0);
+  const [note, setNote] = useState("");
+  const [radio, setRadio] = useState(0);
   const [rHolidayList, setRHolidayList] = useState([]);
   const [nrHolidayList, setNrHolidayList] = useState([]);
   const [holiDays, setHoliDays] = useState([]);
-  const [personalDays, setPersonalDays] = useState([]);
   const [render, setRender] = useState(false);
-  const [pending, setPending] = useState([]);
+  const [sked, setSked] = useState([]);
+  const [entryList, setEntryList] = useState([]);
+  const [day, setDay] = useState(-1);
+  const [published, setPublished] = useState(-1);
   const [depts, setDepts] = useState([]);
   const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
+  const [msg, setMsg] = useState("");
+  const [id, setId] = useState(-1);
 
-  const { user, today, callList } = props;
+  const { today, user, callList } = props;
   const months = moment.months(); // List of each month
-  const isMountedRef = useRef(true);
 
   // Load functions
+  const loadPublished = useCallback(() => {
+    fetch("https://secure-earth-82827.herokuapp.com/published")
+      .then((response) => response.json())
+      .then((num) => setPublished(num));
+  }, []);
+
+  const publishSked = useCallback(() => {
+    var a = moment([2020, 5, 1]);
+    var b = dateContext;
+    const num = b.diff(a, "months");
+    fetch("https://secure-earth-82827.herokuapp.com/published", {
+      method: "put",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        newNum: num,
+      }),
+    })
+      .then((response) => response.json())
+      .then((num) => setPublished(num));
+  }, [dateContext]);
+
+  const priorityCheck = useCallback(
+    (id) => {
+      let index = -1;
+      for (let n = 0; n < callList.length; n++) {
+        if (callList[n].id === id) {
+          index = n;
+          break;
+        }
+      }
+      if (index !== -1) {
+        return callList[index].priority;
+      } else {
+        return 1000;
+      }
+    },
+    [callList]
+  );
+
+  const loadSked = useCallback(() => {
+    fetch("https://secure-earth-82827.herokuapp.com/people")
+      .then((response) => response.json())
+      .then((docs) => {
+        let arr = [];
+        for (let i = 0; i < docs.length; i++) {
+          for (let j = 0; j < docs[i].worksked.length; j++) {
+            arr.push({
+              id: docs[i].worksked[j].id,
+              date: docs[i].worksked[j].date,
+              name: docs[i].lastname,
+              colour: docs[i].colour,
+              priority: priorityCheck(docs[i].worksked[j].id),
+            });
+          }
+        }
+        arr.sort(function (a, b) {
+          return a.priority - b.priority;
+        });
+        setSked(arr);
+      });
+  }, [priorityCheck]);
+
+  const loadDepts = useCallback(() => {
+    fetch("https://secure-earth-82827.herokuapp.com/departments")
+      .then((response) => response.json())
+      .then((departments) => setDepts(departments));
+  }, []);
+
+  const loadEntries = useCallback(() => {
+    fetch("https://secure-earth-82827.herokuapp.com/sked/entries")
+      .then((response) => response.json())
+      .then((entries) =>
+        setEntryList(entries.filter((entry) => entry.isactive === true))
+      );
+  }, []);
+
+  const loadAllNotes = useCallback(() => {
+    fetch("https://secure-earth-82827.herokuapp.com/sked/allNotes")
+      .then((response) => response.json())
+      .then((notes) => {
+        setNumNotes(notes.filter((note) => note.type === 1));
+        setVNotes(notes.filter((note) => note.type === 2));
+        setINotes(notes.filter((note) => note.type === 3));
+      });
+  }, []);
+
   const loadrHolidays = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/r")
       .then((response) => response.json())
-      .then((holidays) => {
-        if (isMountedRef.current) {
-          setRHolidayList(
-            holidays.filter((holiday) => holiday.isactive === true)
-          );
-        }
-      });
+      .then((holidays) =>
+        setRHolidayList(holidays.filter((holiday) => holiday.isactive === true))
+      );
   }, []);
 
   const loadnrHolidays = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/nr")
       .then((response) => response.json())
-      .then((holidays) => {
-        if (isMountedRef.current) {
-          setNrHolidayList(holidays);
-        }
-      });
-  }, []);
-
-  const loadPersonalDays = useCallback(
-    (index, docs = activeDocs) => {
-      setPersonalDays([...docs[index].worksked]);
-    },
-    [activeDocs]
-  );
-
-  const loadActiveDocs = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/sked/docs")
-      .then((response) => response.json())
-      .then((docs) => {
-        if (isMountedRef.current) {
-          if (!render) {
-            const doctors = [...docs];
-            for (let i = 0; i < doctors.length; i++) {
-              if (doctors[i].id === user.id) {
-                loadPersonalDays(i, doctors);
-                setDocIndex(i);
-              }
-            }
-          }
-          setActiveDocs(docs);
-        }
-      });
-  }, [render, user.id, loadPersonalDays]);
-
-  const loadEntries = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/sked/entries")
-      .then((response) => response.json())
-      .then((entries) => {
-        if (isMountedRef.current) {
-          setEntries(entries.filter((entry) => entry.isactive === true));
-        }
-      });
+      .then((holidays) => setNrHolidayList(holidays));
   }, []);
 
   const loadNewDays = useCallback(
@@ -131,247 +176,24 @@ const PerSchedule = (props) => {
     [nrHolidayList, rHolidayList]
   );
 
-  const loadPersonalSked = useCallback((user) => {
-    setActiveDocs((prevActiveDocs) => {
-      let activeDocs = [...prevActiveDocs];
-      for (let i = 0; i < activeDocs.length; i++) {
-        if (user.id === activeDocs[i].id) {
-          let currentUser = Object.assign({}, activeDocs[i]);
-          currentUser.worksked = [...user.worksked];
-          activeDocs[i] = currentUser;
-          setPersonalDays(currentUser.worksked);
-          return activeDocs;
-        }
-      }
-      return prevActiveDocs;
-    });
-  }, []);
-
-  const loadPending = useCallback(
-    (userid = user.id) => {
-      fetch("https://secure-earth-82827.herokuapp.com/emessages/" + userid)
-        .then((response) => response.json())
-        .then((messages) => {
-          if (isMountedRef.current) {
-            setPending(
-              messages.filter((message) => message.status === "pending")
-            );
-          }
-        });
-    },
-    [user.id]
-  );
-
-  const loadDepts = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/departments")
-      .then((response) => response.json())
-      .then((departments) => {
-        if (isMountedRef.current) {
-          setDepts(departments);
-        }
-      });
-  }, []);
-
-  const assignCall = useCallback(
-    (typeID, method, date) => {
-      fetch("https://secure-earth-82827.herokuapp.com/sked/assign", {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          docId: activeDocs[docIndex].id,
-          typeId: typeID,
-          date: date,
-        }),
-      })
-        .then((response) => response.json())
-        .then((user) => {
-          if (user.lastname) {
-            loadPersonalSked(user);
-          }
-        });
-      if (radio !== -1) {
-        setShow(false);
-      }
-    },
-    [activeDocs, docIndex, radio, loadPersonalSked]
-  );
-
-  const requestCall = useCallback(
-    (typeID, date) => {
-      fetch("https://secure-earth-82827.herokuapp.com/request", {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          docid: user.id,
-          entryid: typeID,
-          date: date,
-          stamp: today.format("MM/DD/YYYY"),
-        }),
-      })
-        .then((response) => response.json())
-        .then((message) => {
-          if (message) {
-            loadPending();
-          }
-        });
-      if (radio !== -1) {
-        setShow(false);
-      }
-    },
-    [user.id, today, radio, loadPending]
-  );
-
-  const editCall = useCallback(
-    (typeID, date) => {
-      fetch("https://secure-earth-82827.herokuapp.com/request", {
-        method: "put",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          docid: parseInt(user.id),
-          entryid: parseInt(typeID, 10),
-          date: date,
-        }),
-      })
-        .then((response) => response.json())
-        .then((message) => {
-          if (message) {
-            loadPending();
-          }
-        });
-      if (radio !== -1) {
-        setShow(false);
-      }
-    },
-    [user.id, radio, loadPending]
-  );
-
-  const deleteCall = useCallback(
-    (typeID, date, docid = parseInt(user.id, 10)) => {
-      fetch("https://secure-earth-82827.herokuapp.com/drequest", {
-        method: "put",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          docid: docid,
-          entryid: parseInt(typeID, 10),
-          date: date,
-          pending: pending,
-        }),
-      })
-        .then((response) => response.json())
-        .then((messages) => {
-          if (messages) {
-            loadPending();
-          }
-        });
-      if (radio !== -1) {
-        setShow(false);
-      }
-    },
-    [user.id, pending, radio, loadPending]
-  );
-
-  const assignOrDelete = useCallback(
-    (typeId, selectedDay = day) => {
-      if (typeId !== -1) {
-        const typeID = parseInt(typeId, 10);
-        const date =
-          dateContext.format("MM") +
-          "/" +
-          selectedDay +
-          "/" +
-          dateContext.format("YYYY");
-        if (user.isadmin) {
-          let method = "post";
-          for (let i = 0; i < personalDays.length; i++) {
-            if (
-              personalDays[i].date === date &&
-              typeID === personalDays[i].id
-            ) {
-              method = "delete";
-              break;
-            }
-          }
-          assignCall(typeID, method, date);
-          for (let j = 0; j < pending.length; j++) {
-            for (let n = 0; n < pending[j].dates.length; n++) {
-              if (pending[j].dates[n] === date) {
-                deleteCall(pending[j].entryid, date, activeDocs[docIndex].id);
-                break;
-              }
-            }
-          }
-        } else if (!user.isadmin) {
-          let flag = false;
-          let flag2 = false;
-
-          for (let j = 0; j < pending.length; j++) {
-            for (let n = 0; n < pending[j].dates.length; n++) {
-              if (pending[j].dates[n] === date) {
-                if (parseInt(pending[j].entryid, 10) === typeID) {
-                  flag2 = true;
-                }
-                deleteCall(typeID, date);
-                break;
-              }
-            }
-          }
-
-          if (!flag2) {
-            for (let i = 0; i < pending.length; i++) {
-              if (
-                user.id === parseInt(pending[i].docid, 10) &&
-                typeID === parseInt(pending[i].entryid, 10)
-              ) {
-                flag = true;
-              }
-            }
-            if (!flag) {
-              requestCall(typeID, date);
-            } else {
-              editCall(typeID, date);
-            }
-          }
-        }
-      }
-
-      setDay(0);
-      setRadio(-1);
-    },
-    [
-      day,
-      dateContext,
-      user.isadmin,
-      user.id,
-      assignCall,
-      personalDays,
-      pending,
-      deleteCall,
-      activeDocs,
-      docIndex,
-      requestCall,
-      editCall,
-    ]
-  );
-
   // Event handlers
   const onDayClick = useCallback(
     (e, day) => {
-      const id = entries[entryIndex].id;
-      if (id === 1) {
-        setDay(day);
-        setShow(true);
-      } else {
-        assignOrDelete(id, day);
-      }
+      let newDateContext = Object.assign({}, dateContext);
+      newDateContext = moment(newDateContext).set("date", day);
+      setDateContext(newDateContext);
+      setDay(day);
+      setShow(!show);
     },
-    [entries, entryIndex, assignOrDelete]
+    [dateContext, show]
   );
 
   // Navigation functions
   const setMonth = useCallback(
     (month) => {
       let monthNo = months.indexOf(month);
-      let newDateContext = moment(dateContext).set("month", monthNo);
+      let newDateContext = Object.assign({}, dateContext);
+      newDateContext = moment(newDateContext).set("month", monthNo);
       setDateContext(newDateContext);
       loadNewDays(newDateContext);
     },
@@ -379,76 +201,56 @@ const PerSchedule = (props) => {
   );
 
   const nextMonth = useCallback(() => {
-    let newDateContext = moment(dateContext).add(1, "month");
-    if (newDateContext.year() <= today.year() + 10) {
+    let newDateContext = Object.assign({}, dateContext);
+    newDateContext = moment(newDateContext).add(1, "month");
+    if (!user.isadmin) {
+      let nMonth = moment([2020, 5, 1]).add(published, "month").month();
+      let nYear = moment([2020, 5, 1]).add(published, "month").year();
+      if (newDateContext.year() < nYear) {
+        setDateContext(newDateContext);
+        loadNewDays(newDateContext);
+      } else if (newDateContext.year() === nYear) {
+        if (newDateContext.month() <= nMonth) {
+          setDateContext(newDateContext);
+          loadNewDays(newDateContext);
+        }
+      }
+    } else if (newDateContext.year() <= today.year() + 10) {
       setDateContext(newDateContext);
       loadNewDays(newDateContext);
     }
-  }, [dateContext, today, loadNewDays]);
+  }, [dateContext, user.isadmin, published, today, loadNewDays]);
 
   const prevMonth = useCallback(() => {
-    let newDateContext = moment(dateContext).subtract(1, "month");
+    let newDateContext = Object.assign({}, dateContext);
+    newDateContext = moment(newDateContext).subtract(1, "month");
     if (newDateContext.year() >= 2020) {
       setDateContext(newDateContext);
       loadNewDays(newDateContext);
     }
   }, [dateContext, loadNewDays]);
 
-  const nextDoc = useCallback(() => {
-    let i = docIndex;
-    if (i !== activeDocs.length - 1) {
-      loadPersonalDays(i + 1);
-      loadPending(activeDocs[i + 1].id);
-      setDocIndex(i + 1);
-    } else {
-      loadPersonalDays(0);
-      loadPending(activeDocs[0].id);
-      setDocIndex(0);
-    }
-  }, [docIndex, activeDocs, loadPersonalDays, loadPending]);
-
-  const prevDoc = useCallback(() => {
-    let i = docIndex;
-    if (i !== 0) {
-      loadPersonalDays(i - 1);
-      loadPending(activeDocs[i - 1].id);
-      setDocIndex(i - 1);
-    } else {
-      loadPersonalDays(activeDocs.length - 1);
-      loadPending(activeDocs[activeDocs.length - 1].id);
-      setDocIndex(activeDocs.length - 1);
-    }
-  }, [docIndex, activeDocs, loadPersonalDays, loadPending]);
-
-  const nextEntry = useCallback(() => {
-    let i = entryIndex;
-    if (i !== entries.length - 1) {
-      setEntryIndex(i + 1);
-    } else {
-      setEntryIndex(0);
-    }
-  }, [entryIndex, entries.length]);
-
-  const prevEntry = useCallback(() => {
-    let i = entryIndex;
-    if (i !== 0) {
-      setEntryIndex(i - 1);
-    } else {
-      setEntryIndex(entries.length - 1);
-    }
-  }, [entryIndex, entries.length]);
-
   const nextYear = useCallback(() => {
-    if (dateContext.year() + 1 <= today.year() + 10) {
-      let newDateContext = moment(dateContext).add(1, "year");
+    if (!user.isadmin) {
+      let nYear = moment([2020, 5, 1]).add(published, "month").year();
+      if (dateContext.year() + 1 <= nYear) {
+        let newDateContext = Object.assign({}, dateContext);
+        newDateContext = moment(newDateContext).add(1, "year");
+        setDateContext(newDateContext);
+        loadNewDays(newDateContext);
+      }
+    } else if (dateContext.year() + 1 <= today.year() + 10) {
+      let newDateContext = Object.assign({}, dateContext);
+      newDateContext = moment(newDateContext).add(1, "year");
       setDateContext(newDateContext);
       loadNewDays(newDateContext);
     }
-  }, [dateContext, today, loadNewDays]);
+  }, [dateContext, user.isadmin, published, today, loadNewDays]);
 
   const prevYear = useCallback(() => {
     if (dateContext.year() - 1 >= 2020) {
-      let newDateContext = moment(dateContext).subtract(1, "year");
+      let newDateContext = Object.assign({}, dateContext);
+      newDateContext = moment(newDateContext).subtract(1, "year");
       setDateContext(newDateContext);
       loadNewDays(newDateContext);
     }
@@ -456,49 +258,25 @@ const PerSchedule = (props) => {
 
   const setYear = useCallback(
     (year) => {
-      let newDateContext = moment(dateContext).set("year", year);
+      let newDateContext = Object.assign({}, dateContext);
+      newDateContext = moment(newDateContext).set("year", year);
+      if (!user.isadmin) {
+        let nMonth = moment([2020, 5, 1]).add(published, "month").month();
+        let nYear = moment([2020, 5, 1]).add(published, "month").year();
+        if (
+          newDateContext.year() === nYear &&
+          nMonth < newDateContext.month()
+        ) {
+          newDateContext = moment(newDateContext).set("month", nMonth);
+        }
+      }
       setDateContext(newDateContext);
       loadNewDays(newDateContext);
     },
-    [dateContext, loadNewDays]
+    [dateContext, user.isadmin, published, loadNewDays]
   );
 
   // Form handlers
-  const onPhysicianChange = useCallback(
-    (event) => {
-      if (event.target.key) {
-        loadPersonalDays(event.target.key);
-        setDocIndex(event.target.key);
-      } else {
-        let index = -1;
-        for (let i = 0; i < activeDocs.length; i++) {
-          if (activeDocs[i].lastname === event.target.value) {
-            index = i;
-            break;
-          }
-        }
-        loadPersonalDays(index);
-        loadPending(activeDocs[index].id);
-        setDocIndex(index);
-      }
-    },
-    [activeDocs, loadPersonalDays, loadPending]
-  );
-
-  const onEntryChange = useCallback(
-    (event) => {
-      let index = -1;
-      for (let i = 0; i < entries.length; i++) {
-        if (entries[i].name === event.target.value) {
-          index = i;
-          break;
-        }
-      }
-      setEntryIndex(index);
-    },
-    [entries]
-  );
-
   const onMonthChange = useCallback(
     (event) => {
       setMonth(event.target.value);
@@ -513,71 +291,364 @@ const PerSchedule = (props) => {
     [setYear]
   );
 
-  const radioChange = useCallback((event) => {
+  const noteRadioChange = useCallback((event) => {
     setRadio(event.target.id);
   }, []);
 
-  const toggleShow = useCallback(() => {
-    setShow(!show);
-  }, [show]);
-
-  const adminButton = useCallback(() => {
-    if (user.isadmin) {
-      return (
-        <div>
-          <Button
-            onClick={prevDoc}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextDoc}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </div>
-      );
-    } else {
-      return <p className="vis top-child"></p>;
+  const onNotesSubmit = useCallback(() => {
+    if (note.length > 0 && radio > 0) {
+      fetch("https://secure-earth-82827.herokuapp.com/sked/notes", {
+        method: "post",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date:
+            dateContext.format("MM") +
+            "/" +
+            day +
+            "/" +
+            dateContext.format("Y"),
+          type: parseInt(radio, 10),
+          msg: note,
+        }),
+      })
+        .then((response) => response.json())
+        .then((notes) => {
+          if (notes.id) {
+            loadAllNotes();
+          }
+        });
+      setRadio(0);
+      setNote("");
+      setShow(false);
     }
-  }, [user.isadmin, prevDoc, nextDoc]);
+  }, [note, radio, dateContext, day, loadAllNotes]);
+
+  const onNoteChange = useCallback((event) => {
+    setNote(event.target.value);
+  }, []);
 
   const reset = useCallback(() => {
     setDateContext(today);
     loadNewDays(today);
   }, [today, loadNewDays]);
 
+  // Helper functions
+  const yearSelect = useCallback(() => {
+    let arr = [];
+    let fYear = today.year();
+    if (user.isadmin) {
+      for (let i = 2020; i <= fYear + 10; i++) {
+        arr.push(
+          <option key={i} value={i}>
+            {i}
+          </option>
+        );
+      }
+    } else {
+      let nYear = moment([2020, 5, 1]).add(published, "month").year();
+      for (let i = 2020; i <= nYear; i++) {
+        arr.push(
+          <option key={i} value={i}>
+            {i}
+          </option>
+        );
+      }
+    }
+    return arr;
+  }, [today, user.isadmin, published]);
+
+  const monthSelect = useCallback(() => {
+    let m = 11;
+    let arr = [];
+    if (!user.isadmin) {
+      let nYear = moment([2020, 5, 1]).add(published, "month").year();
+      let nMonth = moment([2020, 5, 1]).add(published, "month").month();
+      if (dateContext.year() === nYear) {
+        m = nMonth;
+      }
+    }
+    for (let i = 0; i <= m; i++) {
+      arr.push(
+        <option key={i} value={months[i]}>
+          {months[i]}
+        </option>
+      );
+    }
+    return arr;
+  }, [user.isadmin, published, dateContext, months]);
+
+  const publishShow = useCallback(() => {
+    if (user.isadmin) {
+      let nYear = moment([2020, 5, 1]).add(published, "month").year();
+      let nMonth = moment([2020, 5, 1]).add(published, "month").month();
+      let p = true;
+      if (dateContext.year() === nYear) {
+        if (dateContext.month() > nMonth) {
+          p = false;
+        }
+      } else if (dateContext.year() > nYear) {
+        p = false;
+      }
+      if (p) {
+        return (
+          <Col>
+            <h5>Published</h5>
+          </Col>
+        );
+      }
+      return (
+        <Col>
+          <Button onClick={publishSked} className="top-child" variant="primary">
+            Publish
+          </Button>
+        </Col>
+      );
+    } else {
+      return (
+        <Col>
+          <p></p>
+        </Col>
+      );
+    }
+  }, [user.isadmin, published, dateContext, publishSked]);
+
+  const adminNotes = useCallback(() => {
+    if (user.isadmin) {
+      return (
+        <Form>
+          <hr />
+          <Form.Group>
+            <Form.Control
+              onChange={onNoteChange}
+              id="note-text"
+              size="sm"
+              type="text"
+              placeholder="Add Note"
+            />
+          </Form.Group>
+          <Form.Label id="typeON">Type of Note:</Form.Label>
+          <Form.Group onChange={noteRadioChange}>
+            <Form.Check
+              name="noteType"
+              inline
+              label="Numbers"
+              type="radio"
+              id="1"
+            />
+            <Form.Check
+              name="noteType"
+              inline
+              label="Visible"
+              type="radio"
+              id="2"
+            />
+            <Form.Check
+              name="noteType"
+              inline
+              label="Invisible"
+              type="radio"
+              id="3"
+            />
+          </Form.Group>
+          <Form.Group>
+            <Button onClick={onNotesSubmit} size="sm" variant="primary">
+              Submit Note
+            </Button>
+          </Form.Group>
+        </Form>
+      );
+    }
+  }, [user.isadmin, onNoteChange, noteRadioChange, onNotesSubmit]);
+
+  const idToName = useCallback(
+    (id) => {
+      for (let n = 0; n < callList.length; n++) {
+        if (callList[n].id === id) {
+          return callList[n].name;
+        }
+      }
+      for (let i = 0; i < entryList.length; i++) {
+        if (entryList[i].id === id) {
+          return entryList[i].name;
+        }
+      }
+    },
+    [callList, entryList]
+  );
+
   const hoverSpan = useCallback(() => {
     setStamp(moment().format("YYYY-MM-DD HH:mm"));
   }, []);
 
+  const adminDownload = useCallback(() => {
+    if (user.isadmin) {
+      let userCopy = Object.assign({}, user);
+      userCopy.isadmin = false;
+
+      return (
+        <Row>
+          <Col id="downloadLink">
+            <PDFDownloadLink
+              document={
+                <MyDocument
+                  colour={false}
+                  stamp={stamp}
+                  depts={depts}
+                  numNotes={numNotes}
+                  vNotes={vNotes}
+                  iNotes={iNotes}
+                  holiDays={holiDays}
+                  callList={callList}
+                  entries={entryList}
+                  sked={sked}
+                  type="Published"
+                  dateContext={dateContext}
+                  user={userCopy}
+                />
+              }
+              fileName={
+                dateContext.format("MMMM") +
+                dateContext.format("Y") +
+                "publishedsked.pdf"
+              }
+            >
+              {({ loading }) =>
+                loading ? (
+                  "Loading document..."
+                ) : (
+                  <span onMouseOver={hoverSpan}>
+                    Employee Black & White Download
+                  </span>
+                )
+              }
+            </PDFDownloadLink>
+          </Col>
+          <Col id="downloadLink">
+            <PDFDownloadLink
+              document={
+                <MyDocument
+                  colour={true}
+                  stamp={stamp}
+                  depts={depts}
+                  numNotes={numNotes}
+                  vNotes={vNotes}
+                  iNotes={iNotes}
+                  holiDays={holiDays}
+                  callList={callList}
+                  entries={entryList}
+                  sked={sked}
+                  type="Published"
+                  dateContext={dateContext}
+                  user={userCopy}
+                />
+              }
+              fileName={
+                dateContext.format("MMMM") +
+                dateContext.format("Y") +
+                "publishedsked.pdf"
+              }
+            >
+              {({ loading }) =>
+                loading ? (
+                  "Loading document..."
+                ) : (
+                  <span onMouseOver={hoverSpan}>Employee Colour Download</span>
+                )
+              }
+            </PDFDownloadLink>
+          </Col>
+        </Row>
+      );
+    }
+  }, [
+    user,
+    stamp,
+    depts,
+    numNotes,
+    vNotes,
+    iNotes,
+    holiDays,
+    callList,
+    entryList,
+    sked,
+    dateContext,
+    hoverSpan,
+  ]);
+
+  const editNote = useCallback(
+    (id) => {
+      fetch("https://secure-earth-82827.herokuapp.com/sked/editNote", {
+        method: "put",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: id,
+          msg: msg,
+        }),
+      })
+        .then((response) => response.json())
+        .then((notes) => {
+          if (notes.id) {
+            loadAllNotes();
+          }
+        });
+      setMsg("");
+      setId(-1);
+      setNShow(false);
+    },
+    [msg, loadAllNotes]
+  );
+
+  const deleteNote = useCallback(
+    (id) => {
+      fetch("https://secure-earth-82827.herokuapp.com/sked/deleteNote", {
+        method: "delete",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: id,
+        }),
+      })
+        .then((response) => response.json())
+        .then((notes) => {
+          if (notes.id) {
+            loadAllNotes();
+          }
+        });
+    },
+    [loadAllNotes]
+  );
+
+  const toggleNote = useCallback(
+    (id, msg) => {
+      setMsg(msg);
+      setId(id);
+      setNShow(!nShow);
+    },
+    [nShow]
+  );
+
+  const onMsgChange = useCallback((e) => {
+    setMsg(e.target.value);
+  }, []);
+
   // useEffect hooks for lifecycle management
   useEffect(() => {
-    loadActiveDocs();
-    loadEntries();
-    props.loadCallTypes();
+    loadAllNotes();
     loadrHolidays();
     loadnrHolidays();
+    loadEntries();
+    loadSked();
+    loadPublished();
     loadDepts();
   }, [
-    loadActiveDocs,
-    loadEntries,
-    props.loadCallTypes,
+    loadAllNotes,
     loadrHolidays,
     loadnrHolidays,
+    loadEntries,
+    loadSked,
+    loadPublished,
     loadDepts,
     props,
   ]);
-
-  useEffect(() => {
-    if (user.id) {
-      loadPending();
-    }
-  }, [user.id, loadPending]);
 
   useEffect(() => {
     if (nrHolidayList.length > 0 && !render) {
@@ -585,336 +656,247 @@ const PerSchedule = (props) => {
     }
   }, [nrHolidayList.length, render, loadNewDays, today]);
 
-  // Cleanup effect to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
   // Render logic
-  let docSelect = activeDocs.map((doc, i) => {
-    return (
-      <option key={i} value={doc.lastname}>
-        {doc.lastname}
-      </option>
-    );
-  });
-
-  let adminSelect = () => {
-    if (user.isadmin && activeDocs.length !== 0) {
-      return (
-        <select
-          value={activeDocs[docIndex].lastname}
-          onChange={onPhysicianChange}
-          className="top-child doc selector"
-        >
-          {docSelect}
-        </select>
+  let modalList = [];
+  for (let i = 0; i < sked.length; i++) {
+    const splitArr = sked[i].date.split("/");
+    if (
+      splitArr[0] === dateContext.format("MM") &&
+      parseInt(splitArr[1], 10) === day &&
+      splitArr[2] === dateContext.format("YYYY")
+    ) {
+      modalList.push(
+        <li key={i}>
+          {idToName(sked[i].id) + " "}
+          <span style={{ backgroundColor: sked[i].colour }}>
+            {sked[i].name}
+          </span>
+        </li>
       );
-    } else {
-      return <h6 className="top-child">{user.lastname}</h6>;
     }
-  };
-
-  let entryFilter = entries.filter((entry) => {
-    return entry.isactive;
-  });
-
-  let entrySelect = entryFilter.map((entry, i) => {
-    return (
-      <option key={i} value={entry.name}>
-        {entry.name}
-      </option>
-    );
-  });
-
-  let eSelect = () => {
-    if (entries.length !== 0) {
-      return (
-        <select
-          value={entries[entryIndex].name}
-          onChange={onEntryChange}
-          className="top-child types selector"
-        >
-          {entrySelect}
-        </select>
-      );
-    } else {
-      return <p id="entriesP">Entries</p>;
-    }
-  };
-
-  let yearSelect = [];
-  let fYear = today.year();
-
-  for (let i = 2020; i <= fYear + 10; i++) {
-    yearSelect.push(
-      <option key={i} value={i}>
-        {i}
-      </option>
-    );
   }
 
-  let radioSelect = [];
-  for (let j = 0; j < callList.length; j++) {
-    if (callList[j].isactive) {
-      radioSelect.push(
-        <Form.Check
-          required
-          key={j}
-          name="callType"
-          type="radio"
-          id={callList[j].id}
-          label={callList[j].name}
-        />
-      );
+  let noteList = [];
+
+  if (user.isadmin) {
+    for (let n = 0; n < numNotes.length; n++) {
+      const split = numNotes[n].date.split("/");
+      if (
+        split[0] === dateContext.format("MM") &&
+        parseInt(split[1], 10) === day &&
+        split[2] === dateContext.format("YYYY")
+      ) {
+        noteList.push(
+          <li key={n} id="numNotes">
+            {numNotes[n].msg}
+            <Button
+              key={n}
+              onClick={() => toggleNote(numNotes[n].id, numNotes[n].msg)}
+              className="edit butn"
+              size="sm"
+              variant="secondary"
+            >
+              Edit
+            </Button>
+            <Button
+              key={-n - 1}
+              onClick={() => deleteNote(numNotes[n].id)}
+              className="delete butn"
+              size="sm"
+              variant="danger"
+            >
+              Delete
+            </Button>
+          </li>
+        );
+      }
+    }
+    for (let i = 0; i < iNotes.length; i++) {
+      const splitArr = iNotes[i].date.split("/");
+      if (
+        splitArr[0] === dateContext.format("MM") &&
+        parseInt(splitArr[1], 10) === day &&
+        splitArr[2] === dateContext.format("YYYY")
+      ) {
+        noteList.push(
+          <li key={i} id="iNotes">
+            {iNotes[i].msg}
+            <Button
+              key={i}
+              onClick={() => toggleNote(iNotes[i].id, iNotes[i].msg)}
+              className="edit butn"
+              size="sm"
+              variant="secondary"
+            >
+              Edit
+            </Button>
+            <Button
+              key={-i - 1}
+              onClick={() => deleteNote(iNotes[i].id)}
+              className="delete butn"
+              size="sm"
+              variant="danger"
+            >
+              Delete
+            </Button>
+          </li>
+        );
+      }
+    }
+    for (let i = 0; i < vNotes.length; i++) {
+      const splitArr = vNotes[i].date.split("/");
+      if (
+        splitArr[0] === dateContext.format("MM") &&
+        parseInt(splitArr[1], 10) === day &&
+        splitArr[2] === dateContext.format("YYYY")
+      ) {
+        noteList.push(
+          <li key={i} id="notes">
+            {vNotes[i].msg}
+            <Button
+              key={i}
+              onClick={() => toggleNote(vNotes[i].id, vNotes[i].msg)}
+              className="edit butn"
+              size="sm"
+              variant="secondary"
+            >
+              Edit
+            </Button>
+            <Button
+              key={-i - 1}
+              onClick={() => deleteNote(vNotes[i].id)}
+              className="delete butn"
+              size="sm"
+              variant="danger"
+            >
+              Delete
+            </Button>
+          </li>
+        );
+      }
+    }
+  } else {
+    for (let i = 0; i < vNotes.length; i++) {
+      const splitArr = vNotes[i].date.split("/");
+      if (
+        splitArr[0] === dateContext.format("MM") &&
+        parseInt(splitArr[1], 10) === day &&
+        splitArr[2] === dateContext.format("YYYY")
+      ) {
+        noteList.push(
+          <li key={i} id="notes">
+            {vNotes[i].msg}
+          </li>
+        );
+      }
     }
   }
 
   return (
     <div className="screen">
-      <Row className="labels">
-        <Col>
-          <h5 className="labels-child">Physician</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Type of Entry</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Month</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Year</h5>
-        </Col>
-        <Col>
-          <Button
-            onClick={reset}
-            id="today"
-            className="top-child"
-            variant="primary"
-          >
-            Today
-          </Button>
-        </Col>
-      </Row>
-      <Row className="header">
-        <Col>{adminSelect()}</Col>
-        <Col>{eSelect()}</Col>
-        <Col>
-          <select
-            value={dateContext.format("MMMM")}
-            onChange={onMonthChange}
-            className="top-child month selector"
-          >
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
-          </select>
-        </Col>
-        <Col>
-          <select
-            value={dateContext.format("Y")}
-            onChange={onYearChange}
-            className="top-child year selector"
-          >
-            {yearSelect}
-          </select>
-        </Col>
-        <Col id="smallCol">
-          <p className="vis labels-child"></p>
-        </Col>
-      </Row>
-      <Row className="subheader">
-        <Col>{adminButton()}</Col>
-        <Col>
-          <Button
-            onClick={prevEntry}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextEntry}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-        <Col>
-          <Button
-            onClick={prevMonth}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextMonth}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-        <Col>
-          <Button
-            onClick={prevYear}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextYear}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-        <Col>
-          <p className="vis top-child"></p>
-        </Col>
-      </Row>
-      <Row className="labels1">
-        <Col>
-          <h5 className="labels-child">Physician</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Type of Entry</h5>
-        </Col>
-      </Row>
-      <Row className="header1">
-        <Col>{adminSelect()}</Col>
-        <Col>{eSelect()}</Col>
-      </Row>
-
-      <Row className="subheader1">
-        <Col>{adminButton()}</Col>
-        <Col>
-          <Button
-            onClick={prevEntry}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextEntry}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-      </Row>
-      <Row className="labels2">
-        <Col>
-          <h5 className="labels-child">Month</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Year</h5>
-        </Col>
-      </Row>
-      <Row className="header2">
-        <Col>
-          <select
-            value={dateContext.format("MMMM")}
-            onChange={onMonthChange}
-            className="top-child month selector"
-          >
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
-          </select>
-        </Col>
-        <Col>
-          <select
-            value={dateContext.format("Y")}
-            onChange={onYearChange}
-            className="top-child year selector"
-          >
-            {yearSelect}
-          </select>
-        </Col>
-      </Row>
-      <Row className="subheader2">
-        <Col>
-          <Button
-            onClick={prevMonth}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextMonth}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-        <Col>
-          <Button
-            onClick={prevYear}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextYear}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-      </Row>
-      <div className="curr">
-        <h3 id="pcurr">
-          {dateContext.format("MMMM") + " " + dateContext.format("Y")}
-        </h3>
-        <Button
-          onClick={reset}
-          id="today1"
-          className="top-child"
-          variant="primary"
-        >
-          Today
-        </Button>
+      <div>
+        <Row className="plabels">
+          {publishShow()}
+          <Col>
+            <h5 className="labels-child">Month</h5>
+          </Col>
+          <Col>
+            <h5 className="labels-child">Year</h5>
+          </Col>
+          <Col>
+            <Button
+              onClick={reset}
+              id="today"
+              className="top-child"
+              variant="primary"
+            >
+              Today
+            </Button>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <p></p>
+          </Col>
+          <Col>
+            <select
+              value={dateContext.format("MMMM")}
+              onChange={onMonthChange}
+              className="top-child month selector"
+            >
+              {monthSelect()}
+            </select>
+          </Col>
+          <Col>
+            <select
+              value={dateContext.format("Y")}
+              onChange={onYearChange}
+              className="top-child year selector"
+            >
+              {yearSelect()}
+            </select>
+          </Col>
+          <Col>
+            <p></p>
+          </Col>
+        </Row>
+        <Row className="psubheader">
+          <Col>
+            <p></p>
+          </Col>
+          <Col>
+            <Button
+              onClick={prevMonth}
+              className="arrow top-child"
+              variant="secondary"
+            >
+              &#x25C0;
+            </Button>
+            <Button
+              onClick={nextMonth}
+              className="arrow top-child"
+              variant="secondary"
+            >
+              &#x25B6;
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              onClick={prevYear}
+              className="arrow top-child"
+              variant="secondary"
+            >
+              &#x25C0;
+            </Button>
+            <Button
+              onClick={nextYear}
+              className="arrow top-child"
+              variant="secondary"
+            >
+              &#x25B6;
+            </Button>
+          </Col>
+          <Col>
+            <p></p>
+          </Col>
+        </Row>
       </div>
-
+      <Row className="curr">
+        <Col xl>
+          <h3>{dateContext.format("MMMM") + " " + dateContext.format("Y")}</h3>
+        </Col>
+      </Row>
       <div className="sked">
         <Calendar
-          pending={pending}
-          entries={entries}
+          testisadmin={user.isadmin}
+          numNotes={numNotes}
+          vNotes={vNotes}
+          iNotes={iNotes}
           callList={callList}
-          personalDays={personalDays}
+          entries={entryList}
+          sked={sked}
           holiDays={holiDays}
-          type="Personal"
+          type="Published"
           dateContext={dateContext}
           today={today}
           style={style}
@@ -929,54 +911,116 @@ const PerSchedule = (props) => {
                 colour={false}
                 stamp={stamp}
                 depts={depts}
-                numNotes={[]}
-                vNotes={[]}
-                iNotes={[]}
-                entries={entries}
-                callList={callList}
-                personalDays={personalDays}
+                numNotes={numNotes}
+                vNotes={vNotes}
+                iNotes={iNotes}
                 holiDays={holiDays}
-                type={user.firstname + " " + user.lastname + "'s Personal"}
+                callList={callList}
+                entries={entryList}
+                sked={sked}
+                type="Published"
                 dateContext={dateContext}
-                today={today}
-                style={style}
-                onDayClick={(e, day) => onDayClick(e, day)}
                 user={user}
               />
             }
             fileName={
               dateContext.format("MMMM") +
               dateContext.format("Y") +
-              "pesonalsked.pdf"
+              "publishedsked.pdf"
             }
           >
             {({ loading }) =>
               loading ? (
                 "Loading document..."
               ) : (
-                <span onMouseOver={hoverSpan}>Download as PDF</span>
+                <span onMouseOver={hoverSpan}>
+                  Download as Black & White PDF
+                </span>
+              )
+            }
+          </PDFDownloadLink>
+        </Col>
+        <Col id="downloadLink">
+          <PDFDownloadLink
+            document={
+              <MyDocument
+                colour={true}
+                stamp={stamp}
+                depts={depts}
+                numNotes={numNotes}
+                vNotes={vNotes}
+                iNotes={iNotes}
+                holiDays={holiDays}
+                callList={callList}
+                entries={entryList}
+                sked={sked}
+                type="Published"
+                dateContext={dateContext}
+                user={user}
+              />
+            }
+            fileName={
+              dateContext.format("MMMM") +
+              dateContext.format("Y") +
+              "publishedsked.pdf"
+            }
+          >
+            {({ loading }) =>
+              loading ? (
+                "Loading document..."
+              ) : (
+                <span onMouseOver={hoverSpan}>Download as Colour PDF</span>
               )
             }
           </PDFDownloadLink>
         </Col>
       </div>
-
+      {adminDownload()}
       <div className="modal">
-        <Modal show={show} onHide={toggleShow}>
+        <Modal show={show} onHide={() => setShow(!show)}>
           <Modal.Header closeButton>
-            <Modal.Title id="modalTitle">Select Call Type</Modal.Title>
+            <Modal.Title id="modalTitle">
+              {dateContext.format("MMMM") +
+                " " +
+                day +
+                " " +
+                dateContext.format("Y")}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <ul>{modalList}</ul>
+            <ul>{noteList}</ul>
+            {adminNotes()}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShow(!show)}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+      <div className="modal">
+        <Modal show={nShow} onHide={toggleNote}>
+          <Modal.Header closeButton>
+            <Modal.Title id="modalTitle">Edit Note</Modal.Title>
           </Modal.Header>
           <Form>
             <Modal.Body>
-              <Form.Group onChange={radioChange} controlId="formBasicRadio">
-                {radioSelect}
+              <Form.Group id="note">
+                <Form.Control
+                  required
+                  value={msg}
+                  onChange={onMsgChange}
+                  type="text"
+                  placeholder="Note"
+                />
               </Form.Group>
             </Modal.Body>
             <Modal.Footer>
-              <Button onClick={toggleShow} variant="secondary">
+              <Button variant="secondary" onClick={toggleNote}>
                 Close
               </Button>
-              <Button onClick={() => assignOrDelete(radio)} variant="primary">
+              <Button onClick={() => editNote(id)} variant="primary">
                 Submit
               </Button>
             </Modal.Footer>
@@ -987,4 +1031,4 @@ const PerSchedule = (props) => {
   );
 };
 
-export default PerSchedule;
+export default PubSchedule;
