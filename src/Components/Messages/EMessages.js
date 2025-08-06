@@ -3,6 +3,7 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import moment from "moment";
+import { dateStyler, sortDates } from "../../utils";
 import "./Messages.css";
 
 class EMessages extends React.Component {
@@ -85,125 +86,6 @@ class EMessages extends React.Component {
     }
   };
 
-  dateStyler = (dates) => {
-    let splitArr = [];
-    let flag = false;
-    if (dates.length === 1) {
-      splitArr = dates[0].split("/");
-      return (
-        "on " +
-        this.months[splitArr[0] - 1] +
-        " " +
-        splitArr[1] +
-        ", " +
-        splitArr[2]
-      );
-    }
-
-    for (let i = 0; i < dates.length; i++) {
-      if (dates[i].charAt(4) === "/") {
-        dates[i] = dates[i].substring(0, 3) + "0" + dates[i].substring(3);
-      }
-    }
-
-    dates.sort(function (a, b) {
-      return a.substring(3, 5) - b.substring(3, 5);
-    });
-
-    for (let i = 0; i < dates.length; i++) {
-      splitArr.push(dates[i].split("/"));
-    }
-
-    for (let n = 1; n < splitArr.length; n++) {
-      if (
-        splitArr[n][0] !== splitArr[n - 1][0] ||
-        splitArr[n][1] - 1 !== parseInt(splitArr[n - 1][1], 10) ||
-        splitArr[n][2] !== splitArr[n - 1][2]
-      ) {
-        flag = true;
-        break;
-      }
-    }
-
-    if (flag) {
-      let str =
-        "on " +
-        this.months[splitArr[0][0] - 1] +
-        " " +
-        splitArr[0][1] +
-        ", " +
-        splitArr[0][2];
-      for (let j = 1; j < splitArr.length; j++) {
-        str =
-          str +
-          ", " +
-          this.months[splitArr[j][0] - 1] +
-          " " +
-          splitArr[j][1] +
-          ", " +
-          splitArr[j][2];
-      }
-      return str;
-    }
-
-    return (
-      "from " +
-      this.months[splitArr[0][0] - 1] +
-      " " +
-      splitArr[0][1] +
-      ", " +
-      splitArr[0][2] +
-      " - " +
-      this.months[splitArr[splitArr.length - 1][0] - 1] +
-      " " +
-      splitArr[splitArr.length - 1][1] +
-      ", " +
-      splitArr[splitArr.length - 1][2]
-    );
-  };
-
-  sortDates = (arr) => {
-    let list = [...arr];
-    let index = 0;
-    let currDate = [];
-    let newDate = [];
-    let temp;
-    let len = list.length;
-    let flag = false;
-
-    for (let i = 0; i < len - 1; i++) {
-      index = i;
-      currDate = list[i].stamp.split("/");
-      for (let j = i + 1; j < len; j++) {
-        flag = false;
-        newDate = list[j].stamp.split("/");
-        if (parseInt(newDate[2], 10) > parseInt(currDate[2], 10)) {
-          flag = true;
-        } else if (parseInt(newDate[2], 10) === parseInt(currDate[2], 10)) {
-          if (parseInt(newDate[0], 10) > parseInt(currDate[0], 10)) {
-            flag = true;
-          } else if (
-            parseInt(newDate[0], 10) === parseInt(currDate[0], 10) &&
-            parseInt(newDate[1], 10) > parseInt(currDate[1], 10)
-          ) {
-            flag = true;
-          }
-        }
-
-        if (flag) {
-          index = j;
-          currDate = list[j].stamp.split("/");
-        }
-      }
-      if (index !== i) {
-        temp = list[i];
-        list[i] = list[index];
-        list[index] = temp;
-      }
-    }
-    return list;
-  };
-
   deleteMessage = (id, deleted) => {
     fetch("https://secure-earth-82827.herokuapp.com/messages", {
       method: "delete",
@@ -227,7 +109,7 @@ class EMessages extends React.Component {
 
     let msgs = [...messages];
 
-    msgs = this.sortDates(msgs);
+    msgs = sortDates(msgs);
 
     let msgList = [];
 
@@ -239,7 +121,7 @@ class EMessages extends React.Component {
               Peter Menikefs{" "}
               <span className={msgs[j].status}>{msgs[j].status}</span> your
               request for {this.entryIdToName(msgs[j].entryid)}{" "}
-              {this.dateStyler(msgs[j].dates)}
+              {dateStyler(msgs[j].dates)}
             </ListGroup.Item>
             <ListGroup.Item className="edates list">
               {msgs[j].stamp}
@@ -267,7 +149,7 @@ class EMessages extends React.Component {
               Peter Menikefs{" "}
               <span className={msgs[j].status}>{msgs[j].status}</span> your
               request for {this.entryIdToName(msgs[j].entryid)}{" "}
-              {this.dateStyler(msgs[j].dates)}
+              {dateStyler(msgs[j].dates)}
             </ListGroup.Item>
             <ListGroup.Item className="edates list">
               {msgs[j].stamp}
@@ -294,8 +176,7 @@ class EMessages extends React.Component {
             >
               Peter Menikefs responded with{" "}
               <span className="maybed">maybe</span> to your request for{" "}
-              {this.entryIdToName(msgs[j].entryid)}{" "}
-              {this.dateStyler(msgs[j].dates)}
+              {this.entryIdToName(msgs[j].entryid)} {dateStyler(msgs[j].dates)}
             </ListGroup.Item>
             <ListGroup.Item className="edates list">
               {msgs[j].stamp2}
