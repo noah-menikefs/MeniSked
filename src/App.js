@@ -67,14 +67,7 @@ const App = () => {
           />
         );
       case "Master Schedule":
-        return (
-          <PubSchedule
-            loadCallTypes={loadCallTypes}
-            callList={callList}
-            today={today}
-            user={user}
-          />
-        );
+        return <PubSchedule callList={callList} today={today} user={user} />;
       case "Call Schedule":
         return (
           <CSchedule
