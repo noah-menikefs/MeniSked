@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -6,513 +6,412 @@ import Form from "react-bootstrap/Form";
 import { dateStyler, sortDates } from "../../utils";
 import "./Messages.css";
 
-class AMessages extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      show: false,
-      msg: "",
-      dshow: false,
-      messages: [],
-      filteredMsgs: [],
-      peopleList: [],
-      entryList: [],
-      callList: [],
-      ctr: 10,
-      id: -1,
-      mshow: false,
-    };
-  }
+const AMessages = ({ today, entryList, peopleList, callList }) => {
+  const [show, setShow] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [dshow, setDShow] = useState(false);
+  const [mshow, setMShow] = useState(false);
+  const [id, setId] = useState(-1);
+  const [ctr, setCtr] = useState(10);
 
-  componentDidMount = () => {
-    this.loadMessages();
-    this.loadUsers();
-    this.loadEntries();
-    this.loadCallTypes();
-  };
+  const [messages, setMessages] = useState([]);
+  const [filteredMsgs, setFilteredMsgs] = useState([]);
 
-  loadMessages = () => {
+  // Loaders
+  const loadMessages = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/amessages")
-      .then((response) => response.json())
-      .then((messages) =>
-        this.setState({
-          messages: messages.filter((message) => message.deleted !== "A"),
-          filteredMsgs: messages.filter((message) => message.deleted !== "A"),
-        })
-      );
-  };
+      .then((res) => res.json())
+      .then((msgs) => {
+        const filtered = msgs.filter((m) => m.deleted !== "A");
+        setMessages(filtered);
+        setFilteredMsgs(filtered);
+      });
+  }, []);
 
-  loadUsers = () => {
-    fetch("https://secure-earth-82827.herokuapp.com/people")
-      .then((response) => response.json())
-      .then((users) => this.setState({ peopleList: users }));
-  };
+  useEffect(() => {
+    loadMessages();
+  }, [loadMessages]);
 
-  loadEntries = () => {
-    fetch("https://secure-earth-82827.herokuapp.com/sked/entries")
-      .then((response) => response.json())
-      .then((entries) => this.setState({ entryList: entries }));
-  };
-
-  loadCallTypes = () => {
-    fetch("https://secure-earth-82827.herokuapp.com/callTypes")
-      .then((response) => response.json())
-      .then((calls) => this.setState({ callList: calls }));
-  };
-
-  respond = (id, status) => {
+  // Respond
+  const respond = (reqId, status) => {
     fetch("https://secure-earth-82827.herokuapp.com/amessages", {
-      method: "put",
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: id,
-        status: status,
-        msg: this.state.msg,
-        stamp: this.props.today.format("MM/DD/YYYY"),
+        id: reqId,
+        status,
+        msg,
+        stamp: today.format("MM/DD/YYYY"),
       }),
     })
-      .then((response) => response.json())
-      .then((message) => {
-        if (message) {
-          this.loadMessages();
-        }
+      .then((res) => res.json())
+      .then((res) => {
+        if (res) loadMessages();
       });
+
     if (status === "accepted") {
-      this.accept(id);
+      accept(reqId);
     }
-    this.setState({
-      msg: "",
-      show: false,
-    });
+
+    setMsg("");
+    setShow(false);
   };
 
-  accept = (id) => {
+  const accept = (reqId) => {
     fetch("https://secure-earth-82827.herokuapp.com/arequest", {
-      method: "put",
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: id,
-      }),
+      body: JSON.stringify({ id: reqId }),
     })
-      .then((response) => response.json())
+      .then((res) => res.json())
       .then((user) => {
-        if (user.lastname) {
-          this.loadMessages();
-        }
+        if (user.lastname) loadMessages();
       });
   };
 
-  toggleShow = (id = -1) => {
-    this.setState({
-      show: !this.state.show,
-      msg: "",
-      id: id,
-    });
+  const deleteMessage = useCallback(
+    (id, deleted) => {
+      fetch("https://secure-earth-82827.herokuapp.com/messages", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          deleted,
+          user: "A",
+        }),
+      })
+        .then((res) => res.json())
+        .then((message) => {
+          if (message) {
+            loadMessages();
+          }
+        });
+    },
+    [loadMessages]
+  );
+
+  const maybeResponse = useCallback(
+    (id) => {
+      fetch("https://secure-earth-82827.herokuapp.com/messages", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          msg2: msg,
+          stamp2: today.format("MM/DD/YYYY"),
+        }),
+      })
+        .then((res) => res.json())
+        .then((message) => {
+          if (message) {
+            loadMessages();
+          }
+        });
+
+      setMsg("");
+      setMShow(false);
+      setId(-1);
+    },
+    [msg, today, loadMessages]
+  );
+
+  // Toggle Modals
+  const toggleShow = (reqId = -1) => {
+    setShow((prev) => !prev);
+    setMsg("");
+    setId(reqId);
   };
 
-  toggleMShow = (id = -1) => {
-    this.setState({
-      mshow: !this.state.mshow,
-      msg: "",
-      id: id,
-    });
+  const toggleMShow = (reqId = -1) => {
+    setMShow((prev) => !prev);
+    setMsg("");
+    setId(reqId);
   };
 
-  toggleDShow = (route) => {
-    this.setState({
-      dshow: !this.state.dshow,
-      msg: route,
-    });
+  const toggleDShow = (text = "") => {
+    setDShow((prev) => !prev);
+    setMsg(text);
   };
 
-  onMsgChange = (event) => {
-    this.setState({ msg: event.target.value });
-  };
+  // Message input handler
+  const onMsgChange = (e) => setMsg(e.target.value);
 
-  docIdToName = (id) => {
-    const { peopleList } = this.state;
-    id = parseInt(id, 10);
-    for (let i = 0; i < peopleList.length; i++) {
-      if (id === peopleList[i].id) {
-        return peopleList[i].firstname + " " + peopleList[i].lastname;
+  const docIdToName = useCallback(
+    (id) => {
+      id = parseInt(id, 10);
+      const doc = peopleList.find((p) => p.id === id);
+      return doc ? `${doc.firstname} ${doc.lastname}` : "";
+    },
+    [peopleList]
+  );
+
+  const entryIdToName = useCallback(
+    (id) => {
+      id = parseInt(id, 10);
+      const combined = [...entryList, ...callList];
+      const match = combined.find((item) => item.id === id);
+      return match?.name || "";
+    },
+    [entryList, callList]
+  );
+
+  const showMore = () => setCtr((prev) => prev + 10);
+
+  const filter = useCallback(
+    (doc) => {
+      if (doc === "All") {
+        setFilteredMsgs(messages);
+      } else {
+        setFilteredMsgs(
+          messages.filter((m) => parseInt(m.docid, 10) === doc.id)
+        );
       }
+    },
+    [messages]
+  );
+
+  const onPhysicianChange = (event) => {
+    const selected = event.target.value;
+    if (selected !== "All") {
+      const match = peopleList.find((p) => p.lastname === selected);
+      if (match) filter(match);
+    } else {
+      filter("All");
     }
   };
 
-  entryIdToName = (id) => {
-    id = parseInt(id, 10);
-    const arr = [...this.state.entryList, ...this.state.callList];
-    for (let i = 0; i < arr.length; i++) {
-      if (id === arr[i].id) {
-        return arr[i].name;
-      }
-    }
-  };
+  const pends = useMemo(
+    () => sortDates(messages.filter((m) => m.status === "pending")),
+    [messages]
+  );
+  const past = useMemo(
+    () =>
+      sortDates(filteredMsgs.filter((m) => m.status !== "pending" || m.maybe)),
+    [filteredMsgs]
+  );
 
-  showMore = () => {
-    this.setState({ ctr: this.state.ctr + 10 });
-  };
-
-  showButton = (length) => {
-    if (this.state.ctr < length) {
-      return (
-        <Button onClick={this.showMore} className="showMore" variant="primary">
-          Show More
+  const pendingList = pends.map((msg, index) => (
+    <ListGroup key={index} horizontal>
+      <ListGroup.Item className="pend list" action>
+        <p className="requestList">
+          {docIdToName(msg.docid)} has requested {entryIdToName(msg.entryid)}{" "}
+          {dateStyler(msg.dates)}
+        </p>
+        <Button
+          onClick={() => respond(msg.id, "accepted")}
+          className="accept"
+          size="sm"
+          variant="success"
+        >
+          Accept
         </Button>
-      );
-    }
-  };
+        <Button
+          onClick={() => toggleShow(msg.id)}
+          className="deny"
+          size="sm"
+          variant="danger"
+        >
+          Deny
+        </Button>
+        {!msg.maybe && (
+          <Button
+            onClick={() => toggleMShow(msg.id)}
+            className="mby"
+            size="sm"
+            variant="warning"
+          >
+            Maybe
+          </Button>
+        )}
+      </ListGroup.Item>
+      <ListGroup.Item className="dates list">{msg.stamp}</ListGroup.Item>
+    </ListGroup>
+  ));
 
-  onPhysicianChange = (event) => {
-    const { peopleList } = this.state;
-    if (event.target.value !== "All") {
-      let index = -1;
-      for (let i = 0; i < peopleList.length; i++) {
-        if (peopleList[i].lastname === event.target.value) {
-          index = i;
-          break;
-        }
-      }
-      this.filter(peopleList[index]);
-    } else {
-      this.filter("All");
-    }
-  };
+  const pastList = past.slice(0, ctr).map((msg, index) => {
+    const docName = docIdToName(msg.docid);
+    const entryName = entryIdToName(msg.entryid);
+    const dateText = dateStyler(msg.dates);
 
-  filter = (doc) => {
-    const { messages } = this.state;
-    if (doc === "All") {
-      this.setState({ filteredMsgs: messages });
-    } else {
-      this.setState({
-        filteredMsgs: messages.filter(
-          (message) => parseInt(message.docid, 10) === doc.id
-        ),
-      });
-    }
-  };
-
-  deleteMessage = (id, deleted) => {
-    fetch("https://secure-earth-82827.herokuapp.com/messages", {
-      method: "delete",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: id,
-        deleted: deleted,
-        user: "A",
-      }),
-    })
-      .then((response) => response.json())
-      .then((message) => {
-        if (message) {
-          this.loadMessages();
-        }
-      });
-  };
-
-  maybeResponse = (id) => {
-    fetch("https://secure-earth-82827.herokuapp.com/messages", {
-      method: "put",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: id,
-        msg2: this.state.msg,
-        stamp2: this.props.today.format("MM/DD/YYYY"),
-      }),
-    })
-      .then((response) => response.json())
-      .then((message) => {
-        if (message) {
-          this.loadMessages();
-        }
-      });
-    this.setState({
-      msg: "",
-      mshow: false,
-      id: -1,
-    });
-  };
-
-  render() {
-    const { show, dshow, msg, messages, ctr, peopleList, filteredMsgs, mshow } =
-      this.state;
-    let pendingList = [];
-    let pastList = [];
-    let pends = [];
-    let past = [];
-    for (let i = 0; i < messages.length; i++) {
-      if (messages[i].status === "pending") {
-        pends.push(messages[i]);
-      }
-    }
-    for (let i = 0; i < filteredMsgs.length; i++) {
-      if (filteredMsgs[i].status !== "pending" || filteredMsgs[i].maybe) {
-        past.push(filteredMsgs[i]);
-      }
-    }
-
-    pends = sortDates(pends);
-    past = sortDates(past);
-
-    for (let n = 0; n < pends.length; n++) {
-      if (!pends[n].maybe) {
-        pendingList.push(
-          <ListGroup key={n} horizontal>
-            <ListGroup.Item className="pend list" action>
-              <p className="requestList">
-                {this.docIdToName(pends[n].docid)} has requested{" "}
-                {this.entryIdToName(pends[n].entryid)}{" "}
-                {dateStyler(pends[n].dates)}
-              </p>
-              <Button
-                onClick={() => this.respond(pends[n].id, "accepted")}
-                className="accept"
-                size="sm"
-                variant="success"
-              >
-                Accept
-              </Button>
-              <Button
-                onClick={() => this.toggleShow(pends[n].id)}
-                className="deny"
-                size="sm"
-                variant="danger"
-              >
-                Deny
-              </Button>
-              <Button
-                onClick={() => this.toggleMShow(pends[n].id)}
-                className="mby"
-                size="sm"
-                variant="warning"
-              >
-                Maybe
-              </Button>
-            </ListGroup.Item>
-            <ListGroup.Item className="dates list">
-              {pends[n].stamp}
-            </ListGroup.Item>
-          </ListGroup>
-        );
-      } else {
-        pendingList.push(
-          <ListGroup key={n} horizontal>
-            <ListGroup.Item className="pend list" action>
-              <p className="requestList">
-                {this.docIdToName(pends[n].docid)} has requested{" "}
-                {this.entryIdToName(pends[n].entryid)}{" "}
-                {dateStyler(pends[n].dates)}
-              </p>
-              <Button
-                onClick={() => this.respond(pends[n].id, "accepted")}
-                className="accept"
-                size="sm"
-                variant="success"
-              >
-                Accept
-              </Button>
-              <Button
-                onClick={() => this.toggleShow(pends[n].id)}
-                className="deny"
-                size="sm"
-                variant="danger"
-              >
-                Deny
-              </Button>
-            </ListGroup.Item>
-            <ListGroup.Item className="dates list">
-              {pends[n].stamp}
-            </ListGroup.Item>
-          </ListGroup>
-        );
-      }
-    }
-
-    for (let j = 0; j < Math.min(past.length, ctr); j++) {
-      if (past[j].status === "accepted") {
-        pastList.push(
-          <ListGroup key={j} horizontal>
-            <ListGroup.Item className="past list" action disabled>
-              You <span className="accepted">accepted</span>{" "}
-              {this.docIdToName(past[j].docid)}'s request for{" "}
-              {this.entryIdToName(past[j].entryid)} {dateStyler(past[j].dates)}
-            </ListGroup.Item>
-            <ListGroup.Item className="edates list">
-              {past[j].stamp}
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Button
-                onClick={() => this.deleteMessage(past[j].id, past[j].deleted)}
-                className="deletemsg"
-                size="sm"
-                variant="danger"
-              >
-                Delete
-              </Button>
-            </ListGroup.Item>
-          </ListGroup>
-        );
-      } else if (past[j].status === "denied") {
-        pastList.push(
-          <ListGroup key={j} horizontal>
-            <ListGroup.Item
-              className="past list"
-              action
-              onClick={() => this.toggleDShow(past[j].msg)}
-            >
-              You <span className="denied">denied</span>{" "}
-              {this.docIdToName(past[j].docid)}'s request for{" "}
-              {this.entryIdToName(past[j].entryid)} {dateStyler(past[j].dates)}
-            </ListGroup.Item>
-            <ListGroup.Item className="edates list">
-              {past[j].stamp}
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Button
-                onClick={() => this.deleteMessage(past[j].id, past[j].deleted)}
-                className="deletemsg"
-                size="sm"
-                variant="danger"
-              >
-                Delete
-              </Button>
-            </ListGroup.Item>
-          </ListGroup>
-        );
-      } else {
-        pastList.push(
-          <ListGroup key={j} horizontal>
-            <ListGroup.Item
-              className="past list"
-              action
-              onClick={() => this.toggleDShow(past[j].msg2)}
-            >
-              You responded with <span className="maybed">maybe</span> to{" "}
-              {this.docIdToName(past[j].docid)}'s request for{" "}
-              {this.entryIdToName(past[j].entryid)} {dateStyler(past[j].dates)}
-            </ListGroup.Item>
-            <ListGroup.Item className="edates list">
-              {past[j].stamp2}
-            </ListGroup.Item>
-          </ListGroup>
-        );
-      }
-    }
-
-    let docSelect = peopleList.map((doc, i) => {
+    if (msg.status === "accepted") {
       return (
-        <option key={i} value={doc.lastname}>
-          {doc.lastname}
-        </option>
+        <ListGroup key={index} horizontal>
+          <ListGroup.Item className="past list" action disabled>
+            You <span className="accepted">accepted</span> {docName}'s request
+            for {entryName} {dateText}
+          </ListGroup.Item>
+          <ListGroup.Item className="edates list">{msg.stamp}</ListGroup.Item>
+          <ListGroup.Item>
+            <Button
+              onClick={() => deleteMessage(msg.id, msg.deleted)}
+              className="deletemsg"
+              size="sm"
+              variant="danger"
+            >
+              Delete
+            </Button>
+          </ListGroup.Item>
+        </ListGroup>
       );
-    });
+    }
 
-    docSelect.unshift(
-      <option key={-1} value="All">
-        All
-      </option>
-    );
+    if (msg.status === "denied") {
+      return (
+        <ListGroup key={index} horizontal>
+          <ListGroup.Item
+            className="past list"
+            action
+            onClick={() => toggleDShow(msg.msg)}
+          >
+            You <span className="denied">denied</span> {docName}'s request for{" "}
+            {entryName} {dateText}
+          </ListGroup.Item>
+          <ListGroup.Item className="edates list">{msg.stamp}</ListGroup.Item>
+          <ListGroup.Item>
+            <Button
+              onClick={() => deleteMessage(msg.id, msg.deleted)}
+              className="deletemsg"
+              size="sm"
+              variant="danger"
+            >
+              Delete
+            </Button>
+          </ListGroup.Item>
+        </ListGroup>
+      );
+    }
 
     return (
-      <div>
-        <h4 className="requests">Pending</h4>
-        <div className="listStyleA">{pendingList}</div>
-        <div className="titleDropdown">
-          <h4 className="past requests">Past Requests</h4>
-          <span className="filter">
-            <h5 className="filtertitle">Filter: </h5>
-            <select
-              onChange={this.onPhysicianChange}
-              className="dropdownfilter"
-            >
-              {docSelect}
-            </select>
-          </span>
+      <ListGroup key={index} horizontal>
+        <ListGroup.Item
+          className="past list"
+          action
+          onClick={() => toggleDShow(msg.msg2)}
+        >
+          You responded with <span className="maybed">maybe</span> to {docName}
+          's request for {entryName} {dateText}
+        </ListGroup.Item>
+        <ListGroup.Item className="edates list">{msg.stamp2}</ListGroup.Item>
+      </ListGroup>
+    );
+  });
+
+  const docSelect = [
+    <option key={-1} value="All">
+      All
+    </option>,
+    ...peopleList.map((doc, i) => (
+      <option key={i} value={doc.lastname}>
+        {doc.lastname}
+      </option>
+    )),
+  ];
+
+  return (
+    <div>
+      <h4 className="requests">Pending</h4>
+      <div className="listStyleA">{pendingList}</div>
+
+      <div className="titleDropdown">
+        <h4 className="past requests">Past Requests</h4>
+        <span className="filter">
+          <h5 className="filtertitle">Filter: </h5>
+          <select onChange={onPhysicianChange} className="dropdownfilter">
+            {docSelect}
+          </select>
+        </span>
+      </div>
+
+      <div className="listStyleE">{pastList}</div>
+
+      {past.length > ctr && (
+        <div>
+          <Button onClick={showMore} className="showMore" variant="primary">
+            Show More
+          </Button>
         </div>
-        <div className="listStyleE">{pastList}</div>
-        <div>{this.showButton(past.length)}</div>
-        <div className="modal">
-          <Modal show={show} onHide={this.toggleShow}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">
-                Denied Request Explanation
-              </Modal.Title>
-            </Modal.Header>
-            <Form>
-              <Modal.Body>
-                <Form.Group controlId="exampleForm.ControlTextarea1">
-                  <Form.Control
-                    onChange={this.onMsgChange}
-                    as="textarea"
-                    rows="4"
-                  />
-                </Form.Group>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button onClick={this.toggleShow} variant="secondary">
-                  Close
-                </Button>
-                <Button
-                  onClick={() => this.respond(this.state.id, "denied")}
-                  variant="primary"
-                >
-                  Submit
-                </Button>
-              </Modal.Footer>
-            </Form>
-          </Modal>
-        </div>
-        <div className="modal">
-          <Modal show={dshow} onHide={() => this.toggleDShow("")}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">
-                Maybe/Denied Request Explanation
-              </Modal.Title>
-            </Modal.Header>
+      )}
+
+      {/* Denied Request Modal */}
+      <div className="modal">
+        <Modal show={show} onHide={() => toggleShow()}>
+          <Modal.Header closeButton>
+            <Modal.Title id="modalTitle">
+              Denied Request Explanation
+            </Modal.Title>
+          </Modal.Header>
+          <Form>
             <Modal.Body>
-              <p>{msg}</p>
+              <Form.Group controlId="exampleForm.ControlTextarea1">
+                <Form.Control
+                  value={msg}
+                  onChange={onMsgChange}
+                  as="textarea"
+                  rows="4"
+                />
+              </Form.Group>
             </Modal.Body>
             <Modal.Footer>
-              <Button onClick={() => this.toggleDShow("")} variant="secondary">
+              <Button onClick={() => toggleShow()} variant="secondary">
                 Close
               </Button>
+              <Button onClick={() => respond(id, "denied")} variant="primary">
+                Submit
+              </Button>
             </Modal.Footer>
-          </Modal>
-        </div>
-        <div className="modal">
-          <Modal show={mshow} onHide={this.toggleMShow}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">
-                Maybe Request Explanation
-              </Modal.Title>
-            </Modal.Header>
-            <Form>
-              <Modal.Body>
-                <Form.Group controlId="exampleForm.ControlTextarea1">
-                  <Form.Control
-                    onChange={this.onMsgChange}
-                    as="textarea"
-                    rows="4"
-                  />
-                </Form.Group>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button onClick={this.toggleMShow} variant="secondary">
-                  Close
-                </Button>
-                <Button
-                  onClick={() => this.maybeResponse(this.state.id)}
-                  variant="primary"
-                >
-                  Submit
-                </Button>
-              </Modal.Footer>
-            </Form>
-          </Modal>
-        </div>
+          </Form>
+        </Modal>
       </div>
-    );
-  }
-}
+
+      {/* Denied / Maybe Explanation Modal */}
+      <div className="modal">
+        <Modal show={dshow} onHide={() => toggleDShow("")}>
+          <Modal.Header closeButton>
+            <Modal.Title id="modalTitle">
+              Maybe/Denied Request Explanation
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>{msg}</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={() => toggleDShow("")} variant="secondary">
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+
+      {/* Maybe Response Modal */}
+      <div className="modal">
+        <Modal show={mshow} onHide={() => toggleMShow()}>
+          <Modal.Header closeButton>
+            <Modal.Title id="modalTitle">Maybe Request Explanation</Modal.Title>
+          </Modal.Header>
+          <Form>
+            <Modal.Body>
+              <Form.Group controlId="exampleForm.ControlTextarea1">
+                <Form.Control
+                  value={msg}
+                  onChange={onMsgChange}
+                  as="textarea"
+                  rows="4"
+                />
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={() => toggleMShow()} variant="secondary">
+                Close
+              </Button>
+              <Button onClick={() => maybeResponse(id)} variant="primary">
+                Submit
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      </div>
+    </div>
+  );
+};
 
 export default AMessages;

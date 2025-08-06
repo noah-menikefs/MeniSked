@@ -559,14 +559,12 @@ const PerSchedule = (props) => {
   useEffect(() => {
     loadActiveDocs();
     loadEntries();
-    props.loadCallTypes();
     loadrHolidays();
     loadnrHolidays();
     loadDepts();
   }, [
     loadActiveDocs,
     loadEntries,
-    props.loadCallTypes,
     loadrHolidays,
     loadnrHolidays,
     loadDepts,

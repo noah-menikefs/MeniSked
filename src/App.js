@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect, useMemo } from "react";
 import Navigation from "./Components/Navigation/Navigation";
 import Login from "./Components/Login/Login";
 import Register from "./Components/Login/Register";
@@ -28,11 +28,13 @@ const initialUser = {
 };
 
 const App = () => {
-  const today = moment();
+  const today = useMemo(() => moment(), []);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [route, setRoute] = useState("Login");
   const [callList, setCallList] = useState([]);
   const [user, setUser] = useState(initialUser);
+  const [entryList, setEntryList] = useState([]);
+  const [peopleList, setPeopleList] = useState([]);
 
   const loadUser = useCallback((data) => {
     setUser({
@@ -46,43 +48,50 @@ const App = () => {
     setIsSignedIn(signedIn);
   }, []);
 
-  const loadCallTypes = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/callTypes")
-      .then((response) => response.json())
-      .then((calls) =>
-        setCallList(calls.sort((a, b) => a.priority - b.priority))
-      );
+  useEffect(() => {
+    const fetchSharedData = async () => {
+      const [entriesRes, peopleRes, callTypesRes] = await Promise.all([
+        fetch("https://secure-earth-82827.herokuapp.com/sked/entries"),
+        fetch("https://secure-earth-82827.herokuapp.com/people"),
+        fetch("https://secure-earth-82827.herokuapp.com/callTypes"),
+      ]);
+      const [entries, people, calls] = await Promise.all([
+        entriesRes.json(),
+        peopleRes.json(),
+        callTypesRes.json(),
+      ]);
+      setEntryList(entries);
+      setPeopleList(people);
+      setCallList(calls.sort((a, b) => a.priority - b.priority));
+    };
+
+    fetchSharedData();
   }, []);
 
   //used for rendering when signed in
   const inRenderSwitch = (route) => {
     switch (route) {
       case "Personal Schedule":
-        return (
-          <PerSchedule
-            loadCallTypes={loadCallTypes}
-            callList={callList}
-            today={today}
-            user={user}
-          />
-        );
+        return <PerSchedule callList={callList} today={today} user={user} />;
       case "Master Schedule":
         return <PubSchedule callList={callList} today={today} user={user} />;
       case "Call Schedule":
-        return (
-          <CSchedule
-            loadCallTypes={loadCallTypes}
-            callList={callList}
-            today={today}
-            user={user}
-          />
-        );
+        return <CSchedule callList={callList} today={today} user={user} />;
       case "Account Information":
         return <Account loadUser={loadUser} user={user} />;
       case "Admin Messages":
-        return <AMessages user={user} today={today} />;
+        return (
+          <AMessages
+            today={today}
+            entryList={entryList}
+            peopleList={peopleList}
+            callList={callList}
+          />
+        );
       case "Messages":
-        return <EMessages user={user} />;
+        return (
+          <EMessages user={user} entryList={entryList} callList={callList} />
+        );
       case "Holidays":
         return <Holidays today={today} />;
       case "Call Types":

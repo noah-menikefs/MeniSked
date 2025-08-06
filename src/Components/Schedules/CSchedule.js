@@ -28,7 +28,7 @@ const CSchedule = (props) => {
   const [depts, setDepts] = useState([]);
   const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
 
-  const { today, user, callList, loadCallTypes } = props;
+  const { today, user, callList } = props;
 
   const priorityCheck = useCallback(
     (id) => {
@@ -90,10 +90,9 @@ const CSchedule = (props) => {
   useEffect(() => {
     loadrHolidays();
     loadnrHolidays();
-    loadCallTypes();
     loadCallSked();
     loadDepts();
-  }, [loadCallSked, loadCallTypes, loadnrHolidays, loadrHolidays, loadDepts]);
+  }, [loadCallSked, loadnrHolidays, loadrHolidays, loadDepts]);
 
   const loadNewDays = (ctx) => {
     let newArr = [];
