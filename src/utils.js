@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const validateEmail = (str) => {
   const [local, domain] = str.split("@");
   if (!domain) return false;
@@ -7,9 +9,10 @@ export const validateEmail = (str) => {
 };
 
 export const dateStyler = (dates) => {
+  const months = moment.months();
   if (dates.length === 1) {
     const [month, day, year] = dates[0].split("/");
-    return `on ${this.months[month - 1]} ${day}, ${year}`;
+    return `on ${months[month - 1]} ${day}, ${year}`;
   }
 
   // Normalize single-digit days to two digits (e.g., 4/1/2023 → 4/01/2023)
@@ -44,9 +47,7 @@ export const dateStyler = (dates) => {
     return (
       "on " +
       parsedDates
-        .map(
-          ([month, day, year]) => `${this.months[month - 1]} ${day}, ${year}`
-        )
+        .map(([month, day, year]) => `${months[month - 1]} ${day}, ${year}`)
         .join(", ")
     );
   }
@@ -54,8 +55,8 @@ export const dateStyler = (dates) => {
   const [startMonth, startDay, startYear] = parsedDates[0];
   const [endMonth, endDay, endYear] = parsedDates[parsedDates.length - 1];
 
-  return `from ${this.months[startMonth - 1]} ${startDay}, ${startYear} - ${
-    this.months[endMonth - 1]
+  return `from ${months[startMonth - 1]} ${startDay}, ${startYear} - ${
+    months[endMonth - 1]
   } ${endDay}, ${endYear}`;
 };
 

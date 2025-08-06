@@ -2,7 +2,6 @@ import React from "react";
 import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import moment from "moment";
 import { dateStyler, sortDates } from "../../utils";
 import "./Messages.css";
 
@@ -52,8 +51,6 @@ class EMessages extends React.Component {
       .then((response) => response.json())
       .then((calls) => this.setState({ callList: calls }));
   };
-
-  months = moment.months(); // List of each month
 
   toggleShow = (route) => {
     this.setState({

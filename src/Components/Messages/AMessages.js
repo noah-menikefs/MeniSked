@@ -3,7 +3,6 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
-import moment from "moment";
 import { dateStyler, sortDates } from "../../utils";
 import "./Messages.css";
 
@@ -31,8 +30,6 @@ class AMessages extends React.Component {
     this.loadEntries();
     this.loadCallTypes();
   };
-
-  months = moment.months(); // List of each month
 
   loadMessages = () => {
     fetch("https://secure-earth-82827.herokuapp.com/amessages")
