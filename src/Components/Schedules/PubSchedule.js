@@ -142,34 +142,37 @@ const PubSchedule = (props) => {
       .then((holidays) => setNRHolidayList(holidays));
   }, []);
 
-  const loadNewDays = useCallback((dateContext) => {
-    let newArr = [];
-    nrHolidayList.forEach((nholiday) => {
-      nholiday.eventsked.forEach((date) => {
-        let dateArr = date.split("/");
-        if (
-          dateArr[0] === dateContext.format("MM") &&
-          dateArr[2] === dateContext.format("YYYY")
-        ) {
+  const loadNewDays = useCallback(
+    (dateContext) => {
+      let newArr = [];
+      nrHolidayList.forEach((nholiday) => {
+        nholiday.eventsked.forEach((date) => {
+          let dateArr = date.split("/");
+          if (
+            dateArr[0] === dateContext.format("MM") &&
+            dateArr[2] === dateContext.format("YYYY")
+          ) {
+            newArr.push({
+              day: parseInt(dateArr[1], 10),
+              name: nholiday.name,
+            });
+          }
+        });
+      });
+
+      rHolidayList.forEach((holiday) => {
+        if (holiday.month === dateContext.format("MMMM")) {
           newArr.push({
-            day: parseInt(dateArr[1], 10),
-            name: nholiday.name,
+            day: holiday.day,
+            name: holiday.name,
           });
         }
       });
-    });
-
-    rHolidayList.forEach((holiday) => {
-      if (holiday.month === dateContext.format("MMMM")) {
-        newArr.push({
-          day: holiday.day,
-          name: holiday.name,
-        });
-      }
-    });
-    setHoliDays(newArr);
-    setRender(true);
-  });
+      setHoliDays(newArr);
+      setRender(true);
+    },
+    [nrHolidayList, rHolidayList]
+  );
 
   useEffect(() => {
     loadAllNotes();
