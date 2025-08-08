@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
@@ -6,56 +6,50 @@ import Scroll from "./../Scroll/Scroll";
 import moment from "moment";
 import "./Settings.css";
 
-class Holidays extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      rHolidayList: [],
-      nrHolidayList: [],
-      newNRshow: false,
-      newRshow: false,
-      sShow: false,
-      eShow: false,
-      add: false,
-      name: "",
-      month: "January",
-      day: 1,
-      isactive: false,
-      dateContext: moment(),
-      todelete: [],
-      editsked: false,
-    };
-  }
+const Holidays = (props) => {
+  const [rHolidayList, setRHolidayList] = useState([]);
+  const [nrHolidayList, setNRHolidayList] = useState([]);
+  const [newNRshow, setNewNRshow] = useState(false);
+  const [newRshow, setNewRshow] = useState(false);
+  const [sShow, setSShow] = useState(false);
+  const [eShow, setEShow] = useState(false);
+  const [add, setAdd] = useState(false);
+  const [name, setName] = useState("");
+  const [month, setMonth] = useState("January");
+  const [day, setDay] = useState(1);
+  const [isactive, setIsactive] = useState(false);
+  const [dateContext, setDateContext] = useState(moment());
+  const [todelete, setTodelete] = useState([]);
+  const [editsked, setEditsked] = useState(false);
 
-  componentDidMount = () => {
-    this.loadrHolidays();
-    this.loadnrHolidays();
-  };
+  const months = moment.months();
 
-  loadrHolidays = () => {
+  useEffect(() => {
+    loadrHolidays();
+    loadnrHolidays();
+  }, []);
+
+  const loadrHolidays = () => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/r")
       .then((response) => response.json())
-      .then((holidays) => this.setState({ rHolidayList: holidays }));
+      .then((holidays) => setRHolidayList(holidays));
   };
 
-  loadnrHolidays = () => {
+  const loadnrHolidays = () => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/nr")
       .then((response) => response.json())
-      .then((holidays) => this.setState({ nrHolidayList: holidays }));
+      .then((holidays) => setNRHolidayList(holidays));
   };
 
-  months = moment.months();
-
-  addOrEdit = () => {
-    if (this.state.add === true) {
-      this.onNewRHoliday();
+  const addOrEdit = () => {
+    if (add === true) {
+      onNewRHoliday();
     } else {
-      this.onEditRHoliday();
+      onEditRHoliday();
     }
   };
 
-  onNewRHoliday = () => {
-    const { name, isactive, month, day } = this.state;
+  const onNewRHoliday = () => {
     if (name.length > 0) {
       fetch("https://secure-earth-82827.herokuapp.com/holiday/r", {
         method: "post",
@@ -70,15 +64,14 @@ class Holidays extends React.Component {
         .then((response) => response.json())
         .then((holiday) => {
           if (holiday) {
-            this.loadrHolidays();
+            loadrHolidays();
           }
         });
-      this.toggleRShow();
+      toggleRShow();
     }
   };
 
-  onNewNRHoliday = () => {
-    const { name } = this.state;
+  const onNewNRHoliday = () => {
     if (name.length > 0) {
       fetch("https://secure-earth-82827.herokuapp.com/holiday/nr", {
         method: "post",
@@ -90,15 +83,14 @@ class Holidays extends React.Component {
         .then((response) => response.json())
         .then((holiday) => {
           if (holiday) {
-            this.loadnrHolidays();
+            loadnrHolidays();
           }
         });
-      this.toggleNRShow();
+      toggleNRShow();
     }
   };
 
-  onEditRHoliday = () => {
-    const { name, isactive, month, day } = this.state;
+  const onEditRHoliday = () => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/r", {
       method: "put",
       headers: { "Content-Type": "application/json" },
@@ -112,12 +104,13 @@ class Holidays extends React.Component {
       .then((response) => response.json())
       .then((holiday) => {
         if (holiday) {
-          this.loadrHolidays();
+          loadrHolidays();
         }
       });
-    this.toggleRShow();
+    toggleRShow();
   };
-  onDeleteRHoliday = (e) => {
+
+  const onDeleteRHoliday = (e) => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/r", {
       method: "delete",
       headers: { "Content-Type": "application/json" },
@@ -128,12 +121,12 @@ class Holidays extends React.Component {
       .then((response) => response.json())
       .then((holiday) => {
         if (holiday) {
-          this.loadrHolidays();
+          loadrHolidays();
         }
       });
   };
 
-  onDeleteNRHoliday = (e) => {
+  const onDeleteNRHoliday = (e) => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/nr", {
       method: "delete",
       headers: { "Content-Type": "application/json" },
@@ -144,13 +137,12 @@ class Holidays extends React.Component {
       .then((response) => response.json())
       .then((holiday) => {
         if (holiday) {
-          this.loadnrHolidays();
+          loadnrHolidays();
         }
       });
   };
 
-  onSkedHoliday = (e) => {
-    const { name, dateContext, day } = this.state;
+  const onSkedHoliday = (e) => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/snr", {
       method: "put",
       headers: { "Content-Type": "application/json" },
@@ -164,131 +156,113 @@ class Holidays extends React.Component {
       .then((response) => response.json())
       .then((holiday) => {
         if (holiday) {
-          this.loadnrHolidays();
+          loadnrHolidays();
         }
       });
-    this.toggleSShow();
+    toggleSShow();
   };
 
-  onNameChange = (event) => {
-    this.setState({ name: event.target.value });
+  const onNameChange = (event) => {
+    setName(event.target.value);
   };
 
-  onMonthChange = (event, r = true) => {
-    this.setState({ month: event.target.value });
+  const onMonthChange = (event, r = true) => {
+    setMonth(event.target.value);
     if (!r) {
-      this.setMonth(event.target.value);
+      setMonthState(event.target.value);
     }
   };
 
-  setMonth = (month) => {
-    let monthNo = this.months.indexOf(month);
-    let dateContext = Object.assign({}, this.state.dateContext);
-    dateContext = moment(dateContext).set("month", monthNo);
-    this.setState({
-      dateContext: dateContext,
-    });
+  const setMonthState = (month) => {
+    let monthNo = months.indexOf(month);
+    let newDateContext = moment(dateContext).set("month", monthNo);
+    setDateContext(newDateContext);
   };
 
-  onDayChange = (event) => {
-    this.setState({ day: event.target.value });
+  const onDayChange = (event) => {
+    setDay(event.target.value);
   };
 
-  onYearChange = (event, r = true) => {
-    this.setYear(event.target.value);
+  const onYearChange = (event, r = true) => {
+    setYear(event.target.value);
   };
 
-  onActiveChange = () => {
-    this.setState({ isactive: !this.state.isactive });
+  const onActiveChange = () => {
+    setIsactive(!isactive);
   };
 
-  setYear = (year) => {
-    let dateContext = Object.assign({}, this.state.dateContext);
-    dateContext = moment(dateContext).set("year", year);
-    this.setState({
-      dateContext: dateContext,
-    });
+  const setYear = (year) => {
+    let newDateContext = moment(dateContext).set("year", year);
+    setDateContext(newDateContext);
   };
 
-  toggleNRShow = () => {
-    this.setState({ newNRshow: !this.state.newNRshow });
+  const toggleNRShow = () => {
+    setNewNRshow(!newNRshow);
   };
 
-  toggleRShow = (e) => {
-    const { rHolidayList } = this.state;
+  const toggleRShow = (e) => {
     if (e && e.target.parentNode.id) {
       if (e.target.className.includes("add")) {
-        this.setState({ add: true });
+        setAdd(true);
       } else {
-        this.setState({ add: false });
+        setAdd(false);
         for (let i = 0; i < rHolidayList.length; i++) {
           if (rHolidayList[i].name === e.target.parentNode.id) {
-            this.setState({
-              name: rHolidayList[i].name,
-              month: rHolidayList[i].month,
-              day: rHolidayList[i].day,
-              isactive: rHolidayList[i].isactive,
-            });
+            setName(rHolidayList[i].name);
+            setMonth(rHolidayList[i].month);
+            setDay(rHolidayList[i].day);
+            setIsactive(rHolidayList[i].isactive);
           }
         }
       }
     } else {
-      this.setState({
-        name: "",
-        month: "January",
-        day: 1,
-        isactive: false,
-      });
+      setName("");
+      setMonth("January");
+      setDay(1);
+      setIsactive(false);
     }
-    this.setState({ newRshow: !this.state.newRshow });
+    setNewRshow(!newRshow);
   };
 
-  toggleEShow = (e) => {
+  const toggleEShow = (e) => {
     if (e && e.target.parentNode.id) {
-      this.setState({
-        name: e.target.parentNode.id,
-        editsked: true,
-      });
+      setName(e.target.parentNode.id);
+      setEditsked(true);
     } else {
-      this.setState({
-        name: "",
-        todelete: [],
-        editsked: false,
-      });
+      setName("");
+      setTodelete([]);
+      setEditsked(false);
     }
-    this.setState({ eShow: !this.state.eShow });
+    setEShow(!eShow);
   };
 
-  toggleSShow = (e) => {
+  const toggleSShow = (e) => {
     if (e && e.target.parentNode.id) {
-      this.setState({ name: e.target.parentNode.id });
+      setName(e.target.parentNode.id);
     } else {
-      this.setState({
-        name: "",
-        month: "January",
-        day: 1,
-        dateContext: this.props.today,
-      });
+      setName("");
+      setMonth("January");
+      setDay(1);
+      setDateContext(props.today);
     }
-    this.setState({ sShow: !this.state.sShow });
+    setSShow(!sShow);
   };
 
-  addModal = () => {
-    if (this.state.add === true) {
+  const addModal = () => {
+    if (add === true) {
       return (
         <Form.Control
-          onChange={this.onNameChange}
+          onChange={onNameChange}
           required
           type="text"
           placeholder="Name"
         />
       );
     }
-    return <h5>{this.state.name}</h5>;
+    return <h5>{name}</h5>;
   };
 
-  skedList = () => {
-    const { nrHolidayList, name, editsked } = this.state;
+  const skedList = () => {
     if (editsked) {
       let holiday;
       for (let i = 0; i < nrHolidayList.length; i++) {
@@ -304,7 +278,7 @@ class Holidays extends React.Component {
             key={j}
             id={j}
             name="skeddates"
-            onChange={this.addtodelete}
+            onChange={addtodelete}
             type="checkbox"
             value={arr[j]}
             label={arr[j]}
@@ -315,8 +289,8 @@ class Holidays extends React.Component {
     }
   };
 
-  addtodelete = (e) => {
-    let arr = [...this.state.todelete];
+  const addtodelete = (e) => {
+    let arr = [...todelete];
     let index = -1;
     for (let i = 0; i < arr.length; i++) {
       if (arr[i] === e.target.value) {
@@ -328,11 +302,10 @@ class Holidays extends React.Component {
     } else {
       arr.push(e.target.value);
     }
-    this.setState({ todelete: arr });
+    setTodelete(arr);
   };
 
-  deleteSked = () => {
-    const { name, todelete, nrHolidayList } = this.state;
+  const deleteSked = () => {
     let eventschedule = [];
     let id = -1;
     for (let i = 0; i < nrHolidayList.length; i++) {
@@ -366,348 +339,323 @@ class Holidays extends React.Component {
       .then((response) => response.json())
       .then((holiday) => {
         if (holiday) {
-          this.loadnrHolidays();
+          loadnrHolidays();
         }
       });
-    this.toggleEShow();
+    toggleEShow();
   };
 
-  render() {
-    const {
-      rHolidayList,
-      nrHolidayList,
-      newNRshow,
-      newRshow,
-      eShow,
-      sShow,
-      dateContext,
-      name,
-      month,
-      day,
-      isactive,
-    } = this.state;
-    const { today } = this.props;
+  const { today } = props;
 
-    let daySelect = [];
-    for (let i = 1; i <= dateContext.daysInMonth(); i++) {
-      daySelect.push(
-        <option key={i} value={i}>
-          {i}
-        </option>
-      );
-    }
-
-    let yearSelect = [];
-
-    let fYear = today.year();
-
-    for (let i = fYear; i <= fYear + 10; i++) {
-      yearSelect.push(
-        <option key={i} value={i}>
-          {i}
-        </option>
-      );
-    }
-
-    let rList = [];
-    for (let j = 0; j < rHolidayList.length; j++) {
-      rList.push(
-        <li key={rHolidayList[j].name} id={rHolidayList[j].name}>
-          {rHolidayList[j].name}
-          <Button
-            key={j}
-            onClick={this.toggleRShow}
-            className="edit butn"
-            size="sm"
-            variant="secondary"
-          >
-            Edit
-          </Button>
-          <Button
-            key={-j - 1}
-            onClick={this.onDeleteRHoliday}
-            className="delete butn"
-            size="sm"
-            variant="danger"
-          >
-            Delete
-          </Button>
-        </li>
-      );
-    }
-    let nrList = [];
-    for (let n = 0; n < nrHolidayList.length; n++) {
-      nrList.push(
-        <li key={nrHolidayList[n].name} id={nrHolidayList[n].name}>
-          {nrHolidayList[n].name}
-          <Button
-            key={n * 100 + 1}
-            onClick={this.toggleEShow}
-            className="edit butn"
-            size="sm"
-            variant="secondary"
-          >
-            Edit
-          </Button>
-          <Button
-            key={n}
-            onClick={this.toggleSShow}
-            className="sked butn"
-            size="sm"
-            variant="warning"
-          >
-            Schedule
-          </Button>
-          <Button
-            key={-n - 1}
-            onClick={this.onDeleteNRHoliday}
-            className="delete butn"
-            size="sm"
-            variant="danger"
-          >
-            Delete
-          </Button>
-        </li>
-      );
-    }
-
-    return (
-      <div className="body">
-        <div className="left">
-          <div id="t" className="top">
-            <h4 className="subtitle">Recurring Holidays</h4>
-            <Button
-              className="add"
-              onClick={this.toggleRShow}
-              variant="primary"
-            >
-              Add Recurring Holiday
-            </Button>
-          </div>
-          <Scroll>
-            <ul className="setList">{rList}</ul>
-          </Scroll>
-        </div>
-        <div className="right">
-          <div className="top">
-            <h4 className="subtitle">Non-recurring Holidays</h4>
-            <Button onClick={this.toggleNRShow} variant="primary">
-              Add Non-recurring Holiday
-            </Button>
-          </div>
-          <Scroll>
-            <ul className="setList">{nrList}</ul>
-          </Scroll>
-        </div>
-        <div className="modal">
-          <Modal show={newNRshow} onHide={this.toggleNRShow}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">
-                Add Non-recurring Holiday
-              </Modal.Title>
-            </Modal.Header>
-            <Form>
-              <Modal.Body>
-                <Form.Group>
-                  <Form.Control
-                    onChange={this.onNameChange}
-                    required
-                    type="text"
-                    placeholder="Name"
-                  />
-                </Form.Group>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button onClick={this.toggleNRShow} variant="secondary">
-                  Cancel
-                </Button>
-                <Button onClick={this.onNewNRHoliday} variant="primary">
-                  Submit
-                </Button>
-              </Modal.Footer>
-            </Form>
-          </Modal>
-        </div>
-        <div className="modal">
-          <Modal show={newRshow} onHide={this.toggleRShow}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">
-                Add/Edit Recurring Holiday
-              </Modal.Title>
-            </Modal.Header>
-            <Form>
-              <Modal.Body>
-                <Form.Group>{this.addModal()}</Form.Group>
-                <Form.Group>
-                  <Form.Label>Month</Form.Label>
-                  <Form.Control
-                    value={month}
-                    onChange={this.onMonthChange}
-                    as="select"
-                  >
-                    <option value="January">January</option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
-                    <option value="September">September</option>
-                    <option value="October">October</option>
-                    <option value="November">November</option>
-                    <option value="December">December</option>
-                  </Form.Control>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Day of the Month</Form.Label>
-                  <Form.Control
-                    value={day}
-                    onChange={this.onDayChange}
-                    as="select"
-                  >
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                    <option value="10">10</option>
-                    <option value="11">11</option>
-                    <option value="12">12</option>
-                    <option value="13">13</option>
-                    <option value="14">14</option>
-                    <option value="15">15</option>
-                    <option value="16">16</option>
-                    <option value="17">17</option>
-                    <option value="18">18</option>
-                    <option value="19">19</option>
-                    <option value="20">20</option>
-                    <option value="21">21</option>
-                    <option value="22">22</option>
-                    <option value="23">23</option>
-                    <option value="24">24</option>
-                    <option value="25">25</option>
-                    <option value="26">26</option>
-                    <option value="27">27</option>
-                    <option value="28">28</option>
-                    <option value="29">29</option>
-                    <option value="30">30</option>
-                    <option value="31">31</option>
-                  </Form.Control>
-                </Form.Group>
-                <Form.Group
-                  /*onChange={this.onActiveChange}*/ id="activeCheck"
-                  controlId="formBasicCheckbox"
-                >
-                  <Form.Check
-                    onChange={this.onActiveChange}
-                    checked={isactive}
-                    type="checkbox"
-                    label="Active"
-                  />
-                </Form.Group>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button onClick={this.toggleRShow} variant="secondary">
-                  Cancel
-                </Button>
-                <Button onClick={this.addOrEdit} variant="primary">
-                  Submit
-                </Button>
-              </Modal.Footer>
-            </Form>
-          </Modal>
-        </div>
-        <div className="modal">
-          <Modal show={sShow} onHide={this.toggleSShow}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">Schedule Holiday</Modal.Title>
-            </Modal.Header>
-            <Form>
-              <Modal.Body>
-                <Form.Group>
-                  <h3>{name}</h3>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Year</Form.Label>
-                  <Form.Control
-                    value={dateContext.format("Y")}
-                    onChange={this.onYearChange}
-                    as="select"
-                  >
-                    {yearSelect}
-                  </Form.Control>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Month</Form.Label>
-                  <Form.Control
-                    onChange={(e) => this.onMonthChange(e, false)}
-                    as="select"
-                  >
-                    <option value="January">January</option>
-                    <option value="February">February</option>
-                    <option value="March">March</option>
-                    <option value="April">April</option>
-                    <option value="May">May</option>
-                    <option value="June">June</option>
-                    <option value="July">July</option>
-                    <option value="August">August</option>
-                    <option value="September">September</option>
-                    <option value="October">October</option>
-                    <option value="November">November</option>
-                    <option value="December">December</option>
-                  </Form.Control>
-                </Form.Group>
-                <Form.Group>
-                  <Form.Label>Day of the Month</Form.Label>
-                  <Form.Control onChange={this.onDayChange} as="select">
-                    {daySelect}
-                  </Form.Control>
-                </Form.Group>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button onClick={this.toggleSShow} variant="secondary">
-                  Cancel
-                </Button>
-                <Button onClick={this.onSkedHoliday} variant="primary">
-                  Submit
-                </Button>
-              </Modal.Footer>
-            </Form>
-          </Modal>
-        </div>
-        <div className="modal">
-          <Modal show={eShow} onHide={this.toggleEShow}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">Edit {name} Schedule</Modal.Title>
-            </Modal.Header>
-            <Form>
-              <Modal.Body>
-                <Form.Label>Choose dates to delete</Form.Label>
-                <Form.Group
-                  /*onChange={this.onActiveChange} id="activeCheck"*/ controlId="formBasicCheckbox"
-                >
-                  {this.skedList()}
-                </Form.Group>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button onClick={this.toggleEShow} variant="secondary">
-                  Close
-                </Button>
-                <Button onClick={this.deleteSked} variant="primary">
-                  Submit
-                </Button>
-              </Modal.Footer>
-            </Form>
-          </Modal>
-        </div>
-      </div>
+  let daySelect = [];
+  for (let i = 1; i <= dateContext.daysInMonth(); i++) {
+    daySelect.push(
+      <option key={i} value={i}>
+        {i}
+      </option>
     );
   }
-}
+
+  let yearSelect = [];
+
+  let fYear = today.year();
+
+  for (let i = fYear; i <= fYear + 10; i++) {
+    yearSelect.push(
+      <option key={i} value={i}>
+        {i}
+      </option>
+    );
+  }
+
+  let rList = [];
+  for (let j = 0; j < rHolidayList.length; j++) {
+    rList.push(
+      <li key={rHolidayList[j].name} id={rHolidayList[j].name}>
+        {rHolidayList[j].name}
+        <Button
+          key={j}
+          onClick={toggleRShow}
+          className="edit butn"
+          size="sm"
+          variant="secondary"
+        >
+          Edit
+        </Button>
+        <Button
+          key={-j - 1}
+          onClick={onDeleteRHoliday}
+          className="delete butn"
+          size="sm"
+          variant="danger"
+        >
+          Delete
+        </Button>
+      </li>
+    );
+  }
+  let nrList = [];
+  for (let n = 0; n < nrHolidayList.length; n++) {
+    nrList.push(
+      <li key={nrHolidayList[n].name} id={nrHolidayList[n].name}>
+        {nrHolidayList[n].name}
+        <Button
+          key={n * 100 + 1}
+          onClick={toggleEShow}
+          className="edit butn"
+          size="sm"
+          variant="secondary"
+        >
+          Edit
+        </Button>
+        <Button
+          key={n}
+          onClick={toggleSShow}
+          className="sked butn"
+          size="sm"
+          variant="warning"
+        >
+          Schedule
+        </Button>
+        <Button
+          key={-n - 1}
+          onClick={onDeleteNRHoliday}
+          className="delete butn"
+          size="sm"
+          variant="danger"
+        >
+          Delete
+        </Button>
+      </li>
+    );
+  }
+
+  return (
+    <div className="body">
+      <div className="left">
+        <div id="t" className="top">
+          <h4 className="subtitle">Recurring Holidays</h4>
+          <Button className="add" onClick={toggleRShow} variant="primary">
+            Add Recurring Holiday
+          </Button>
+        </div>
+        <Scroll>
+          <ul className="setList">{rList}</ul>
+        </Scroll>
+      </div>
+      <div className="right">
+        <div className="top">
+          <h4 className="subtitle">Non-recurring Holidays</h4>
+          <Button onClick={toggleNRShow} variant="primary">
+            Add Non-recurring Holiday
+          </Button>
+        </div>
+        <Scroll>
+          <ul className="setList">{nrList}</ul>
+        </Scroll>
+      </div>
+      <div className="modal">
+        <Modal show={newNRshow} onHide={toggleNRShow}>
+          <Modal.Header closeButton>
+            <Modal.Title id="modalTitle">Add Non-recurring Holiday</Modal.Title>
+          </Modal.Header>
+          <Form>
+            <Modal.Body>
+              <Form.Group>
+                <Form.Control
+                  onChange={onNameChange}
+                  required
+                  type="text"
+                  placeholder="Name"
+                />
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={toggleNRShow} variant="secondary">
+                Cancel
+              </Button>
+              <Button onClick={onNewNRHoliday} variant="primary">
+                Submit
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      </div>
+      <div className="modal">
+        <Modal show={newRshow} onHide={toggleRShow}>
+          <Modal.Header closeButton>
+            <Modal.Title id="modalTitle">
+              Add/Edit Recurring Holiday
+            </Modal.Title>
+          </Modal.Header>
+          <Form>
+            <Modal.Body>
+              <Form.Group>{addModal()}</Form.Group>
+              <Form.Group>
+                <Form.Label>Month</Form.Label>
+                <Form.Control
+                  value={month}
+                  onChange={onMonthChange}
+                  as="select"
+                >
+                  <option value="January">January</option>
+                  <option value="February">February</option>
+                  <option value="March">March</option>
+                  <option value="April">April</option>
+                  <option value="May">May</option>
+                  <option value="June">June</option>
+                  <option value="July">July</option>
+                  <option value="August">August</option>
+                  <option value="September">September</option>
+                  <option value="October">October</option>
+                  <option value="November">November</option>
+                  <option value="December">December</option>
+                </Form.Control>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Day of the Month</Form.Label>
+                <Form.Control value={day} onChange={onDayChange} as="select">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                  <option value="11">11</option>
+                  <option value="12">12</option>
+                  <option value="13">13</option>
+                  <option value="14">14</option>
+                  <option value="15">15</option>
+                  <option value="16">16</option>
+                  <option value="17">17</option>
+                  <option value="18">18</option>
+                  <option value="19">19</option>
+                  <option value="20">20</option>
+                  <option value="21">21</option>
+                  <option value="22">22</option>
+                  <option value="23">23</option>
+                  <option value="24">24</option>
+                  <option value="25">25</option>
+                  <option value="26">26</option>
+                  <option value="27">27</option>
+                  <option value="28">28</option>
+                  <option value="29">29</option>
+                  <option value="30">30</option>
+                  <option value="31">31</option>
+                </Form.Control>
+              </Form.Group>
+              <Form.Group
+                /*onChange={onActiveChange}*/ id="activeCheck"
+                controlId="formBasicCheckbox"
+              >
+                <Form.Check
+                  onChange={onActiveChange}
+                  checked={isactive}
+                  type="checkbox"
+                  label="Active"
+                />
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={toggleRShow} variant="secondary">
+                Cancel
+              </Button>
+              <Button onClick={addOrEdit} variant="primary">
+                Submit
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      </div>
+      <div className="modal">
+        <Modal show={sShow} onHide={toggleSShow}>
+          <Modal.Header closeButton>
+            <Modal.Title id="modalTitle">Schedule Holiday</Modal.Title>
+          </Modal.Header>
+          <Form>
+            <Modal.Body>
+              <Form.Group>
+                <h3>{name}</h3>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Year</Form.Label>
+                <Form.Control
+                  value={dateContext.format("Y")}
+                  onChange={onYearChange}
+                  as="select"
+                >
+                  {yearSelect}
+                </Form.Control>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Month</Form.Label>
+                <Form.Control
+                  onChange={(e) => onMonthChange(e, false)}
+                  as="select"
+                >
+                  <option value="January">January</option>
+                  <option value="February">February</option>
+                  <option value="March">March</option>
+                  <option value="April">April</option>
+                  <option value="May">May</option>
+                  <option value="June">June</option>
+                  <option value="July">July</option>
+                  <option value="August">August</option>
+                  <option value="September">September</option>
+                  <option value="October">October</option>
+                  <option value="November">November</option>
+                  <option value="December">December</option>
+                </Form.Control>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Day of the Month</Form.Label>
+                <Form.Control onChange={onDayChange} as="select">
+                  {daySelect}
+                </Form.Control>
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={toggleSShow} variant="secondary">
+                Cancel
+              </Button>
+              <Button onClick={onSkedHoliday} variant="primary">
+                Submit
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      </div>
+      <div className="modal">
+        <Modal show={eShow} onHide={toggleEShow}>
+          <Modal.Header closeButton>
+            <Modal.Title id="modalTitle">Edit {name} Schedule</Modal.Title>
+          </Modal.Header>
+          <Form>
+            <Modal.Body>
+              <Form.Label>Choose dates to delete</Form.Label>
+              <Form.Group
+                /*onChange={onActiveChange} id="activeCheck"*/ controlId="formBasicCheckbox"
+              >
+                {skedList()}
+              </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={toggleEShow} variant="secondary">
+                Close
+              </Button>
+              <Button onClick={deleteSked} variant="primary">
+                Submit
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+      </div>
+    </div>
+  );
+};
 
 export default Holidays;
