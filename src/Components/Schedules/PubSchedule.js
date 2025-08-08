@@ -142,7 +142,7 @@ const PubSchedule = (props) => {
       .then((holidays) => setNRHolidayList(holidays));
   }, []);
 
-  const loadNewDays = (dateContext) => {
+  const loadNewDays = useCallback((dateContext) => {
     let newArr = [];
     nrHolidayList.forEach((nholiday) => {
       nholiday.eventsked.forEach((date) => {
@@ -169,7 +169,7 @@ const PubSchedule = (props) => {
     });
     setHoliDays(newArr);
     setRender(true);
-  };
+  });
 
   useEffect(() => {
     loadAllNotes();
@@ -188,6 +188,13 @@ const PubSchedule = (props) => {
     loadPublished,
     loadDepts,
   ]);
+
+  // Load holidays for the current date context when component mounts or date changes
+  useEffect(() => {
+    if (nrHolidayList.length > 0 && !render) {
+      loadNewDays(props.today);
+    }
+  }, [nrHolidayList, render, props.today, loadNewDays]);
 
   const onDayClick = (e, day) => {
     let newDateContext = moment(dateContext).set("date", day);
@@ -826,7 +833,6 @@ const PubSchedule = (props) => {
         </Col>
       </Row>
       <div className="sked">
-        {nrHolidayList.length > 0 && !render ? loadNewDays(props.today) : false}
         <Calendar
           testisadmin={user.isadmin}
           numNotes={numNotes}
