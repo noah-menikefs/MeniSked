@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Calendar from "./Calendar/Calendar";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -17,52 +17,58 @@ const style = {
   width: "90%",
 };
 
-class PubSchedule extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      numNotes: [],
-      vNotes: [],
-      iNotes: [],
-      show: false,
-      nShow: false,
-      dateContext: moment(),
-      note: "",
-      radio: 0,
-      rHolidayList: [],
-      nrHolidayList: [],
-      holiDays: [],
-      render: false,
-      sked: [],
-      entryList: [],
-      day: -1,
-      published: -1,
-      depts: [],
-      stamp: moment().format("YYYY-MM-DD HH:mm"),
-      msg: "",
-      id: -1,
-    };
-  }
+const PubSchedule = (props) => {
+  const [numNotes, setNumNotes] = useState([]);
+  const [vNotes, setVNotes] = useState([]);
+  const [iNotes, setINotes] = useState([]);
+  const [show, setShow] = useState(false);
+  const [nShow, setNShow] = useState(false);
+  const [dateContext, setDateContext] = useState(moment());
+  const [note, setNote] = useState("");
+  const [radio, setRadio] = useState(0);
+  const [rHolidayList, setRHolidayList] = useState([]);
+  const [nrHolidayList, setNRHolidayList] = useState([]);
+  const [holiDays, setHoliDays] = useState([]);
+  const [render, setRender] = useState(false);
+  const [sked, setSked] = useState([]);
+  const [entryList, setEntryList] = useState([]);
+  const [day, setDay] = useState(-1);
+  const [published, setPublished] = useState(-1);
+  const [depts, setDepts] = useState([]);
+  const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
+  const [msg, setMsg] = useState("");
+  const [id, setId] = useState(-1);
 
-  componentDidMount = () => {
-    this.loadAllNotes();
-    this.loadrHolidays();
-    this.loadnrHolidays();
-    this.loadEntries();
-    this.loadSked();
-    this.loadPublished();
-    this.loadDepts();
-  };
+  const months = moment.months(); // List of each month
 
-  loadPublished = () => {
+  const priorityCheck = useCallback(
+    (id) => {
+      const { callList } = props;
+      let index = -1;
+      for (let n = 0; n < callList.length; n++) {
+        if (callList[n].id === id) {
+          index = n;
+          break;
+        }
+      }
+      if (index !== -1) {
+        return callList[index].priority;
+      } else {
+        return 1000;
+      }
+    },
+    [props]
+  );
+
+  const loadPublished = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/published")
       .then((response) => response.json())
-      .then((num) => this.setState({ published: num }));
-  };
+      .then((num) => setPublished(num));
+  }, []);
 
-  publishSked = () => {
+  const publishSked = () => {
     var a = moment([2020, 5, 1]);
-    var b = this.state.dateContext;
+    var b = dateContext;
     const num = b.diff(a, "months");
     fetch("https://secure-earth-82827.herokuapp.com/published", {
       method: "put",
@@ -72,10 +78,10 @@ class PubSchedule extends React.Component {
       }),
     })
       .then((response) => response.json())
-      .then((num) => this.setState({ published: num }));
+      .then((num) => setPublished(num));
   };
 
-  loadSked = () => {
+  const loadSked = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/people")
       .then((response) => response.json())
       .then((docs) => {
@@ -87,80 +93,58 @@ class PubSchedule extends React.Component {
               date: docs[i].worksked[j].date,
               name: docs[i].lastname,
               colour: docs[i].colour,
-              priority: this.priorityCheck(docs[i].worksked[j].id),
+              priority: priorityCheck(docs[i].worksked[j].id),
             });
           }
         }
         arr.sort(function (a, b) {
           return a.priority - b.priority;
         });
-        this.setState({ sked: arr });
+        setSked(arr);
       });
-  };
+  }, [priorityCheck]);
 
-  loadDepts = () => {
+  const loadDepts = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/departments")
       .then((response) => response.json())
-      .then((departments) => this.setState({ depts: departments }));
-  };
+      .then((departments) => setDepts(departments));
+  }, []);
 
-  priorityCheck = (id) => {
-    const { callList } = this.props;
-    let index = -1;
-    for (let n = 0; n < callList.length; n++) {
-      if (callList[n].id === id) {
-        index = n;
-        break;
-      }
-    }
-    if (index !== -1) {
-      return callList[index].priority;
-    } else {
-      return 1000;
-    }
-  };
-
-  loadEntries = () => {
+  const loadEntries = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/sked/entries")
       .then((response) => response.json())
       .then((entries) =>
-        this.setState({
-          entryList: entries.filter((entry) => entry.isactive === true),
-        })
+        setEntryList(entries.filter((entry) => entry.isactive === true))
       );
-  };
+  }, []);
 
-  loadAllNotes = () => {
+  const loadAllNotes = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/sked/allNotes")
       .then((response) => response.json())
-      .then((notes) =>
-        this.setState({
-          numNotes: notes.filter((note) => note.type === 1),
-          vNotes: notes.filter((note) => note.type === 2),
-          iNotes: notes.filter((note) => note.type === 3),
-        })
-      );
-  };
+      .then((notes) => {
+        setNumNotes(notes.filter((note) => note.type === 1));
+        setVNotes(notes.filter((note) => note.type === 2));
+        setINotes(notes.filter((note) => note.type === 3));
+      });
+  }, []);
 
-  loadrHolidays = () => {
+  const loadrHolidays = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/r")
       .then((response) => response.json())
       .then((holidays) =>
-        this.setState({
-          rHolidayList: holidays.filter((holiday) => holiday.isactive === true),
-        })
+        setRHolidayList(holidays.filter((holiday) => holiday.isactive === true))
       );
-  };
+  }, []);
 
-  loadnrHolidays = () => {
+  const loadnrHolidays = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/holiday/nr")
       .then((response) => response.json())
-      .then((holidays) => this.setState({ nrHolidayList: holidays }));
-  };
+      .then((holidays) => setNRHolidayList(holidays));
+  }, []);
 
-  loadNewDays = (dateContext) => {
+  const loadNewDays = (dateContext) => {
     let newArr = [];
-    this.state.nrHolidayList.forEach((nholiday) => {
+    nrHolidayList.forEach((nholiday) => {
       nholiday.eventsked.forEach((date) => {
         let dateArr = date.split("/");
         if (
@@ -175,7 +159,7 @@ class PubSchedule extends React.Component {
       });
     });
 
-    this.state.rHolidayList.forEach((holiday) => {
+    rHolidayList.forEach((holiday) => {
       if (holiday.month === dateContext.format("MMMM")) {
         newArr.push({
           day: holiday.day,
@@ -183,149 +167,123 @@ class PubSchedule extends React.Component {
         });
       }
     });
-    this.setState({
-      holiDays: newArr,
-      render: true,
-    });
+    setHoliDays(newArr);
+    setRender(true);
   };
 
-  onDayClick = (e, day) => {
-    let dateContext = Object.assign({}, this.state.dateContext);
-    dateContext = moment(dateContext).set("date", day);
-    this.setState({
-      dateContext: dateContext,
-      day: day,
-    });
-    this.toggleShow(day);
+  useEffect(() => {
+    loadAllNotes();
+    loadrHolidays();
+    loadnrHolidays();
+    loadEntries();
+    loadSked();
+    loadPublished();
+    loadDepts();
+  }, [
+    loadAllNotes,
+    loadrHolidays,
+    loadnrHolidays,
+    loadEntries,
+    loadSked,
+    loadPublished,
+    loadDepts,
+  ]);
+
+  const onDayClick = (e, day) => {
+    let newDateContext = moment(dateContext).set("date", day);
+    setDateContext(newDateContext);
+    setDay(day);
+    toggleShow(day);
   };
 
-  toggleShow = (day) => {
-    this.setState({ show: !this.state.show });
+  const toggleShow = () => {
+    setShow(!show);
   };
 
-  months = moment.months(); // List of each month
-
-  setMonth = (month) => {
-    let monthNo = this.months.indexOf(month);
-    let dateContext = Object.assign({}, this.state.dateContext);
-    dateContext = moment(dateContext).set("month", monthNo);
-    this.setState({
-      dateContext: dateContext,
-    });
-    this.loadNewDays(dateContext);
+  const setMonth = (month) => {
+    let monthNo = months.indexOf(month);
+    let newDateContext = moment(dateContext).set("month", monthNo);
+    setDateContext(newDateContext);
+    loadNewDays(newDateContext);
   };
 
-  nextMonth = () => {
-    let dateContext = Object.assign({}, this.state.dateContext);
-    dateContext = moment(dateContext).add(1, "month");
-    if (!this.props.user.isadmin) {
-      let nMonth = moment([2020, 5, 1])
-        .add(this.state.published, "month")
-        .month();
-      let nYear = moment([2020, 5, 1])
-        .add(this.state.published, "month")
-        .year();
-      if (dateContext.year() < nYear) {
-        this.setState({
-          dateContext: dateContext,
-        });
-        this.loadNewDays(dateContext);
-      } else if (dateContext.year() === nYear) {
-        if (dateContext.month() <= nMonth) {
-          this.setState({
-            dateContext: dateContext,
-          });
-          this.loadNewDays(dateContext);
-        }
-      }
-    } else if (dateContext.year() <= this.props.today.year() + 10) {
-      this.setState({
-        dateContext: dateContext,
-      });
-      this.loadNewDays(dateContext);
-    }
-  };
-
-  prevMonth = () => {
-    let dateContext = Object.assign({}, this.state.dateContext);
-    dateContext = moment(dateContext).subtract(1, "month");
-    if (dateContext.year() >= 2020) {
-      this.setState({
-        dateContext: dateContext,
-      });
-      this.loadNewDays(dateContext);
-    }
-  };
-
-  nextYear = () => {
-    if (!this.props.user.isadmin) {
-      let nYear = moment([2020, 5, 1])
-        .add(this.state.published, "month")
-        .year();
-      if (this.state.dateContext.year() + 1 <= nYear) {
-        let dateContext = Object.assign({}, this.state.dateContext);
-        dateContext = moment(dateContext).add(1, "year");
-        this.setState({
-          dateContext: dateContext,
-        });
-        this.loadNewDays(dateContext);
-      }
-    } else if (
-      this.state.dateContext.year() + 1 <=
-      this.props.today.year() + 10
-    ) {
-      let dateContext = Object.assign({}, this.state.dateContext);
-      dateContext = moment(dateContext).add(1, "year");
-      this.setState({
-        dateContext: dateContext,
-      });
-      this.loadNewDays(dateContext);
-    }
-  };
-
-  prevYear = () => {
-    if (this.state.dateContext.year() - 1 >= 2020) {
-      let dateContext = Object.assign({}, this.state.dateContext);
-      dateContext = moment(dateContext).subtract(1, "year");
-      this.setState({
-        dateContext: dateContext,
-      });
-      this.loadNewDays(dateContext);
-    }
-  };
-
-  setYear = (year) => {
-    const { published } = this.state;
-    let dateContext = Object.assign({}, this.state.dateContext);
-    dateContext = moment(dateContext).set("year", year);
-    if (!this.props.user.isadmin) {
+  const nextMonth = () => {
+    let newDateContext = moment(dateContext).add(1, "month");
+    if (!props.user.isadmin) {
       let nMonth = moment([2020, 5, 1]).add(published, "month").month();
       let nYear = moment([2020, 5, 1]).add(published, "month").year();
-      if (dateContext.year() === nYear && nMonth < dateContext.month()) {
-        dateContext = moment(dateContext).set("month", nMonth);
+      if (newDateContext.year() < nYear) {
+        setDateContext(newDateContext);
+        loadNewDays(newDateContext);
+      } else if (newDateContext.year() === nYear) {
+        if (newDateContext.month() <= nMonth) {
+          setDateContext(newDateContext);
+          loadNewDays(newDateContext);
+        }
+      }
+    } else if (newDateContext.year() <= props.today.year() + 10) {
+      setDateContext(newDateContext);
+      loadNewDays(newDateContext);
+    }
+  };
+
+  const prevMonth = () => {
+    let newDateContext = moment(dateContext).subtract(1, "month");
+    if (newDateContext.year() >= 2020) {
+      setDateContext(newDateContext);
+      loadNewDays(newDateContext);
+    }
+  };
+
+  const nextYear = () => {
+    if (!props.user.isadmin) {
+      let nYear = moment([2020, 5, 1]).add(published, "month").year();
+      if (dateContext.year() + 1 <= nYear) {
+        let newDateContext = moment(dateContext).add(1, "year");
+        setDateContext(newDateContext);
+        loadNewDays(newDateContext);
+      }
+    } else if (dateContext.year() + 1 <= props.today.year() + 10) {
+      let newDateContext = moment(dateContext).add(1, "year");
+      setDateContext(newDateContext);
+      loadNewDays(newDateContext);
+    }
+  };
+
+  const prevYear = () => {
+    if (dateContext.year() - 1 >= 2020) {
+      let newDateContext = moment(dateContext).subtract(1, "year");
+      setDateContext(newDateContext);
+      loadNewDays(newDateContext);
+    }
+  };
+
+  const setYear = (year) => {
+    let newDateContext = moment(dateContext).set("year", year);
+    if (!props.user.isadmin) {
+      let nMonth = moment([2020, 5, 1]).add(published, "month").month();
+      let nYear = moment([2020, 5, 1]).add(published, "month").year();
+      if (newDateContext.year() === nYear && nMonth < newDateContext.month()) {
+        newDateContext = moment(newDateContext).set("month", nMonth);
       }
     }
-    this.setState({
-      dateContext: dateContext,
-    });
-    this.loadNewDays(dateContext);
+    setDateContext(newDateContext);
+    loadNewDays(newDateContext);
   };
 
-  onMonthChange = (event) => {
-    this.setMonth(event.target.value);
-    this.setState({ month: event.target.value });
+  const onMonthChange = (event) => {
+    setMonth(event.target.value);
   };
 
-  onYearChange = (event) => {
-    this.setYear(event.target.value);
+  const onYearChange = (event) => {
+    setYear(event.target.value);
   };
 
-  noteRadioChange = (event) => {
-    this.setState({ radio: event.target.id });
+  const noteRadioChange = (event) => {
+    setRadio(event.target.id);
   };
 
-  onNotesSubmit = () => {
-    const { note, radio, dateContext, day } = this.state;
+  const onNotesSubmit = () => {
     if (note.length > 0 && radio > 0) {
       fetch("https://secure-earth-82827.herokuapp.com/sked/notes", {
         method: "post",
@@ -344,31 +302,29 @@ class PubSchedule extends React.Component {
         .then((response) => response.json())
         .then((notes) => {
           if (notes.id) {
-            this.loadAllNotes();
+            loadAllNotes();
           }
         });
-      this.setState({
-        radio: 0,
-        note: "",
-      });
-      this.toggleShow();
+      setRadio(0);
+      setNote("");
+      toggleShow();
     }
   };
 
-  onNoteChange = (event) => {
-    this.setState({ note: event.target.value });
+  const onNoteChange = (event) => {
+    setNote(event.target.value);
   };
 
-  reset = () => {
-    const { today } = this.props;
-    this.setState({ dateContext: today });
-    this.loadNewDays(today);
+  const reset = () => {
+    const { today } = props;
+    setDateContext(today);
+    loadNewDays(today);
   };
 
-  yearSelect = () => {
+  const yearSelect = () => {
     let arr = [];
-    let fYear = this.props.today.year();
-    if (this.props.user.isadmin) {
+    let fYear = props.today.year();
+    if (props.user.isadmin) {
       for (let i = 2020; i <= fYear + 10; i++) {
         arr.push(
           <option key={i} value={i}>
@@ -377,9 +333,7 @@ class PubSchedule extends React.Component {
         );
       }
     } else {
-      let nYear = moment([2020, 5, 1])
-        .add(this.state.published, "month")
-        .year();
+      let nYear = moment([2020, 5, 1]).add(published, "month").year();
       for (let i = 2020; i <= nYear; i++) {
         arr.push(
           <option key={i} value={i}>
@@ -391,9 +345,8 @@ class PubSchedule extends React.Component {
     return arr;
   };
 
-  monthSelect = () => {
-    const { published, dateContext } = this.state;
-    const { user } = this.props;
+  const monthSelect = () => {
+    const { user } = props;
     let m = 11;
     let arr = [];
     if (!user.isadmin) {
@@ -405,17 +358,16 @@ class PubSchedule extends React.Component {
     }
     for (let i = 0; i <= m; i++) {
       arr.push(
-        <option key={i} value={this.months[i]}>
-          {this.months[i]}
+        <option key={i} value={months[i]}>
+          {months[i]}
         </option>
       );
     }
     return arr;
   };
 
-  publishShow = () => {
-    const { published, dateContext } = this.state;
-    const { user } = this.props;
+  const publishShow = () => {
+    const { user } = props;
     if (user.isadmin) {
       let nYear = moment([2020, 5, 1]).add(published, "month").year();
       let nMonth = moment([2020, 5, 1]).add(published, "month").month();
@@ -436,11 +388,7 @@ class PubSchedule extends React.Component {
       }
       return (
         <Col>
-          <Button
-            onClick={this.publishSked}
-            className="top-child"
-            variant="primary"
-          >
+          <Button onClick={publishSked} className="top-child" variant="primary">
             Publish
           </Button>
         </Col>
@@ -454,14 +402,14 @@ class PubSchedule extends React.Component {
     }
   };
 
-  adminNotes = () => {
-    if (this.props.user.isadmin) {
+  const adminNotes = () => {
+    if (props.user.isadmin) {
       return (
         <Form>
           <hr />
           <Form.Group>
             <Form.Control
-              onChange={this.onNoteChange}
+              onChange={onNoteChange}
               id="note-text"
               size="sm"
               type="text"
@@ -469,7 +417,7 @@ class PubSchedule extends React.Component {
             />
           </Form.Group>
           <Form.Label id="typeON">Type of Note:</Form.Label>
-          <Form.Group onChange={this.noteRadioChange}>
+          <Form.Group onChange={noteRadioChange}>
             <Form.Check
               name="noteType"
               inline
@@ -493,7 +441,7 @@ class PubSchedule extends React.Component {
             />
           </Form.Group>
           <Form.Group>
-            <Button onClick={this.onNotesSubmit} size="sm" variant="primary">
+            <Button onClick={onNotesSubmit} size="sm" variant="primary">
               Submit Note
             </Button>
           </Form.Group>
@@ -502,9 +450,8 @@ class PubSchedule extends React.Component {
     }
   };
 
-  idToName = (id) => {
-    const { callList } = this.props;
-    const { entryList } = this.state;
+  const idToName = (id) => {
+    const { callList } = props;
     for (let n = 0; n < callList.length; n++) {
       if (callList[n].id === id) {
         return callList[n].name;
@@ -517,26 +464,13 @@ class PubSchedule extends React.Component {
     }
   };
 
-  hoverSpan = () => {
-    this.setState({ stamp: moment().format("YYYY-MM-DD HH:mm") });
+  const hoverSpan = () => {
+    setStamp(moment().format("YYYY-MM-DD HH:mm"));
   };
 
-  adminDownload = () => {
-    if (this.props.user.isadmin) {
-      const {
-        stamp,
-        depts,
-        numNotes,
-        vNotes,
-        iNotes,
-        holiDays,
-        entryList,
-        dateContext,
-        sked,
-      } = this.state;
-      const { callList } = this.props;
-
-      let user = Object.assign({}, this.props.user);
+  const adminDownload = () => {
+    if (props.user.isadmin) {
+      let user = Object.assign({}, props.user);
       user.isadmin = false;
 
       return (
@@ -552,7 +486,7 @@ class PubSchedule extends React.Component {
                   vNotes={vNotes}
                   iNotes={iNotes}
                   holiDays={holiDays}
-                  callList={callList}
+                  callList={props.callList}
                   entries={entryList}
                   sked={sked}
                   type="Published"
@@ -566,11 +500,11 @@ class PubSchedule extends React.Component {
                 "publishedsked.pdf"
               }
             >
-              {({ blob, url, loading, error }) =>
+              {({ loading }) =>
                 loading ? (
                   "Loading document..."
                 ) : (
-                  <span onMouseOver={this.hoverSpan}>
+                  <span onMouseOver={hoverSpan}>
                     Employee Black & White Download
                   </span>
                 )
@@ -588,7 +522,7 @@ class PubSchedule extends React.Component {
                   vNotes={vNotes}
                   iNotes={iNotes}
                   holiDays={holiDays}
-                  callList={callList}
+                  callList={props.callList}
                   entries={entryList}
                   sked={sked}
                   type="Published"
@@ -602,13 +536,11 @@ class PubSchedule extends React.Component {
                 "publishedsked.pdf"
               }
             >
-              {({ blob, url, loading, error }) =>
+              {({ loading }) =>
                 loading ? (
                   "Loading document..."
                 ) : (
-                  <span onMouseOver={this.hoverSpan}>
-                    Employee Colour Download
-                  </span>
+                  <span onMouseOver={hoverSpan}>Employee Colour Download</span>
                 )
               }
             </PDFDownloadLink>
@@ -618,25 +550,25 @@ class PubSchedule extends React.Component {
     }
   };
 
-  editNote = (id) => {
+  const editNote = (id) => {
     fetch("https://secure-earth-82827.herokuapp.com/sked/editNote", {
       method: "put",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         id: id,
-        msg: this.state.msg,
+        msg: msg,
       }),
     })
       .then((response) => response.json())
       .then((notes) => {
         if (notes.id) {
-          this.loadAllNotes();
+          loadAllNotes();
         }
       });
-    this.toggleNote(-1, "");
+    toggleNote(-1, "");
   };
 
-  deleteNote = (id) => {
+  const deleteNote = (id) => {
     fetch("https://secure-earth-82827.herokuapp.com/sked/deleteNote", {
       method: "delete",
       headers: { "Content-Type": "application/json" },
@@ -647,424 +579,396 @@ class PubSchedule extends React.Component {
       .then((response) => response.json())
       .then((notes) => {
         if (notes.id) {
-          this.loadAllNotes();
+          loadAllNotes();
         }
       });
   };
 
-  toggleNote = (id, msg) => {
-    this.setState({
-      msg: msg,
-      id: id,
-      nShow: !this.state.nShow,
-    });
+  const toggleNote = (id, msg) => {
+    setMsg(msg);
+    setId(id);
+    setNShow(!nShow);
   };
 
-  onMsgChange = (e) => {
-    this.setState({ msg: e.target.value });
+  const onMsgChange = (e) => {
+    setMsg(e.target.value);
   };
 
-  render() {
-    const {
-      show,
-      dateContext,
-      numNotes,
-      vNotes,
-      iNotes,
-      nrHolidayList,
-      render,
-      holiDays,
-      sked,
-      entryList,
-      day,
-      depts,
-      stamp,
-      nShow,
-      id,
-      msg,
-    } = this.state;
-    const { today, user, callList } = this.props;
+  const { today, user, callList } = props;
 
-    let modalList = [];
-    for (let i = 0; i < sked.length; i++) {
-      const splitArr = sked[i].date.split("/");
+  let modalList = [];
+  for (let i = 0; i < sked.length; i++) {
+    const splitArr = sked[i].date.split("/");
+    if (
+      splitArr[0] === dateContext.format("MM") &&
+      parseInt(splitArr[1], 10) === day &&
+      splitArr[2] === dateContext.format("YYYY")
+    ) {
+      modalList.push(
+        <li key={i}>
+          {idToName(sked[i].id) + " "}
+          <span style={{ backgroundColor: sked[i].colour }}>
+            {sked[i].name}
+          </span>
+        </li>
+      );
+    }
+  }
+
+  let noteList = [];
+
+  if (user.isadmin) {
+    for (let n = 0; n < numNotes.length; n++) {
+      const split = numNotes[n].date.split("/");
+      if (
+        split[0] === dateContext.format("MM") &&
+        parseInt(split[1], 10) === day &&
+        split[2] === dateContext.format("YYYY")
+      ) {
+        noteList.push(
+          <li key={n} id="numNotes">
+            {numNotes[n].msg}
+            <Button
+              key={n}
+              onClick={() => toggleNote(numNotes[n].id, numNotes[n].msg)}
+              className="edit butn"
+              size="sm"
+              variant="secondary"
+            >
+              Edit
+            </Button>
+            <Button
+              key={-n - 1}
+              onClick={() => deleteNote(numNotes[n].id)}
+              className="delete butn"
+              size="sm"
+              variant="danger"
+            >
+              Delete
+            </Button>
+          </li>
+        );
+      }
+    }
+    for (let i = 0; i < iNotes.length; i++) {
+      const splitArr = iNotes[i].date.split("/");
       if (
         splitArr[0] === dateContext.format("MM") &&
         parseInt(splitArr[1], 10) === day &&
         splitArr[2] === dateContext.format("YYYY")
       ) {
-        modalList.push(
-          <li key={i}>
-            {this.idToName(sked[i].id) + " "}
-            <span style={{ backgroundColor: sked[i].colour }}>
-              {sked[i].name}
-            </span>
+        noteList.push(
+          <li key={i} id="iNotes">
+            {iNotes[i].msg}
+            <Button
+              key={i}
+              onClick={() => toggleNote(iNotes[i].id, iNotes[i].msg)}
+              className="edit butn"
+              size="sm"
+              variant="secondary"
+            >
+              Edit
+            </Button>
+            <Button
+              key={-i - 1}
+              onClick={() => deleteNote(iNotes[i].id)}
+              className="delete butn"
+              size="sm"
+              variant="danger"
+            >
+              Delete
+            </Button>
           </li>
         );
       }
     }
-
-    let noteList = [];
-
-    if (user.isadmin) {
-      for (let n = 0; n < numNotes.length; n++) {
-        const split = numNotes[n].date.split("/");
-        if (
-          split[0] === dateContext.format("MM") &&
-          parseInt(split[1], 10) === day &&
-          split[2] === dateContext.format("YYYY")
-        ) {
-          noteList.push(
-            <li key={n} id="numNotes">
-              {numNotes[n].msg}
-              <Button
-                key={n}
-                onClick={() => this.toggleNote(numNotes[n].id, numNotes[n].msg)}
-                className="edit butn"
-                size="sm"
-                variant="secondary"
-              >
-                Edit
-              </Button>
-              <Button
-                key={-n - 1}
-                onClick={() => this.deleteNote(numNotes[n].id)}
-                className="delete butn"
-                size="sm"
-                variant="danger"
-              >
-                Delete
-              </Button>
-            </li>
-          );
-        }
-      }
-      for (let i = 0; i < iNotes.length; i++) {
-        const splitArr = iNotes[i].date.split("/");
-        if (
-          splitArr[0] === dateContext.format("MM") &&
-          parseInt(splitArr[1], 10) === day &&
-          splitArr[2] === dateContext.format("YYYY")
-        ) {
-          noteList.push(
-            <li key={i} id="iNotes">
-              {iNotes[i].msg}
-              <Button
-                key={i}
-                onClick={() => this.toggleNote(iNotes[i].id, iNotes[i].msg)}
-                className="edit butn"
-                size="sm"
-                variant="secondary"
-              >
-                Edit
-              </Button>
-              <Button
-                key={-i - 1}
-                onClick={() => this.deleteNote(iNotes[i].id)}
-                className="delete butn"
-                size="sm"
-                variant="danger"
-              >
-                Delete
-              </Button>
-            </li>
-          );
-        }
-      }
-      for (let i = 0; i < vNotes.length; i++) {
-        const splitArr = vNotes[i].date.split("/");
-        if (
-          splitArr[0] === dateContext.format("MM") &&
-          parseInt(splitArr[1], 10) === day &&
-          splitArr[2] === dateContext.format("YYYY")
-        ) {
-          noteList.push(
-            <li key={i} id="notes">
-              {vNotes[i].msg}
-              <Button
-                key={i}
-                onClick={() => this.toggleNote(vNotes[i].id, vNotes[i].msg)}
-                className="edit butn"
-                size="sm"
-                variant="secondary"
-              >
-                Edit
-              </Button>
-              <Button
-                key={-i - 1}
-                onClick={() => this.deleteNote(vNotes[i].id)}
-                className="delete butn"
-                size="sm"
-                variant="danger"
-              >
-                Delete
-              </Button>
-            </li>
-          );
-        }
-      }
-    } else {
-      for (let i = 0; i < vNotes.length; i++) {
-        const splitArr = vNotes[i].date.split("/");
-        if (
-          splitArr[0] === dateContext.format("MM") &&
-          parseInt(splitArr[1], 10) === day &&
-          splitArr[2] === dateContext.format("YYYY")
-        ) {
-          noteList.push(
-            <li key={i} id="notes">
-              {vNotes[i].msg}
-            </li>
-          );
-        }
+    for (let i = 0; i < vNotes.length; i++) {
+      const splitArr = vNotes[i].date.split("/");
+      if (
+        splitArr[0] === dateContext.format("MM") &&
+        parseInt(splitArr[1], 10) === day &&
+        splitArr[2] === dateContext.format("YYYY")
+      ) {
+        noteList.push(
+          <li key={i} id="notes">
+            {vNotes[i].msg}
+            <Button
+              key={i}
+              onClick={() => toggleNote(vNotes[i].id, vNotes[i].msg)}
+              className="edit butn"
+              size="sm"
+              variant="secondary"
+            >
+              Edit
+            </Button>
+            <Button
+              key={-i - 1}
+              onClick={() => deleteNote(vNotes[i].id)}
+              className="delete butn"
+              size="sm"
+              variant="danger"
+            >
+              Delete
+            </Button>
+          </li>
+        );
       }
     }
+  } else {
+    for (let i = 0; i < vNotes.length; i++) {
+      const splitArr = vNotes[i].date.split("/");
+      if (
+        splitArr[0] === dateContext.format("MM") &&
+        parseInt(splitArr[1], 10) === day &&
+        splitArr[2] === dateContext.format("YYYY")
+      ) {
+        noteList.push(
+          <li key={i} id="notes">
+            {vNotes[i].msg}
+          </li>
+        );
+      }
+    }
+  }
 
-    return (
-      <div className="screen">
-        <div>
-          <Row className="plabels">
-            {this.publishShow()}
-            <Col>
-              <h5 className="labels-child">Month</h5>
-            </Col>
-            <Col>
-              <h5 className="labels-child">Year</h5>
-            </Col>
-            <Col>
-              <Button
-                onClick={this.reset}
-                id="today"
-                className="top-child"
-                variant="primary"
-              >
-                Today
-              </Button>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <p></p>
-            </Col>
-            <Col>
-              <select
-                value={this.state.dateContext.format("MMMM")}
-                onChange={this.onMonthChange}
-                className="top-child month selector"
-              >
-                {this.monthSelect()}
-              </select>
-            </Col>
-            <Col>
-              <select
-                value={this.state.dateContext.format("Y")}
-                onChange={this.onYearChange}
-                className="top-child year selector"
-              >
-                {this.yearSelect()}
-              </select>
-            </Col>
-            <Col>
-              <p></p>
-            </Col>
-          </Row>
-          <Row className="psubheader">
-            <Col>
-              <p></p>
-            </Col>
-            <Col>
-              <Button
-                onClick={this.prevMonth}
-                className="arrow top-child"
-                variant="secondary"
-              >
-                &#x25C0;
-              </Button>
-              <Button
-                onClick={this.nextMonth}
-                className="arrow top-child"
-                variant="secondary"
-              >
-                &#x25B6;
-              </Button>
-            </Col>
-            <Col>
-              <Button
-                onClick={this.prevYear}
-                className="arrow top-child"
-                variant="secondary"
-              >
-                &#x25C0;
-              </Button>
-              <Button
-                onClick={this.nextYear}
-                className="arrow top-child"
-                variant="secondary"
-              >
-                &#x25B6;
-              </Button>
-            </Col>
-            <Col>
-              <p></p>
-            </Col>
-          </Row>
-        </div>
-        <Row className="curr">
-          <Col xl>
-            <h3>
-              {dateContext.format("MMMM") + " " + dateContext.format("Y")}
-            </h3>
+  return (
+    <div className="screen">
+      <div>
+        <Row className="plabels">
+          {publishShow()}
+          <Col>
+            <h5 className="labels-child">Month</h5>
+          </Col>
+          <Col>
+            <h5 className="labels-child">Year</h5>
+          </Col>
+          <Col>
+            <Button
+              onClick={reset}
+              id="today"
+              className="top-child"
+              variant="primary"
+            >
+              Today
+            </Button>
           </Col>
         </Row>
-        <div className="sked">
-          {nrHolidayList.length > 0 && !render
-            ? this.loadNewDays(this.props.today)
-            : false}
-          <Calendar
-            testisadmin={user.isadmin}
-            numNotes={numNotes}
-            vNotes={vNotes}
-            iNotes={iNotes}
-            callList={callList}
-            entries={entryList}
-            sked={sked}
-            holiDays={holiDays}
-            type="Published"
-            dateContext={dateContext}
-            today={today}
-            style={style}
-            onDayClick={(e, day) => this.onDayClick(e, day)}
-          />
-        </div>
-        <div className="bottom">
-          <Col id="downloadLink">
-            <PDFDownloadLink
-              document={
-                <MyDocument
-                  colour={false}
-                  stamp={stamp}
-                  depts={depts}
-                  numNotes={numNotes}
-                  vNotes={vNotes}
-                  iNotes={iNotes}
-                  holiDays={holiDays}
-                  callList={callList}
-                  entries={entryList}
-                  sked={sked}
-                  type="Published"
-                  dateContext={dateContext}
-                  user={user}
-                />
-              }
-              fileName={
-                dateContext.format("MMMM") +
-                dateContext.format("Y") +
-                "publishedsked.pdf"
-              }
-            >
-              {({ blob, url, loading, error }) =>
-                loading ? (
-                  "Loading document..."
-                ) : (
-                  <span onMouseOver={this.hoverSpan}>
-                    Download as Black & White PDF
-                  </span>
-                )
-              }
-            </PDFDownloadLink>
+        <Row>
+          <Col>
+            <p></p>
           </Col>
-          <Col id="downloadLink">
-            <PDFDownloadLink
-              document={
-                <MyDocument
-                  colour={true}
-                  stamp={stamp}
-                  depts={depts}
-                  numNotes={numNotes}
-                  vNotes={vNotes}
-                  iNotes={iNotes}
-                  holiDays={holiDays}
-                  callList={callList}
-                  entries={entryList}
-                  sked={sked}
-                  type="Published"
-                  dateContext={dateContext}
-                  user={user}
-                />
-              }
-              fileName={
-                dateContext.format("MMMM") +
-                dateContext.format("Y") +
-                "publishedsked.pdf"
-              }
+          <Col>
+            <select
+              value={dateContext.format("MMMM")}
+              onChange={onMonthChange}
+              className="top-child month selector"
             >
-              {({ blob, url, loading, error }) =>
-                loading ? (
-                  "Loading document..."
-                ) : (
-                  <span onMouseOver={this.hoverSpan}>
-                    Download as Colour PDF
-                  </span>
-                )
-              }
-            </PDFDownloadLink>
+              {monthSelect()}
+            </select>
           </Col>
-        </div>
-        {this.adminDownload()}
-        <div className="modal">
-          <Modal show={show} onHide={this.toggleShow}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">
-                {dateContext.format("MMMM") +
-                  " " +
-                  day +
-                  " " +
-                  dateContext.format("Y")}
-              </Modal.Title>
-            </Modal.Header>
+          <Col>
+            <select
+              value={dateContext.format("Y")}
+              onChange={onYearChange}
+              className="top-child year selector"
+            >
+              {yearSelect()}
+            </select>
+          </Col>
+          <Col>
+            <p></p>
+          </Col>
+        </Row>
+        <Row className="psubheader">
+          <Col>
+            <p></p>
+          </Col>
+          <Col>
+            <Button
+              onClick={prevMonth}
+              className="arrow top-child"
+              variant="secondary"
+            >
+              &#x25C0;
+            </Button>
+            <Button
+              onClick={nextMonth}
+              className="arrow top-child"
+              variant="secondary"
+            >
+              &#x25B6;
+            </Button>
+          </Col>
+          <Col>
+            <Button
+              onClick={prevYear}
+              className="arrow top-child"
+              variant="secondary"
+            >
+              &#x25C0;
+            </Button>
+            <Button
+              onClick={nextYear}
+              className="arrow top-child"
+              variant="secondary"
+            >
+              &#x25B6;
+            </Button>
+          </Col>
+          <Col>
+            <p></p>
+          </Col>
+        </Row>
+      </div>
+      <Row className="curr">
+        <Col xl>
+          <h3>{dateContext.format("MMMM") + " " + dateContext.format("Y")}</h3>
+        </Col>
+      </Row>
+      <div className="sked">
+        {nrHolidayList.length > 0 && !render ? loadNewDays(props.today) : false}
+        <Calendar
+          testisadmin={user.isadmin}
+          numNotes={numNotes}
+          vNotes={vNotes}
+          iNotes={iNotes}
+          callList={callList}
+          entries={entryList}
+          sked={sked}
+          holiDays={holiDays}
+          type="Published"
+          dateContext={dateContext}
+          today={today}
+          style={style}
+          onDayClick={(e, day) => onDayClick(e, day)}
+        />
+      </div>
+      <div className="bottom">
+        <Col id="downloadLink">
+          <PDFDownloadLink
+            document={
+              <MyDocument
+                colour={false}
+                stamp={stamp}
+                depts={depts}
+                numNotes={numNotes}
+                vNotes={vNotes}
+                iNotes={iNotes}
+                holiDays={holiDays}
+                callList={callList}
+                entries={entryList}
+                sked={sked}
+                type="Published"
+                dateContext={dateContext}
+                user={user}
+              />
+            }
+            fileName={
+              dateContext.format("MMMM") +
+              dateContext.format("Y") +
+              "publishedsked.pdf"
+            }
+          >
+            {({ loading }) =>
+              loading ? (
+                "Loading document..."
+              ) : (
+                <span onMouseOver={hoverSpan}>
+                  Download as Black & White PDF
+                </span>
+              )
+            }
+          </PDFDownloadLink>
+        </Col>
+        <Col id="downloadLink">
+          <PDFDownloadLink
+            document={
+              <MyDocument
+                colour={true}
+                stamp={stamp}
+                depts={depts}
+                numNotes={numNotes}
+                vNotes={vNotes}
+                iNotes={iNotes}
+                holiDays={holiDays}
+                callList={callList}
+                entries={entryList}
+                sked={sked}
+                type="Published"
+                dateContext={dateContext}
+                user={user}
+              />
+            }
+            fileName={
+              dateContext.format("MMMM") +
+              dateContext.format("Y") +
+              "publishedsked.pdf"
+            }
+          >
+            {({ loading }) =>
+              loading ? (
+                "Loading document..."
+              ) : (
+                <span onMouseOver={hoverSpan}>Download as Colour PDF</span>
+              )
+            }
+          </PDFDownloadLink>
+        </Col>
+      </div>
+      {adminDownload()}
+      <div className="modal">
+        <Modal show={show} onHide={toggleShow}>
+          <Modal.Header closeButton>
+            <Modal.Title id="modalTitle">
+              {dateContext.format("MMMM") +
+                " " +
+                day +
+                " " +
+                dateContext.format("Y")}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <ul>{modalList}</ul>
+            <ul>{noteList}</ul>
+            {adminNotes()}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={toggleShow}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
+      <div className="modal">
+        <Modal show={nShow} onHide={toggleNote}>
+          <Modal.Header closeButton>
+            <Modal.Title id="modalTitle">Edit Note</Modal.Title>
+          </Modal.Header>
+          <Form>
             <Modal.Body>
-              <ul>{modalList}</ul>
-              <ul>{noteList}</ul>
-              {this.adminNotes()}
+              <Form.Group id="note">
+                <Form.Control
+                  required
+                  value={msg}
+                  onChange={onMsgChange}
+                  type="text"
+                  placeholder="Note"
+                />
+              </Form.Group>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={this.toggleShow}>
+              <Button variant="secondary" onClick={toggleNote}>
                 Close
               </Button>
+              <Button onClick={() => editNote(id)} variant="primary">
+                Submit
+              </Button>
             </Modal.Footer>
-          </Modal>
-        </div>
-        <div className="modal">
-          <Modal show={nShow} onHide={this.toggleNote}>
-            <Modal.Header closeButton>
-              <Modal.Title id="modalTitle">Edit Note</Modal.Title>
-            </Modal.Header>
-            <Form>
-              <Modal.Body>
-                <Form.Group id="note">
-                  <Form.Control
-                    required
-                    value={msg}
-                    onChange={this.onMsgChange}
-                    type="text"
-                    placeholder="Note"
-                  />
-                </Form.Group>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={this.toggleNote}>
-                  Close
-                </Button>
-                <Button onClick={() => this.editNote(id)} variant="primary">
-                  Submit
-                </Button>
-              </Modal.Footer>
-            </Form>
-          </Modal>
-        </div>
+          </Form>
+        </Modal>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default PubSchedule;
