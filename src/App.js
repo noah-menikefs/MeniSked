@@ -36,6 +36,11 @@ const App = () => {
   const [entryList, setEntryList] = useState([]);
   const [peopleList, setPeopleList] = useState([]);
 
+  // NEW: Shared state for schedule components
+  const [rHolidayList, setRHolidayList] = useState([]);
+  const [nrHolidayList, setNrHolidayList] = useState([]);
+  const [depts, setDepts] = useState([]);
+
   const loadUser = useCallback((data) => {
     setUser({
       ...initialUser,
@@ -50,33 +55,123 @@ const App = () => {
 
   useEffect(() => {
     const fetchSharedData = async () => {
-      const [entriesRes, peopleRes, callTypesRes] = await Promise.all([
+      const [
+        entriesRes,
+        peopleRes,
+        callTypesRes,
+        rHolidaysRes,
+        nrHolidaysRes,
+        deptsRes,
+      ] = await Promise.all([
         fetch("https://secure-earth-82827.herokuapp.com/sked/entries"),
         fetch("https://secure-earth-82827.herokuapp.com/people"),
         fetch("https://secure-earth-82827.herokuapp.com/callTypes"),
+        fetch("https://secure-earth-82827.herokuapp.com/holiday/r"),
+        fetch("https://secure-earth-82827.herokuapp.com/holiday/nr"),
+        fetch("https://secure-earth-82827.herokuapp.com/departments"),
       ]);
-      const [entries, people, calls] = await Promise.all([
-        entriesRes.json(),
-        peopleRes.json(),
-        callTypesRes.json(),
-      ]);
+
+      const [entries, people, calls, rHolidays, nrHolidays, departments] =
+        await Promise.all([
+          entriesRes.json(),
+          peopleRes.json(),
+          callTypesRes.json(),
+          rHolidaysRes.json(),
+          nrHolidaysRes.json(),
+          deptsRes.json(),
+        ]);
+
       setEntryList(entries);
       setPeopleList(people);
       setCallList(calls.sort((a, b) => a.priority - b.priority));
+      setRHolidayList(rHolidays.filter((holiday) => holiday.isactive === true));
+      setNrHolidayList(nrHolidays);
+      setDepts(departments);
     };
 
     fetchSharedData();
   }, []);
 
+  // NEW: Shared utility functions
+  const processHolidaysForDate = useCallback(
+    (dateContext) => {
+      let newArr = [];
+      nrHolidayList.forEach((nholiday) => {
+        nholiday.eventsked.forEach((date) => {
+          let dateArr = date.split("/");
+          if (
+            dateArr[0] === dateContext.format("MM") &&
+            dateArr[2] === dateContext.format("YYYY")
+          ) {
+            newArr.push({
+              day: parseInt(dateArr[1], 10),
+              name: nholiday.name,
+            });
+          }
+        });
+      });
+
+      rHolidayList.forEach((holiday) => {
+        if (holiday.month === dateContext.format("MMMM")) {
+          newArr.push({
+            day: holiday.day,
+            name: holiday.name,
+          });
+        }
+      });
+      return newArr;
+    },
+    [nrHolidayList, rHolidayList]
+  );
+
+  const filteredEntries = useMemo(() => {
+    return entryList.filter((entry) => entry.isactive === true);
+  }, [entryList]);
+
   //used for rendering when signed in
   const inRenderSwitch = (route) => {
     switch (route) {
       case "Personal Schedule":
-        return <PerSchedule callList={callList} today={today} user={user} />;
+        return (
+          <PerSchedule
+            callList={callList}
+            today={today}
+            user={user}
+            // NEW: Pass shared data
+            nrHolidayList={nrHolidayList}
+            depts={depts}
+            processHolidaysForDate={processHolidaysForDate}
+            entryList={filteredEntries}
+          />
+        );
       case "Master Schedule":
-        return <PubSchedule callList={callList} today={today} user={user} />;
+        return (
+          <PubSchedule
+            callList={callList}
+            today={today}
+            user={user}
+            // NEW: Pass shared data
+            nrHolidayList={nrHolidayList}
+            depts={depts}
+            processHolidaysForDate={processHolidaysForDate}
+            entryList={filteredEntries}
+            peopleList={peopleList}
+          />
+        );
       case "Call Schedule":
-        return <CSchedule callList={callList} today={today} user={user} />;
+        return (
+          <CSchedule
+            callList={callList}
+            today={today}
+            user={user}
+            // NEW: Pass shared data
+            rHolidayList={rHolidayList}
+            nrHolidayList={nrHolidayList}
+            depts={depts}
+            processHolidaysForDate={processHolidaysForDate}
+            peopleList={peopleList}
+          />
+        );
       case "Account Information":
         return <Account loadUser={loadUser} user={user} />;
       case "Admin Messages":

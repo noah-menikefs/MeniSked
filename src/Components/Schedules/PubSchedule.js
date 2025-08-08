@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Calendar from "./Calendar/Calendar";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -18,47 +18,81 @@ const style = {
 };
 
 const PubSchedule = (props) => {
-  const [numNotes, setNumNotes] = useState([]);
-  const [vNotes, setVNotes] = useState([]);
-  const [iNotes, setINotes] = useState([]);
   const [show, setShow] = useState(false);
   const [nShow, setNShow] = useState(false);
   const [dateContext, setDateContext] = useState(moment());
   const [note, setNote] = useState("");
   const [radio, setRadio] = useState(0);
-  const [rHolidayList, setRHolidayList] = useState([]);
-  const [nrHolidayList, setNRHolidayList] = useState([]);
   const [holiDays, setHoliDays] = useState([]);
   const [render, setRender] = useState(false);
-  const [sked, setSked] = useState([]);
-  const [entryList, setEntryList] = useState([]);
   const [day, setDay] = useState(-1);
   const [published, setPublished] = useState(-1);
-  const [depts, setDepts] = useState([]);
   const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
   const [msg, setMsg] = useState("");
   const [id, setId] = useState(-1);
+  const [allNotes, setAllNotes] = useState({
+    numNotes: [],
+    vNotes: [],
+    iNotes: [],
+  });
 
   const months = moment.months(); // List of each month
 
+  const { numNotes, vNotes, iNotes } = allNotes;
+
+  // Extract shared data from props
+  const {
+    today,
+    user,
+    callList,
+    nrHolidayList,
+    depts,
+    processHolidaysForDate,
+    peopleList,
+    entryList,
+  } = props;
+
   const priorityCheck = useCallback(
     (id) => {
-      const { callList } = props;
-      let index = -1;
       for (let n = 0; n < callList.length; n++) {
         if (callList[n].id === id) {
-          index = n;
-          break;
+          return callList[n].priority;
         }
       }
-      if (index !== -1) {
-        return callList[index].priority;
-      } else {
-        return 1000;
-      }
+      return 1000;
     },
-    [props]
+    [callList]
   );
+
+  // NEW: Shared data processing
+  const sked = useMemo(() => {
+    let allSked = [];
+    peopleList.forEach((person) => {
+      person.worksked.forEach((work) => {
+        allSked.push({
+          id: work.id,
+          date: work.date,
+          name: person.lastname,
+          colour: person.colour,
+          priority: priorityCheck(work.id),
+        });
+      });
+    });
+    allSked.sort((a, b) => a.priority - b.priority);
+    return allSked;
+  }, [peopleList, priorityCheck]);
+
+  const loadAllNotes = useCallback(() => {
+    fetch("https://secure-earth-82827.herokuapp.com/sked/allNotes")
+      .then((response) => response.json())
+      .then((notes) => {
+        setAllNotes({
+          numNotes: notes.filter((note) => note.type === 1),
+          vNotes: notes.filter((note) => note.type === 2),
+          iNotes: notes.filter((note) => note.type === 3),
+        });
+      });
+  }, []);
 
   const loadPublished = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/published")
@@ -81,123 +115,24 @@ const PubSchedule = (props) => {
       .then((num) => setPublished(num));
   };
 
-  const loadSked = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/people")
-      .then((response) => response.json())
-      .then((docs) => {
-        let arr = [];
-        for (let i = 0; i < docs.length; i++) {
-          for (let j = 0; j < docs[i].worksked.length; j++) {
-            arr.push({
-              id: docs[i].worksked[j].id,
-              date: docs[i].worksked[j].date,
-              name: docs[i].lastname,
-              colour: docs[i].colour,
-              priority: priorityCheck(docs[i].worksked[j].id),
-            });
-          }
-        }
-        arr.sort(function (a, b) {
-          return a.priority - b.priority;
-        });
-        setSked(arr);
-      });
-  }, [priorityCheck]);
-
-  const loadDepts = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/departments")
-      .then((response) => response.json())
-      .then((departments) => setDepts(departments));
-  }, []);
-
-  const loadEntries = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/sked/entries")
-      .then((response) => response.json())
-      .then((entries) =>
-        setEntryList(entries.filter((entry) => entry.isactive === true))
-      );
-  }, []);
-
-  const loadAllNotes = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/sked/allNotes")
-      .then((response) => response.json())
-      .then((notes) => {
-        setNumNotes(notes.filter((note) => note.type === 1));
-        setVNotes(notes.filter((note) => note.type === 2));
-        setINotes(notes.filter((note) => note.type === 3));
-      });
-  }, []);
-
-  const loadrHolidays = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/holiday/r")
-      .then((response) => response.json())
-      .then((holidays) =>
-        setRHolidayList(holidays.filter((holiday) => holiday.isactive === true))
-      );
-  }, []);
-
-  const loadnrHolidays = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/holiday/nr")
-      .then((response) => response.json())
-      .then((holidays) => setNRHolidayList(holidays));
-  }, []);
-
   const loadNewDays = useCallback(
     (dateContext) => {
-      let newArr = [];
-      nrHolidayList.forEach((nholiday) => {
-        nholiday.eventsked.forEach((date) => {
-          let dateArr = date.split("/");
-          if (
-            dateArr[0] === dateContext.format("MM") &&
-            dateArr[2] === dateContext.format("YYYY")
-          ) {
-            newArr.push({
-              day: parseInt(dateArr[1], 10),
-              name: nholiday.name,
-            });
-          }
-        });
-      });
-
-      rHolidayList.forEach((holiday) => {
-        if (holiday.month === dateContext.format("MMMM")) {
-          newArr.push({
-            day: holiday.day,
-            name: holiday.name,
-          });
-        }
-      });
+      const newArr = processHolidaysForDate(dateContext);
       setHoliDays(newArr);
       setRender(true);
     },
-    [nrHolidayList, rHolidayList]
+    [processHolidaysForDate]
   );
 
   useEffect(() => {
-    loadAllNotes();
-    loadrHolidays();
-    loadnrHolidays();
-    loadEntries();
-    loadSked();
     loadPublished();
-    loadDepts();
-  }, [
-    loadAllNotes,
-    loadrHolidays,
-    loadnrHolidays,
-    loadEntries,
-    loadSked,
-    loadPublished,
-    loadDepts,
-  ]);
+  }, [loadPublished]);
 
-  // Load holidays for the current date context when component mounts or date changes
   useEffect(() => {
     if (nrHolidayList.length > 0 && !render) {
-      loadNewDays(props.today);
+      loadNewDays(today);
     }
-  }, [nrHolidayList, render, props.today, loadNewDays]);
+  }, [nrHolidayList.length, render, today, loadNewDays]);
 
   const onDayClick = (e, day) => {
     let newDateContext = moment(dateContext).set("date", day);
@@ -219,7 +154,7 @@ const PubSchedule = (props) => {
 
   const nextMonth = () => {
     let newDateContext = moment(dateContext).add(1, "month");
-    if (!props.user.isadmin) {
+    if (!user.isadmin) {
       let nMonth = moment([2020, 5, 1]).add(published, "month").month();
       let nYear = moment([2020, 5, 1]).add(published, "month").year();
       if (newDateContext.year() < nYear) {
@@ -231,7 +166,7 @@ const PubSchedule = (props) => {
           loadNewDays(newDateContext);
         }
       }
-    } else if (newDateContext.year() <= props.today.year() + 10) {
+    } else if (newDateContext.year() <= today.year() + 10) {
       setDateContext(newDateContext);
       loadNewDays(newDateContext);
     }
@@ -246,14 +181,14 @@ const PubSchedule = (props) => {
   };
 
   const nextYear = () => {
-    if (!props.user.isadmin) {
+    if (!user.isadmin) {
       let nYear = moment([2020, 5, 1]).add(published, "month").year();
       if (dateContext.year() + 1 <= nYear) {
         let newDateContext = moment(dateContext).add(1, "year");
         setDateContext(newDateContext);
         loadNewDays(newDateContext);
       }
-    } else if (dateContext.year() + 1 <= props.today.year() + 10) {
+    } else if (dateContext.year() + 1 <= today.year() + 10) {
       let newDateContext = moment(dateContext).add(1, "year");
       setDateContext(newDateContext);
       loadNewDays(newDateContext);
@@ -270,7 +205,7 @@ const PubSchedule = (props) => {
 
   const setYear = (year) => {
     let newDateContext = moment(dateContext).set("year", year);
-    if (!props.user.isadmin) {
+    if (!user.isadmin) {
       let nMonth = moment([2020, 5, 1]).add(published, "month").month();
       let nYear = moment([2020, 5, 1]).add(published, "month").year();
       if (newDateContext.year() === nYear && nMonth < newDateContext.month()) {
@@ -326,15 +261,14 @@ const PubSchedule = (props) => {
   };
 
   const reset = () => {
-    const { today } = props;
     setDateContext(today);
     loadNewDays(today);
   };
 
   const yearSelect = () => {
     let arr = [];
-    let fYear = props.today.year();
-    if (props.user.isadmin) {
+    let fYear = today.year();
+    if (user.isadmin) {
       for (let i = 2020; i <= fYear + 10; i++) {
         arr.push(
           <option key={i} value={i}>
@@ -356,7 +290,6 @@ const PubSchedule = (props) => {
   };
 
   const monthSelect = () => {
-    const { user } = props;
     let m = 11;
     let arr = [];
     if (!user.isadmin) {
@@ -377,7 +310,6 @@ const PubSchedule = (props) => {
   };
 
   const publishShow = () => {
-    const { user } = props;
     if (user.isadmin) {
       let nYear = moment([2020, 5, 1]).add(published, "month").year();
       let nMonth = moment([2020, 5, 1]).add(published, "month").month();
@@ -413,7 +345,7 @@ const PubSchedule = (props) => {
   };
 
   const adminNotes = () => {
-    if (props.user.isadmin) {
+    if (user.isadmin) {
       return (
         <Form>
           <hr />
@@ -461,7 +393,6 @@ const PubSchedule = (props) => {
   };
 
   const idToName = (id) => {
-    const { callList } = props;
     for (let n = 0; n < callList.length; n++) {
       if (callList[n].id === id) {
         return callList[n].name;
@@ -479,9 +410,9 @@ const PubSchedule = (props) => {
   };
 
   const adminDownload = () => {
-    if (props.user.isadmin) {
-      let user = Object.assign({}, props.user);
-      user.isadmin = false;
+    if (user.isadmin) {
+      let userCopy = { ...user };
+      userCopy.isadmin = false;
 
       return (
         <Row>
@@ -496,12 +427,12 @@ const PubSchedule = (props) => {
                   vNotes={vNotes}
                   iNotes={iNotes}
                   holiDays={holiDays}
-                  callList={props.callList}
+                  callList={callList}
                   entries={entryList}
                   sked={sked}
                   type="Published"
                   dateContext={dateContext}
-                  user={user}
+                  user={userCopy}
                 />
               }
               fileName={
@@ -532,12 +463,12 @@ const PubSchedule = (props) => {
                   vNotes={vNotes}
                   iNotes={iNotes}
                   holiDays={holiDays}
-                  callList={props.callList}
+                  callList={callList}
                   entries={entryList}
                   sked={sked}
                   type="Published"
                   dateContext={dateContext}
-                  user={user}
+                  user={userCopy}
                 />
               }
               fileName={
@@ -604,26 +535,22 @@ const PubSchedule = (props) => {
     setMsg(e.target.value);
   };
 
-  const { today, user, callList } = props;
-
   let modalList = [];
-  for (let i = 0; i < sked.length; i++) {
-    const splitArr = sked[i].date.split("/");
+  sked.forEach((item, index) => {
+    const splitArr = item.date.split("/");
     if (
       splitArr[0] === dateContext.format("MM") &&
       parseInt(splitArr[1], 10) === day &&
       splitArr[2] === dateContext.format("YYYY")
     ) {
       modalList.push(
-        <li key={i}>
-          {idToName(sked[i].id) + " "}
-          <span style={{ backgroundColor: sked[i].colour }}>
-            {sked[i].name}
-          </span>
+        <li key={index}>
+          {idToName(item.id) + " "}
+          <span style={{ backgroundColor: item.colour }}>{item.name}</span>
         </li>
       );
     }
-  }
+  });
 
   let noteList = [];
 

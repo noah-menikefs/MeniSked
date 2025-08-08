@@ -20,49 +20,32 @@ const style = {
 const PerSchedule = (props) => {
   // State management with hooks
   const [activeDocs, setActiveDocs] = useState([]);
-  const [entries, setEntries] = useState([]);
   const [docIndex, setDocIndex] = useState(0);
   const [entryIndex, setEntryIndex] = useState(0);
   const [show, setShow] = useState(false);
   const [dateContext, setDateContext] = useState(moment());
   const [radio, setRadio] = useState(-1);
   const [day, setDay] = useState(0);
-  const [rHolidayList, setRHolidayList] = useState([]);
-  const [nrHolidayList, setNrHolidayList] = useState([]);
   const [holiDays, setHoliDays] = useState([]);
   const [personalDays, setPersonalDays] = useState([]);
   const [render, setRender] = useState(false);
   const [pending, setPending] = useState([]);
-  const [depts, setDepts] = useState([]);
   const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
 
-  const { user, today, callList } = props;
+  // Extract shared data from props
+  const {
+    user,
+    today,
+    callList,
+    nrHolidayList,
+    depts,
+    processHolidaysForDate,
+    entryList,
+  } = props;
   const months = moment.months(); // List of each month
   const isMountedRef = useRef(true);
 
   // Load functions
-  const loadrHolidays = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/holiday/r")
-      .then((response) => response.json())
-      .then((holidays) => {
-        if (isMountedRef.current) {
-          setRHolidayList(
-            holidays.filter((holiday) => holiday.isactive === true)
-          );
-        }
-      });
-  }, []);
-
-  const loadnrHolidays = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/holiday/nr")
-      .then((response) => response.json())
-      .then((holidays) => {
-        if (isMountedRef.current) {
-          setNrHolidayList(holidays);
-        }
-      });
-  }, []);
-
   const loadPersonalDays = useCallback(
     (index, docs = activeDocs) => {
       setPersonalDays([...docs[index].worksked]);
@@ -89,46 +72,13 @@ const PerSchedule = (props) => {
       });
   }, [render, user.id, loadPersonalDays]);
 
-  const loadEntries = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/sked/entries")
-      .then((response) => response.json())
-      .then((entries) => {
-        if (isMountedRef.current) {
-          setEntries(entries.filter((entry) => entry.isactive === true));
-        }
-      });
-  }, []);
-
   const loadNewDays = useCallback(
     (dateContext) => {
-      let newArr = [];
-      nrHolidayList.forEach((nholiday) => {
-        nholiday.eventsked.forEach((date) => {
-          let dateArr = date.split("/");
-          if (
-            dateArr[0] === dateContext.format("MM") &&
-            dateArr[2] === dateContext.format("YYYY")
-          ) {
-            newArr.push({
-              day: parseInt(dateArr[1], 10),
-              name: nholiday.name,
-            });
-          }
-        });
-      });
-
-      rHolidayList.forEach((holiday) => {
-        if (holiday.month === dateContext.format("MMMM")) {
-          newArr.push({
-            day: holiday.day,
-            name: holiday.name,
-          });
-        }
-      });
+      const newArr = processHolidaysForDate(dateContext);
       setHoliDays(newArr);
       setRender(true);
     },
-    [nrHolidayList, rHolidayList]
+    [processHolidaysForDate]
   );
 
   const loadPersonalSked = useCallback((user) => {
@@ -161,16 +111,6 @@ const PerSchedule = (props) => {
     },
     [user.id]
   );
-
-  const loadDepts = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/departments")
-      .then((response) => response.json())
-      .then((departments) => {
-        if (isMountedRef.current) {
-          setDepts(departments);
-        }
-      });
-  }, []);
 
   const assignCall = useCallback(
     (typeID, method, date) => {
@@ -356,7 +296,7 @@ const PerSchedule = (props) => {
   // Event handlers
   const onDayClick = useCallback(
     (e, day) => {
-      const id = entries[entryIndex].id;
+      const id = entryList[entryIndex].id;
       if (id === 1) {
         setDay(day);
         setShow(true);
@@ -364,7 +304,7 @@ const PerSchedule = (props) => {
         assignOrDelete(id, day);
       }
     },
-    [entries, entryIndex, assignOrDelete]
+    [entryList, entryIndex, assignOrDelete]
   );
 
   // Navigation functions
@@ -422,21 +362,21 @@ const PerSchedule = (props) => {
 
   const nextEntry = useCallback(() => {
     let i = entryIndex;
-    if (i !== entries.length - 1) {
+    if (i !== entryList.length - 1) {
       setEntryIndex(i + 1);
     } else {
       setEntryIndex(0);
     }
-  }, [entryIndex, entries.length]);
+  }, [entryIndex, entryList.length]);
 
   const prevEntry = useCallback(() => {
     let i = entryIndex;
     if (i !== 0) {
       setEntryIndex(i - 1);
     } else {
-      setEntryIndex(entries.length - 1);
+      setEntryIndex(entryList.length - 1);
     }
-  }, [entryIndex, entries.length]);
+  }, [entryIndex, entryList.length]);
 
   const nextYear = useCallback(() => {
     if (dateContext.year() + 1 <= today.year() + 10) {
@@ -488,15 +428,15 @@ const PerSchedule = (props) => {
   const onEntryChange = useCallback(
     (event) => {
       let index = -1;
-      for (let i = 0; i < entries.length; i++) {
-        if (entries[i].name === event.target.value) {
+      for (let i = 0; i < entryList.length; i++) {
+        if (entryList[i].name === event.target.value) {
           index = i;
           break;
         }
       }
       setEntryIndex(index);
     },
-    [entries]
+    [entryList]
   );
 
   const onMonthChange = useCallback(
@@ -558,18 +498,7 @@ const PerSchedule = (props) => {
   // useEffect hooks for lifecycle management
   useEffect(() => {
     loadActiveDocs();
-    loadEntries();
-    loadrHolidays();
-    loadnrHolidays();
-    loadDepts();
-  }, [
-    loadActiveDocs,
-    loadEntries,
-    loadrHolidays,
-    loadnrHolidays,
-    loadDepts,
-    props,
-  ]);
+  }, [loadActiveDocs]);
 
   useEffect(() => {
     if (user.id) {
@@ -615,7 +544,7 @@ const PerSchedule = (props) => {
     }
   };
 
-  let entryFilter = entries.filter((entry) => {
+  let entryFilter = entryList.filter((entry) => {
     return entry.isactive;
   });
 
@@ -628,10 +557,10 @@ const PerSchedule = (props) => {
   });
 
   let eSelect = () => {
-    if (entries.length !== 0) {
+    if (entryList.length !== 0) {
       return (
         <select
-          value={entries[entryIndex].name}
+          value={entryList[entryIndex].name}
           onChange={onEntryChange}
           className="top-child types selector"
         >
@@ -908,7 +837,7 @@ const PerSchedule = (props) => {
       <div className="sked">
         <Calendar
           pending={pending}
-          entries={entries}
+          entries={entryList}
           callList={callList}
           personalDays={personalDays}
           holiDays={holiDays}
@@ -930,7 +859,7 @@ const PerSchedule = (props) => {
                 numNotes={[]}
                 vNotes={[]}
                 iNotes={[]}
-                entries={entries}
+                entries={entryList}
                 callList={callList}
                 personalDays={personalDays}
                 holiDays={holiDays}
