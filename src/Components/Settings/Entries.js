@@ -1,222 +1,169 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Button from "react-bootstrap/Button";
 import Scroll from "./../Scroll/Scroll";
 import Form from "react-bootstrap/Form";
 import "./Settings.css";
 
-class Entries extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      entryList: [],
-      entryName: "",
-      isactive: false,
-      add: true,
-      id: -1,
-    };
-  }
+const Entries = () => {
+  const [entryList, setEntryList] = useState([]);
+  const [entryName, setEntryName] = useState("");
+  const [isactive, setIsActive] = useState(false);
+  const [add, setAdd] = useState(true);
+  const [id, setId] = useState(-1);
 
-  componentDidMount = () => {
-    this.loadEntries();
-  };
-
-  loadEntries = () => {
+  const loadEntries = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/sked/entries")
-      .then((response) => response.json())
-      .then((entries) => this.setState({ entryList: entries }));
+      .then((res) => res.json())
+      .then(setEntryList);
+  }, []);
+
+  useEffect(() => {
+    loadEntries();
+  }, [loadEntries]);
+
+  const onNameChange = (e) => setEntryName(e.target.value);
+  const onActiveChange = () => setIsActive((prev) => !prev);
+
+  const onCancel = () => {
+    setEntryName("");
+    setIsActive(false);
+    setAdd(true);
+    setId(-1);
   };
 
-  addOrEdit = () => {
-    if (this.state.add) {
-      this.addEntry();
-    } else {
-      this.editEntry();
-    }
-  };
-
-  addEntry = () => {
-    const { entryName, isactive } = this.state;
+  const addEntry = () => {
     if (entryName.length > 0) {
       fetch("https://secure-earth-82827.herokuapp.com/entries", {
         method: "post",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: entryName,
-          active: isactive,
-        }),
+        body: JSON.stringify({ name: entryName, active: isactive }),
       })
-        .then((response) => response.json())
+        .then((res) => res.json())
         .then((entry) => {
-          if (entry) {
-            this.loadEntries();
-          }
+          if (entry) loadEntries();
         });
-      this.setState({
-        entryName: "",
-        isactive: false,
-      });
+      onCancel();
     }
   };
 
-  deleteCall = (e) => {
-    fetch("https://secure-earth-82827.herokuapp.com/entries", {
-      method: "delete",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: parseInt(e.target.parentNode.id, 10),
-      }),
-    })
-      .then((response) => response.json())
-      .then((entries) => {
-        if (entries) {
-          this.loadEntries();
-        }
-      });
-    this.setState({
-      entryName: "",
-      isactive: false,
-      add: true,
-      id: -1,
-    });
-  };
-
-  editEntry = () => {
-    const { entryName, isactive, id } = this.state;
+  const editEntry = () => {
     if (entryName.length > 0) {
       fetch("https://secure-earth-82827.herokuapp.com/entries", {
         method: "put",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: entryName,
-          active: isactive,
-          id: parseInt(id, 10),
-        }),
+        body: JSON.stringify({ name: entryName, active: isactive, id }),
       })
-        .then((response) => response.json())
+        .then((res) => res.json())
         .then((entry) => {
-          if (entry) {
-            this.loadEntries();
-          }
+          if (entry) loadEntries();
         });
-      this.setState({
-        entryName: "",
-        isactive: false,
-        add: true,
-        id: -1,
+
+      onCancel();
+    }
+  };
+
+  const addOrEdit = () => {
+    if (add) {
+      addEntry();
+    } else {
+      editEntry();
+    }
+  };
+
+  const deleteCall = (e) => {
+    const targetId = parseInt(e.target.parentNode.id, 10);
+    fetch("https://secure-earth-82827.herokuapp.com/entries", {
+      method: "delete",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: targetId }),
+    })
+      .then((res) => res.json())
+      .then((entries) => {
+        if (entries) loadEntries();
       });
+
+    onCancel();
+  };
+
+  const onEdit = (e) => {
+    const targetId = parseInt(e.target.parentNode.id, 10);
+    const match = entryList.find((entry) => entry.id === targetId);
+    if (match) {
+      setEntryName(match.name);
+      setIsActive(match.isactive);
+      setAdd(false);
+      setId(targetId);
     }
   };
 
-  onNameChange = (e) => {
-    this.setState({ entryName: e.target.value });
-  };
-
-  onActiveChange = () => {
-    this.setState({ isactive: !this.state.isactive });
-  };
-
-  onEdit = (e) => {
-    const { entryList } = this.state;
-    const id = parseInt(e.target.parentNode.id, 10);
-    for (let i = 0; i < entryList.length; i++) {
-      if (entryList[i].id === id) {
-        this.setState({
-          entryName: entryList[i].name,
-          isactive: entryList[i].isactive,
-          add: false,
-          id: id,
-        });
-        break;
-      }
-    }
-  };
-
-  onCancel = () => {
-    this.setState({
-      entryName: "",
-      isactive: false,
-      add: true,
-      id: -1,
-    });
-  };
-
-  render() {
-    const { entryList, entryName, isactive } = this.state;
-    let priorityList = [];
-    for (let j = 0; j < entryList.length; j++) {
-      priorityList.push(
-        <li key={entryList[j].name} id={entryList[j].id}>
-          {entryList[j].name}
-          <Button
-            key={j}
-            onClick={this.onEdit}
-            className="edit butn"
-            size="sm"
-            variant="secondary"
-          >
-            Edit
-          </Button>
-          <Button
-            key={-j - 1}
-            onClick={this.deleteCall}
-            className="delete butn"
-            size="sm"
-            variant="danger"
-          >
-            Delete
-          </Button>
-        </li>
-      );
-    }
-    return (
-      <div className="body">
-        <div className="left">
-          <div className="top">
-            <h4 className="subtitle">Entry List</h4>
-          </div>
-          <Scroll>
-            <ol className="setList">{priorityList}</ol>
-          </Scroll>
+  return (
+    <div className="body">
+      <div className="left">
+        <div className="top">
+          <h4 className="subtitle">Entry List</h4>
         </div>
-        <div className="ct right">
-          <div className="top">
-            <h4 className="subtitle">Add/Edit Calls</h4>
-          </div>
-          <Form id="callForm">
-            <div
-              id="box"
-              style={{ border: "2px solid black", height: "125px" }}
-            >
-              <Form.Group id="name">
-                <Form.Control
-                  required
-                  value={entryName}
-                  onChange={this.onNameChange}
-                  type="text"
-                  placeholder="Name"
-                />
-              </Form.Group>
-              <Form.Group id="activeCheck" controlId="formBasicCheckbox">
-                <Form.Check
-                  onChange={this.onActiveChange}
-                  checked={isactive}
-                  type="checkbox"
-                  label="Active"
-                />
-              </Form.Group>
-            </div>
-            <div className="bottom">
-              <Button onClick={this.onCancel} id="callSub" variant="secondary">
-                Cancel
-              </Button>
-              <Button id="callSub" variant="primary" onClick={this.addOrEdit}>
-                Submit
-              </Button>
-            </div>
-          </Form>
-        </div>
+        <Scroll>
+          <ol className="setList">
+            {entryList.map((entry) => (
+              <li key={entry.name} id={entry.id}>
+                {entry.name}
+                <Button
+                  onClick={onEdit}
+                  className="edit butn"
+                  size="sm"
+                  variant="secondary"
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={deleteCall}
+                  className="delete butn"
+                  size="sm"
+                  variant="danger"
+                >
+                  Delete
+                </Button>
+              </li>
+            ))}
+          </ol>
+        </Scroll>
       </div>
-    );
-  }
-}
+      <div className="ct right">
+        <div className="top">
+          <h4 className="subtitle">Add/Edit Calls</h4>
+        </div>
+        <Form id="callForm">
+          <div id="box" style={{ border: "2px solid black", height: "125px" }}>
+            <Form.Group id="name">
+              <Form.Control
+                required
+                value={entryName}
+                onChange={onNameChange}
+                type="text"
+                placeholder="Name"
+              />
+            </Form.Group>
+            <Form.Group id="activeCheck" controlId="formBasicCheckbox">
+              <Form.Check
+                onChange={onActiveChange}
+                checked={isactive}
+                type="checkbox"
+                label="Active"
+              />
+            </Form.Group>
+          </div>
+          <div className="bottom">
+            <Button onClick={onCancel} id="callSub" variant="secondary">
+              Cancel
+            </Button>
+            <Button id="callSub" variant="primary" onClick={addOrEdit}>
+              Submit
+            </Button>
+          </div>
+        </Form>
+      </div>
+    </div>
+  );
+};
+
 export default Entries;
