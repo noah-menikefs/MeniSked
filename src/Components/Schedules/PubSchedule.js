@@ -126,7 +126,8 @@ const PubSchedule = (props) => {
 
   useEffect(() => {
     loadPublished();
-  }, [loadPublished]);
+    loadAllNotes();
+  }, [loadPublished, loadAllNotes]);
 
   useEffect(() => {
     if (nrHolidayList.length > 0 && !render) {
