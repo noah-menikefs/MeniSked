@@ -7,6 +7,7 @@ import MyDocument from "./../PDF/MyDocument";
 import Modal from "react-bootstrap/Modal";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import moment from "moment";
+import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 
 import "./Schedules.css";
 
@@ -17,7 +18,6 @@ const style = {
 };
 
 const CSchedule = (props) => {
-  const [dateContext, setDateContext] = useState(moment());
   const [show, setShow] = useState(false);
   const [holiDays, setHoliDays] = useState([]);
   const [render, setRender] = useState(false);
@@ -74,6 +74,23 @@ const CSchedule = (props) => {
     [processHolidaysForDate]
   );
 
+  const {
+    dateContext,
+    setDateContext,
+    setMonth,
+    setYear,
+    nextMonth,
+    prevMonth,
+    nextYear,
+    prevYear,
+    reset,
+  } = useCalendarNavigation({
+    initialDate: today,
+    minYear: 2020,
+    maxYear: today.year() + 10,
+    onChange: loadNewDays,
+  });
+
   useEffect(() => {
     if (nrHolidayList.length > 0 && !render) {
       loadNewDays(today);
@@ -91,52 +108,7 @@ const CSchedule = (props) => {
     setDay(d);
   };
 
-  const months = moment.months(); // List of each month
-
-  const setMonth = (month) => {
-    const monthNo = months.indexOf(month);
-    const ctx = moment(dateContext).set("month", monthNo);
-    setDateContext(ctx);
-    loadNewDays(ctx);
-  };
-
-  const nextMonth = () => {
-    const ctx = moment(dateContext).add(1, "month");
-    if (ctx.year() <= today.year() + 10) {
-      setDateContext(ctx);
-      loadNewDays(ctx);
-    }
-  };
-
-  const prevMonth = () => {
-    const ctx = moment(dateContext).subtract(1, "month");
-    if (ctx.year() >= 2020) {
-      setDateContext(ctx);
-      loadNewDays(ctx);
-    }
-  };
-
-  const nextYear = () => {
-    const ctx = moment(dateContext).add(1, "year");
-    if (ctx.year() <= today.year() + 10) {
-      setDateContext(ctx);
-      loadNewDays(ctx);
-    }
-  };
-
-  const prevYear = () => {
-    const ctx = moment(dateContext).subtract(1, "year");
-    if (ctx.year() >= 2020) {
-      setDateContext(ctx);
-      loadNewDays(ctx);
-    }
-  };
-
-  const setYear = (year) => {
-    const ctx = moment(dateContext).set("year", year);
-    setDateContext(ctx);
-    loadNewDays(ctx);
-  };
+  // Keep initial load behavior on first holidays ready
 
   const onMonthChange = (e) => {
     setMonth(e.target.value);
@@ -144,11 +116,6 @@ const CSchedule = (props) => {
 
   const onYearChange = (e) => {
     setYear(e.target.value);
-  };
-
-  const reset = () => {
-    setDateContext(today);
-    loadNewDays(today);
   };
 
   const idToName = (id) => {
