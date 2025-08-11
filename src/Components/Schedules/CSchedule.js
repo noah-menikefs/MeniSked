@@ -210,7 +210,6 @@ const CSchedule = (props) => {
         <CalendarGrid
           year={Number(dateContext.format("YYYY"))}
           monthIndex={Number(dateContext.format("M")) - 1}
-          currentDay={Number(dateContext.format("D"))}
           days={days}
           style={style}
           onDayClick={onDayClick}

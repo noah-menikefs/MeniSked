@@ -8,7 +8,6 @@ import "./Calendar.css";
  * Props:
  * - year: number (YYYY)
  * - monthIndex: number (0-11)
- * - currentDay: number (1..daysInMonth) to highlight; optional
  * - onDayClick: (day: number) => void
  * - days: Array<{ day: number, holidayName?: string, numberNote?: string, contentItems?: React.ReactNode[] }>
  * - style?: React.CSSProperties
@@ -16,7 +15,6 @@ import "./Calendar.css";
 const CalendarGrid = ({
   year,
   monthIndex,
-  currentDay,
   onDayClick,
   days = [],
   style = {},
@@ -52,10 +50,9 @@ const CalendarGrid = ({
   const dayCells = Array.from({ length: daysInMonth }, (_, idx) => {
     const d = idx + 1;
     const data = dayMap.get(d) || {};
-    const className = d === currentDay ? "day current-day" : "day";
     const hasHoliday = Boolean(data.holidayName);
     return (
-      <td key={d} onClick={() => onDayClick(d)} className={className}>
+      <td key={d} onClick={() => onDayClick(d)} className="day">
         <div className="spacer">
           {hasHoliday ? <span id="holiday">{data.holidayName}</span> : null}
           {data.numberNote ? (
