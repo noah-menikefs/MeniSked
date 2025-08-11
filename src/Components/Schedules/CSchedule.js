@@ -94,9 +94,14 @@ const CSchedule = (props) => {
     toggleShow(d);
   };
 
-  const toggleShow = (d) => {
+  const toggleShow = (maybeDay) => {
     setShow((prev) => !prev);
-    setDay(d);
+    if (typeof maybeDay === "number" && Number.isFinite(maybeDay)) {
+      setDay(maybeDay);
+    } else {
+      // Reset day when called from events like Modal.onHide/Button.onClick
+      setDay(-1);
+    }
   };
 
   const onMonthChange = (e) => {
@@ -254,11 +259,11 @@ const CSchedule = (props) => {
         </Col>
       </div>
       <div className="modal">
-        <Modal show={show} onHide={toggleShow}>
+        <Modal show={show} onHide={() => toggleShow()}>
           <Modal.Header closeButton>
             <Modal.Title id="modalTitle">
               {`${dateContext.format("MMMM")} ${
-                day > 0
+                typeof day === "number" && day > 0
                   ? String(day).padStart(2, "0")
                   : dateContext.format("DD")
               }, ${dateContext.format("YYYY")}`}
@@ -268,7 +273,7 @@ const CSchedule = (props) => {
             <ul>{modalList}</ul>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={toggleShow}>
+            <Button variant="secondary" onClick={() => toggleShow()}>
               Close
             </Button>
           </Modal.Footer>
