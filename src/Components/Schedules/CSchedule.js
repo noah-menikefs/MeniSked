@@ -11,6 +11,7 @@ import useHolidays from "../../hooks/useHolidays";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import { buildCallMonthDays } from "../../selectors/calendarData";
 import { buildCallSkedFromPeople } from "../../utils/scheduleUtils";
+import usePdfStamp from "../../hooks/usePdfStamp";
 
 import "./Schedules.css";
 
@@ -23,7 +24,7 @@ const style = {
 const CSchedule = (props) => {
   const [show, setShow] = useState(false);
   const [day, setDay] = useState(-1);
-  const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
+  const { stamp, updateStamp } = usePdfStamp();
 
   // Extract shared data from props
   const {
@@ -53,8 +54,7 @@ const CSchedule = (props) => {
     reset,
   } = useCalendarNavigation({
     initialDate: today,
-    minYear: 2020,
-    maxYear: today.year() + 10,
+    maxDate: moment(today).add(10, "year"),
   });
 
   // Holidays recompute when dateContext or holiday data changes
@@ -96,9 +96,7 @@ const CSchedule = (props) => {
     }
   };
 
-  const hoverSpan = () => {
-    setStamp(moment().format("YYYY-MM-DD HH:mm"));
-  };
+  const hoverSpan = () => updateStamp();
 
   let yearSelect = [];
 

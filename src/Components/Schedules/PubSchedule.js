@@ -7,6 +7,9 @@ import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
+import CalendarHeader from "./Calendar/CalendarHeader";
+import useCalendarNavigation from "../../hooks/useCalendarNavigation";
+import useHolidays from "../../hooks/useHolidays";
 
 import "./Schedules.css";
 
@@ -19,11 +22,8 @@ const style = {
 const PubSchedule = (props) => {
   const [show, setShow] = useState(false);
   const [nShow, setNShow] = useState(false);
-  const [dateContext, setDateContext] = useState(moment());
   const [note, setNote] = useState("");
   const [radio, setRadio] = useState(0);
-  const [holiDays, setHoliDays] = useState([]);
-  const [render, setRender] = useState(false);
   const [day, setDay] = useState(-1);
   const [published, setPublished] = useState(-1);
   const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
@@ -36,6 +36,10 @@ const PubSchedule = (props) => {
   });
 
   const months = moment.months(); // List of each month
+  const lastPublished = useMemo(
+    () => moment([2020, 5, 1]).add(published, "month"),
+    [published]
+  );
 
   const { numNotes, vNotes, iNotes } = allNotes;
 
@@ -114,29 +118,32 @@ const PubSchedule = (props) => {
       .then((num) => setPublished(num));
   };
 
-  const loadNewDays = useCallback(
-    (dateContext) => {
-      const newArr = processHolidaysForDate(dateContext);
-      setHoliDays(newArr);
-      setRender(true);
-    },
-    [processHolidaysForDate]
-  );
+  const {
+    dateContext,
+    setMonth,
+    setYear,
+    nextMonth,
+    prevMonth,
+    nextYear,
+    prevYear,
+    reset,
+  } = useCalendarNavigation({
+    initialDate: today,
+    maxDate: user.isadmin ? moment(today).add(10, "year") : lastPublished,
+  });
+
+  const holiDays = useHolidays({
+    dateContext,
+    nrHolidayList,
+    processHolidaysForDate,
+  });
 
   useEffect(() => {
     loadPublished();
     loadAllNotes();
   }, [loadPublished, loadAllNotes]);
 
-  useEffect(() => {
-    if (nrHolidayList.length > 0 && !render) {
-      loadNewDays(today);
-    }
-  }, [nrHolidayList.length, render, today, loadNewDays]);
-
   const onDayClick = (e, day) => {
-    let newDateContext = moment(dateContext).set("date", day);
-    setDateContext(newDateContext);
     setDay(day);
     toggleShow(day);
   };
@@ -145,83 +152,19 @@ const PubSchedule = (props) => {
     setShow(!show);
   };
 
-  const setMonth = (month) => {
-    let monthNo = months.indexOf(month);
-    let newDateContext = moment(dateContext).set("month", monthNo);
-    setDateContext(newDateContext);
-    loadNewDays(newDateContext);
-  };
-
-  const nextMonth = () => {
-    let newDateContext = moment(dateContext).add(1, "month");
-    if (!user.isadmin) {
-      let nMonth = moment([2020, 5, 1]).add(published, "month").month();
-      let nYear = moment([2020, 5, 1]).add(published, "month").year();
-      if (newDateContext.year() < nYear) {
-        setDateContext(newDateContext);
-        loadNewDays(newDateContext);
-      } else if (newDateContext.year() === nYear) {
-        if (newDateContext.month() <= nMonth) {
-          setDateContext(newDateContext);
-          loadNewDays(newDateContext);
-        }
-      }
-    } else if (newDateContext.year() <= today.year() + 10) {
-      setDateContext(newDateContext);
-      loadNewDays(newDateContext);
+  const onMonthChange = (event) => setMonth(event.target.value);
+  const onYearChange = (event) => setYear(event.target.value);
+  const onReset = () => {
+    if (
+      !user.isadmin &&
+      lastPublished &&
+      moment(today).isAfter(lastPublished, "month")
+    ) {
+      setYear(lastPublished.year());
+      setMonth(months[lastPublished.month()]);
+    } else {
+      reset();
     }
-  };
-
-  const prevMonth = () => {
-    let newDateContext = moment(dateContext).subtract(1, "month");
-    if (newDateContext.year() >= 2020) {
-      setDateContext(newDateContext);
-      loadNewDays(newDateContext);
-    }
-  };
-
-  const nextYear = () => {
-    if (!user.isadmin) {
-      let nYear = moment([2020, 5, 1]).add(published, "month").year();
-      if (dateContext.year() + 1 <= nYear) {
-        let newDateContext = moment(dateContext).add(1, "year");
-        setDateContext(newDateContext);
-        loadNewDays(newDateContext);
-      }
-    } else if (dateContext.year() + 1 <= today.year() + 10) {
-      let newDateContext = moment(dateContext).add(1, "year");
-      setDateContext(newDateContext);
-      loadNewDays(newDateContext);
-    }
-  };
-
-  const prevYear = () => {
-    if (dateContext.year() - 1 >= 2020) {
-      let newDateContext = moment(dateContext).subtract(1, "year");
-      setDateContext(newDateContext);
-      loadNewDays(newDateContext);
-    }
-  };
-
-  const setYear = (year) => {
-    let newDateContext = moment(dateContext).set("year", year);
-    if (!user.isadmin) {
-      let nMonth = moment([2020, 5, 1]).add(published, "month").month();
-      let nYear = moment([2020, 5, 1]).add(published, "month").year();
-      if (newDateContext.year() === nYear && nMonth < newDateContext.month()) {
-        newDateContext = moment(newDateContext).set("month", nMonth);
-      }
-    }
-    setDateContext(newDateContext);
-    loadNewDays(newDateContext);
-  };
-
-  const onMonthChange = (event) => {
-    setMonth(event.target.value);
-  };
-
-  const onYearChange = (event) => {
-    setYear(event.target.value);
   };
 
   const noteRadioChange = (event) => {
@@ -260,11 +203,6 @@ const PubSchedule = (props) => {
     setNote(event.target.value);
   };
 
-  const reset = () => {
-    setDateContext(today);
-    loadNewDays(today);
-  };
-
   const yearSelect = () => {
     let arr = [];
     let fYear = today.year();
@@ -289,59 +227,26 @@ const PubSchedule = (props) => {
     return arr;
   };
 
-  const monthSelect = () => {
-    let m = 11;
-    let arr = [];
-    if (!user.isadmin) {
-      let nYear = moment([2020, 5, 1]).add(published, "month").year();
-      let nMonth = moment([2020, 5, 1]).add(published, "month").month();
-      if (dateContext.year() === nYear) {
-        m = nMonth;
+  const publishLeading = () => {
+    if (!user.isadmin) return null;
+    let nYear = moment([2020, 5, 1]).add(published, "month").year();
+    let nMonth = moment([2020, 5, 1]).add(published, "month").month();
+    let isAlreadyPublished = true;
+    if (dateContext.year() === nYear) {
+      if (dateContext.month() > nMonth) {
+        isAlreadyPublished = false;
       }
+    } else if (dateContext.year() > nYear) {
+      isAlreadyPublished = false;
     }
-    for (let i = 0; i <= m; i++) {
-      arr.push(
-        <option key={i} value={months[i]}>
-          {months[i]}
-        </option>
-      );
+    if (isAlreadyPublished) {
+      return <h5>Published</h5>;
     }
-    return arr;
-  };
-
-  const publishShow = () => {
-    if (user.isadmin) {
-      let nYear = moment([2020, 5, 1]).add(published, "month").year();
-      let nMonth = moment([2020, 5, 1]).add(published, "month").month();
-      let p = true;
-      if (dateContext.year() === nYear) {
-        if (dateContext.month() > nMonth) {
-          p = false;
-        }
-      } else if (dateContext.year() > nYear) {
-        p = false;
-      }
-      if (p) {
-        return (
-          <Col>
-            <h5>Published</h5>
-          </Col>
-        );
-      }
-      return (
-        <Col>
-          <Button onClick={publishSked} className="top-child" variant="primary">
-            Publish
-          </Button>
-        </Col>
-      );
-    } else {
-      return (
-        <Col>
-          <p></p>
-        </Col>
-      );
-    }
+    return (
+      <Button onClick={publishSked} className="top-child" variant="primary">
+        Publish
+      </Button>
+    );
   };
 
   const adminNotes = () => {
@@ -639,93 +544,19 @@ const PubSchedule = (props) => {
 
   return (
     <div className="screen">
-      <div>
-        <Row className="plabels">
-          {publishShow()}
-          <Col>
-            <h5 className="labels-child">Month</h5>
-          </Col>
-          <Col>
-            <h5 className="labels-child">Year</h5>
-          </Col>
-          <Col>
-            <Button
-              onClick={reset}
-              id="today"
-              className="top-child"
-              variant="primary"
-            >
-              Today
-            </Button>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <p></p>
-          </Col>
-          <Col>
-            <select
-              value={dateContext.format("MMMM")}
-              onChange={onMonthChange}
-              className="top-child month selector"
-            >
-              {monthSelect()}
-            </select>
-          </Col>
-          <Col>
-            <select
-              value={dateContext.format("Y")}
-              onChange={onYearChange}
-              className="top-child year selector"
-            >
-              {yearSelect()}
-            </select>
-          </Col>
-          <Col>
-            <p></p>
-          </Col>
-        </Row>
-        <Row className="psubheader">
-          <Col>
-            <p></p>
-          </Col>
-          <Col>
-            <Button
-              onClick={prevMonth}
-              className="arrow top-child"
-              variant="secondary"
-            >
-              &#x25C0;
-            </Button>
-            <Button
-              onClick={nextMonth}
-              className="arrow top-child"
-              variant="secondary"
-            >
-              &#x25B6;
-            </Button>
-          </Col>
-          <Col>
-            <Button
-              onClick={prevYear}
-              className="arrow top-child"
-              variant="secondary"
-            >
-              &#x25C0;
-            </Button>
-            <Button
-              onClick={nextYear}
-              className="arrow top-child"
-              variant="secondary"
-            >
-              &#x25B6;
-            </Button>
-          </Col>
-          <Col>
-            <p></p>
-          </Col>
-        </Row>
-      </div>
+      <CalendarHeader
+        leadingCols={[{ content: publishLeading() }]}
+        monthValue={dateContext.format("MMMM")}
+        yearValue={dateContext.format("Y")}
+        onMonthChange={onMonthChange}
+        onYearChange={onYearChange}
+        onPrevMonth={prevMonth}
+        onNextMonth={nextMonth}
+        onPrevYear={prevYear}
+        onNextYear={nextYear}
+        onReset={onReset}
+        yearOptions={yearSelect()}
+      />
       <Row className="curr">
         <Col xl>
           <h3>{dateContext.format("MMMM") + " " + dateContext.format("Y")}</h3>
