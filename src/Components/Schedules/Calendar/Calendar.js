@@ -1,79 +1,70 @@
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import moment from "moment";
 import "./Calendar.css";
 
 moment().format();
 
 const Calendar = (props) => {
-  const [style] = useState(props.style || {});
+  const {
+    style = {},
+    type,
+    dateContext,
+    holiDays = [],
+    callSked = [],
+    personalDays = [],
+    sked = [],
+    vNotes = [],
+    iNotes = [],
+    numNotes = [],
+    pending = [],
+    callList = [],
+    entries = [],
+    testisadmin,
+    onDayClick,
+  } = props;
 
-  const weekdaysShort = moment.weekdaysShort(); //List of shortened days
+  const { monthStr, yearStr, firstDay, daysInMonth, currentDay } =
+    useMemo(() => {
+      const monthStr = dateContext.format("MM");
+      const yearStr = dateContext.format("YYYY");
+      const firstDay = moment(dateContext).startOf("month").format("d");
+      const daysInMonth = dateContext.daysInMonth();
+      const currentDay = Number(dateContext.format("D"));
+      return { monthStr, yearStr, firstDay, daysInMonth, currentDay };
+    }, [dateContext]);
 
-  const daysInMonth = () => {
-    return props.dateContext.daysInMonth();
+  const parseMDY = (s) => {
+    const [month, day, year] = s.split("/");
+    return { month, day: Number(day), year };
   };
 
-  const currentDay = () => {
-    return props.dateContext.format("D");
+  const isSameDay = (dateStr, d) => {
+    const { month, day, year } = parseMDY(dateStr);
+    return month === monthStr && day === d && year === yearStr;
   };
 
-  const firstDayofMonth = () => {
-    let dateContext = props.dateContext;
-    let firstDay = moment(dateContext).startOf("month").format("d"); //Day of week 0-6
-    return firstDay;
-  };
-
-  const onDayClick = (e, day) => {
-    props.onDayClick && props.onDayClick(e, day);
-  };
-
-  const dayType = (d) => {
-    const { type } = props;
-    if (type === "Personal") {
-      return (
-        <ul>
-          {personalToday(d)}
-          {pendingToday(d)}
-        </ul>
-      );
-    } else if (type === "Call") {
-      return <ul>{callToday(d)}</ul>;
-    } else {
-      return (
-        <ul>
-          {workToday(d)}
-          {noteToday(d)}
-        </ul>
-      );
-    }
+  const idToName = (id) => {
+    const foundCall = callList.find((call) => call.id === id);
+    if (foundCall) return foundCall.name;
+    const foundEntry = entries.find((entry) => entry.id === id);
+    if (foundEntry) return foundEntry.name;
+    return "";
   };
 
   const holidayToday = (d) => {
-    const arr = [...props.holiDays];
-    for (let i = 0; i < arr.length; i++) {
-      if (arr[i].day === d) {
-        return <span id="holiday">{arr[i].name}</span>;
-      }
-    }
+    const hit = holiDays.find((h) => h.day === d);
+    return hit ? <span id="holiday">{hit.name}</span> : null;
   };
 
   const callToday = (d) => {
-    const arr = [...props.callSked];
-    const { dateContext } = props;
-    let list = [];
-    for (let i = 0; i < arr.length; i++) {
-      const splitArr = arr[i].date.split("/");
-      if (
-        splitArr[0] === dateContext.format("MM") &&
-        parseInt(splitArr[1], 10) === d &&
-        splitArr[2] === dateContext.format("YYYY")
-      ) {
+    const list = [];
+    for (let i = 0; i < callSked.length; i++) {
+      const item = callSked[i];
+      if (isSameDay(item.date, d)) {
         list.push(
           <li key={i} className="call" id="call">
-            {idToName(arr[i].id) + " "}
-            <span style={{ backgroundColor: arr[i].colour }}>
-              {arr[i].name}
-            </span>
+            {idToName(item.id) + " "}
+            <span style={{ backgroundColor: item.colour }}>{item.name}</span>
           </li>
         );
       }
@@ -82,41 +73,28 @@ const Calendar = (props) => {
   };
 
   const personalToday = (d) => {
-    const arr = [...props.personalDays];
-    const { dateContext } = props;
-    for (let i = 0; i < arr.length; i++) {
-      const splitArr = arr[i].date.split("/");
-      if (
-        splitArr[0] === dateContext.format("MM") &&
-        parseInt(splitArr[1], 10) === d &&
-        splitArr[2] === dateContext.format("YYYY")
-      ) {
+    for (let i = 0; i < personalDays.length; i++) {
+      const item = personalDays[i];
+      if (isSameDay(item.date, d)) {
         return (
           <li key={i} className="personal" id="personal">
-            {idToName(arr[i].id)}
+            {idToName(item.id)}
           </li>
         );
       }
     }
+    return null;
   };
 
   const workToday = (d) => {
-    const arr = [...props.sked];
-    const { dateContext } = props;
-    let list = [];
-    for (let i = 0; i < arr.length; i++) {
-      const splitArr = arr[i].date.split("/");
-      if (
-        splitArr[0] === dateContext.format("MM") &&
-        parseInt(splitArr[1], 10) === d &&
-        splitArr[2] === dateContext.format("YYYY")
-      ) {
+    const list = [];
+    for (let i = 0; i < sked.length; i++) {
+      const item = sked[i];
+      if (isSameDay(item.date, d)) {
         list.push(
           <li key={i} className="call" id="call">
-            {idToName(arr[i].id) + " "}
-            <span style={{ backgroundColor: arr[i].colour }}>
-              {arr[i].name}
-            </span>
+            {idToName(item.id) + " "}
+            <span style={{ backgroundColor: item.colour }}>{item.name}</span>
           </li>
         );
       }
@@ -125,36 +103,24 @@ const Calendar = (props) => {
   };
 
   const noteToday = (d) => {
-    const arr = [...props.vNotes];
-    const { dateContext, testisadmin } = props;
-    let list = [];
-    for (let i = 0; i < arr.length; i++) {
-      const splitArr = arr[i].date.split("/");
-      if (
-        splitArr[0] === dateContext.format("MM") &&
-        parseInt(splitArr[1], 10) === d &&
-        splitArr[2] === dateContext.format("YYYY")
-      ) {
+    const list = [];
+    for (let i = 0; i < vNotes.length; i++) {
+      const item = vNotes[i];
+      if (isSameDay(item.date, d)) {
         list.push(
           <li key={i} className="note" id="note">
-            {arr[i].msg}
+            {item.msg}
           </li>
         );
       }
     }
-
     if (testisadmin) {
-      const arr2 = [...props.iNotes];
-      for (let i = 0; i < arr2.length; i++) {
-        const splitArr2 = arr2[i].date.split("/");
-        if (
-          splitArr2[0] === dateContext.format("MM") &&
-          parseInt(splitArr2[1], 10) === d &&
-          splitArr2[2] === dateContext.format("YYYY")
-        ) {
+      for (let i = 0; i < iNotes.length; i++) {
+        const item = iNotes[i];
+        if (isSameDay(item.date, d)) {
           list.push(
             <li key={-i - 1} className="note" id="iNote">
-              {arr2[i].msg}
+              {item.msg}
             </li>
           );
         }
@@ -163,157 +129,118 @@ const Calendar = (props) => {
     return list;
   };
 
-  const numToday = (d, id) => {
-    const { numNotes, testisadmin, dateContext } = props;
-    if (numNotes && testisadmin) {
-      let idVar = "num";
-      const arr = [...numNotes];
-      for (let i = 0; i < arr.length; i++) {
-        const splitArr = arr[i].date.split("/");
-        if (
-          splitArr[0] === dateContext.format("MM") &&
-          parseInt(splitArr[1], 10) === d &&
-          splitArr[2] === dateContext.format("YYYY")
-        ) {
-          if (id) {
-            idVar = "num2";
-          }
-          return (
-            <span key={i} id={idVar}>
-              {arr[i].msg}
-            </span>
+  const numToday = (d, hasHoliday) => {
+    if (!(numNotes && testisadmin)) return null;
+    for (let i = 0; i < numNotes.length; i++) {
+      const item = numNotes[i];
+      if (isSameDay(item.date, d)) {
+        const idVar = hasHoliday ? "num2" : "num";
+        return (
+          <span key={i} id={idVar}>
+            {item.msg}
+          </span>
+        );
+      }
+    }
+    return null;
+  };
+
+  const pendingToday = (d) => {
+    for (let i = 0; i < pending.length; i++) {
+      const p = pending[i];
+      for (let n = 0; n < p.dates.length; n++) {
+        if (isSameDay(p.dates[n], d)) {
+          const name = idToName(Number(p.entryid));
+          return p.maybe ? (
+            <li key={i + n} className="maybe" id="maybe">
+              {name}
+            </li>
+          ) : (
+            <li key={i + n} className="pending" id="pending">
+              {name}
+            </li>
           );
         }
       }
     }
+    return null;
   };
 
-  const idToName = (id) => {
-    const { callList, entries } = props;
-    for (let n = 0; n < callList.length; n++) {
-      if (callList[n].id === id) {
-        return callList[n].name;
-      }
+  const dayType = (d) => {
+    if (type === "Personal") {
+      return (
+        <ul>
+          {personalToday(d)}
+          {pendingToday(d)}
+        </ul>
+      );
     }
-    for (let i = 0; i < entries.length; i++) {
-      if (entries[i].id === id) {
-        return entries[i].name;
-      }
+    if (type === "Call") {
+      return <ul>{callToday(d)}</ul>;
     }
-  };
-
-  const pendingToday = (d) => {
-    const arr = [...props.pending];
-    const { dateContext } = props;
-    for (let i = 0; i < arr.length; i++) {
-      for (let n = 0; n < arr[i].dates.length; n++) {
-        const splitArr = arr[i].dates[n].split("/");
-        if (
-          splitArr[0] === dateContext.format("MM") &&
-          parseInt(splitArr[1], 10) === d &&
-          splitArr[2] === dateContext.format("YYYY")
-        ) {
-          if (arr[i].maybe) {
-            return (
-              <li key={i + n} className="maybe" id="maybe">
-                {idToName(parseInt(arr[i].entryid, 10))}
-              </li>
-            );
-          } else {
-            return (
-              <li key={i + n} className="pending" id="pending">
-                {idToName(parseInt(arr[i].entryid, 10))}
-              </li>
-            );
-          }
-        }
-      }
-    }
+    return (
+      <ul>
+        {workToday(d)}
+        {noteToday(d)}
+      </ul>
+    );
   };
 
   //Map the weekdays as <td>
-  let weekdaysElements = weekdaysShort.map((day) => {
+  const weekdaysElements = moment.weekdaysShort().map((day) => (
+    <td key={day} className="week-day">
+      {day}
+    </td>
+  ));
+
+  // Leading blanks
+  const blanks = Array.from({ length: firstDay }, (_, i) => (
+    <td key={`blank-start-${i}`} className="emptySlot" />
+  ));
+
+  // Days in month
+  const daysInMonthElements = Array.from({ length: daysInMonth }, (_, idx) => {
+    const d = idx + 1;
+    const holidayNode = holidayToday(d);
+    const className = d === currentDay ? "day current-day" : "day";
     return (
-      <td key={day} className="week-day">
-        {day}
-      </td>
-    );
-  });
-
-  let blanks = [];
-  for (let i = 0; i < firstDayofMonth(); i++) {
-    blanks.push(
-      <td key={i * 80} className="emptySlot">
-        {" "}
-      </td>
-    );
-  }
-
-  let daysInMonthElements = [];
-  for (let d = 1; d <= daysInMonth(); d++) {
-    let id = holidayToday(d);
-    let className = d === currentDay() ? "day current-day" : "day";
-    daysInMonthElements.push(
       <td
         key={d}
-        onClick={(e) => {
-          onDayClick(e, d);
-        }}
+        onClick={(e) => onDayClick && onDayClick(e, d)}
         className={className}
       >
         <div className="spacer">
-          {id}
-          {numToday(d, id)}
+          {holidayNode}
+          {numToday(d, !!holidayNode)}
           <span className="text">{d}</span>
         </div>
         <hr />
         {dayType(d)}
       </td>
     );
-  }
-
-  let len = blanks.length + daysInMonthElements.length;
-
-  let extraBlanks = [];
-
-  while (len % 7 !== 0) {
-    len++;
-    extraBlanks.push(
-      <td key={len} className="emptySlot">
-        {" "}
-      </td>
-    );
-  }
-
-  var totalSlots = [...blanks, ...daysInMonthElements, ...extraBlanks];
-  let rows = [];
-  let cells = [];
-
-  totalSlots.forEach((row, i) => {
-    if (i % 7 !== 0) {
-      cells.push(row);
-    } else {
-      let insertRow = cells.slice();
-      rows.push(insertRow);
-      cells = [];
-      cells.push(row);
-    }
-    if (i === totalSlots.length - 1) {
-      let insertRow = cells.slice();
-      rows.push(insertRow);
-    }
   });
 
-  let trElements = rows.map((d, i) => {
-    return <tr key={i * 100}>{d}</tr>;
-  });
+  // Trailing blanks to complete weeks
+  const totalLen = blanks.length + daysInMonthElements.length;
+  const pad = (7 - (totalLen % 7 || 7)) % 7;
+  const extraBlanks = Array.from({ length: pad }, (_, i) => (
+    <td key={`blank-end-${i}`} className="emptySlot" />
+  ));
+
+  const totalSlots = [...blanks, ...daysInMonthElements, ...extraBlanks];
+
+  // Chunk into rows of 7
+  const rows = [];
+  for (let i = 0; i < totalSlots.length; i += 7) {
+    rows.push(<tr key={`row-${i / 7}`}>{totalSlots.slice(i, i + 7)}</tr>);
+  }
 
   return (
     <div className="calendar-container" style={style}>
       <table className="calendar">
         <tbody>
           <tr>{weekdaysElements}</tr>
-          {trElements}
+          {rows}
         </tbody>
       </table>
     </div>
