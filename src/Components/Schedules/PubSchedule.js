@@ -129,7 +129,7 @@ const PubSchedule = (props) => {
     reset,
   } = useCalendarNavigation({
     initialDate: today,
-    maxDate: user.isadmin ? undefined : lastPublished,
+    maxDate: user.isadmin ? moment(today).add(10, "year") : lastPublished,
   });
 
   const holiDays = useHolidays({

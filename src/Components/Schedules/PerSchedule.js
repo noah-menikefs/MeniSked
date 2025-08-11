@@ -76,7 +76,7 @@ const PerSchedule = (props) => {
     reset,
   } = useCalendarNavigation({
     initialDate: today,
-    maxDate: today.year() + 10,
+    maxDate: moment(today).add(10, "year"),
   });
 
   const holiDays = useHolidays({
