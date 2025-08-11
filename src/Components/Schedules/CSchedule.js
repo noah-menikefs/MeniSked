@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import CalendarGrid from "./Calendar/CalendarGrid";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -10,6 +10,8 @@ import moment from "moment";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
 import CalendarHeader from "./Calendar/CalendarHeader";
+import { buildCallMonthDays } from "../../selectors/calendarData";
+import { buildCallSkedFromPeople } from "../../utils/scheduleUtils";
 
 import "./Schedules.css";
 
@@ -35,35 +37,10 @@ const CSchedule = (props) => {
     peopleList,
   } = props;
 
-  const priorityCheck = useCallback(
-    (id) => {
-      for (let n = 0; n < callList.length; n++) {
-        if (callList[n].id === id) {
-          return callList[n].priority;
-        }
-      }
-    },
-    [callList]
+  const callSked = useMemo(
+    () => buildCallSkedFromPeople(peopleList, callList),
+    [peopleList, callList]
   );
-
-  const callSked = useMemo(() => {
-    let arr = [];
-    peopleList.forEach((person) => {
-      person.worksked.forEach((work) => {
-        if (callList.some((c) => c.id === work.id)) {
-          arr.push({
-            id: work.id,
-            date: work.date,
-            name: person.lastname,
-            colour: person.colour,
-            priority: priorityCheck(work.id),
-          });
-        }
-      });
-    });
-    arr.sort((a, b) => a.priority - b.priority);
-    return arr;
-  }, [callList, peopleList, priorityCheck]);
 
   const {
     dateContext,
@@ -155,37 +132,13 @@ const CSchedule = (props) => {
     }
   }
 
-  // Build DayCell[] for CalendarGrid (only Call schedule content)
-  const monthStr = dateContext.format("MM");
-  const yearStr = dateContext.format("YYYY");
-  const daysMap = new Map();
-  const ensureDay = (d) => {
-    if (!daysMap.has(d)) {
-      daysMap.set(d, { day: d, contentItems: [] });
-    }
-    return daysMap.get(d);
-  };
-  // Holidays
-  for (const h of holiDays) {
-    const item = ensureDay(h.day);
-    item.holidayName = h.name;
-  }
-  // Calls
-  for (let i = 0; i < callSked.length; i++) {
-    const { date, id, colour, name } = callSked[i];
-    const [m, dStr, y] = date.split("/");
-    const d = Number(dStr);
-    if (m === monthStr && y === yearStr) {
-      const item = ensureDay(d);
-      item.contentItems.push(
-        <li key={`c-${i}`} className="call" id="call">
-          {idToName(id) + " "}
-          <span style={{ backgroundColor: colour }}>{name}</span>
-        </li>
-      );
-    }
-  }
-  const days = Array.from(daysMap.values());
+  // Build DayCell[] for CalendarGrid using selector
+  const days = buildCallMonthDays({
+    dateContext,
+    holiDays,
+    callSked,
+    callList,
+  });
 
   return (
     <div className="screen">
