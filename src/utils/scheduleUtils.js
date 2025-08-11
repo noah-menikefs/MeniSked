@@ -12,12 +12,18 @@ export function priorityForCall(callList = [], id) {
   return found ? found.priority : 1000;
 }
 
-/** Build array of call assignments from peopleList filtered to callList ids, sorted by priority */
-export function buildCallSkedFromPeople(peopleList = [], callList = []) {
+/**
+ * Generic builder for work schedule entries taken from peopleList.
+ */
+export function buildWorkSkedFromPeople(
+  peopleList = [],
+  callList = [],
+  onlyCalls = false
+) {
   const arr = [];
   for (const person of peopleList) {
     for (const work of person.worksked || []) {
-      if (callList.some((c) => c.id === work.id)) {
+      if (!onlyCalls || callList.some((c) => c.id === work.id)) {
         arr.push({
           id: work.id,
           date: work.date,

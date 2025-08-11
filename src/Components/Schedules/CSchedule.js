@@ -10,7 +10,7 @@ import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import { buildCallMonthDays } from "../../selectors/calendarData";
-import { buildCallSkedFromPeople } from "../../utils/scheduleUtils";
+import { buildWorkSkedFromPeople } from "../../utils/scheduleUtils";
 import usePdfStamp from "../../hooks/usePdfStamp";
 
 import "./Schedules.css";
@@ -38,8 +38,8 @@ const CSchedule = (props) => {
   } = props;
 
   const callSked = useMemo(
-    () => buildCallSkedFromPeople(peopleList, callList),
-    [peopleList, callList]
+    () => buildWorkSkedFromPeople(peopleList, callList, true),
+    [callList, peopleList]
   );
 
   const {
