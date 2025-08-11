@@ -7,8 +7,8 @@ export function buildCallMonthDays({
   callSked = [],
   callList = [],
 }) {
-  const monthStr = dateContext.format("MM");
-  const yearStr = dateContext.format("YYYY");
+  const monthNum = Number(dateContext.format("M"));
+  const yearNum = Number(dateContext.format("YYYY"));
 
   const daysMap = new Map();
   const ensureDay = (d) => {
@@ -27,9 +27,9 @@ export function buildCallMonthDays({
   // Call assignments
   for (let i = 0; i < callSked.length; i++) {
     const { date, id, colour, name } = callSked[i];
-    const [m, dStr, y] = date.split("/");
+    const [m, dStr, y] = String(date).split("/");
     const d = Number(dStr);
-    if (m === monthStr && y === yearStr) {
+    if (Number(m) === monthNum && Number(y) === yearNum) {
       const item = ensureDay(d);
       item.contentItems.push(
         <li key={`c-${i}`} className="call" id="call">
@@ -51,8 +51,8 @@ export function buildPersonalMonthDays({
   callList = [],
   entryList = [],
 }) {
-  const monthStr = dateContext.format("MM");
-  const yearStr = dateContext.format("YYYY");
+  const monthNum = Number(dateContext.format("M"));
+  const yearNum = Number(dateContext.format("YYYY"));
 
   const daysMap = new Map();
   const ensureDay = (d) => {
@@ -68,7 +68,7 @@ export function buildPersonalMonthDays({
   personalDays.forEach((pd, i) => {
     const [m, dStr, y] = String(pd.date).split("/");
     const d = Number(dStr);
-    if (m === monthStr && y === yearStr) {
+    if (Number(m) === monthNum && Number(y) === yearNum) {
       const name = idToNameFromLists(callList, entryList, pd.id);
       ensureDay(d).contentItems.push(
         <li key={`pd-${i}`} className="personal" id="personal">
@@ -82,7 +82,7 @@ export function buildPersonalMonthDays({
     for (let n = 0; n < p.dates.length; n++) {
       const [m, dStr, y] = String(p.dates[n]).split("/");
       const d = Number(dStr);
-      if (m === monthStr && y === yearStr) {
+      if (Number(m) === monthNum && Number(y) === yearNum) {
         const name = idToNameFromLists(callList, entryList, Number(p.entryid));
         ensureDay(d).contentItems.push(
           p.maybe ? (
@@ -113,8 +113,8 @@ export function buildPublishedMonthDays({
   entryList = [],
   isAdmin = false,
 }) {
-  const monthStr = dateContext.format("MM");
-  const yearStr = dateContext.format("YYYY");
+  const monthNum = Number(dateContext.format("M"));
+  const yearNum = Number(dateContext.format("YYYY"));
 
   const daysMap = new Map();
   const ensureDay = (d) => {
@@ -130,7 +130,7 @@ export function buildPublishedMonthDays({
   sked.forEach((item, i) => {
     const [m, dStr, y] = String(item.date).split("/");
     const d = Number(dStr);
-    if (m === monthStr && y === yearStr) {
+    if (Number(m) === monthNum && Number(y) === yearNum) {
       ensureDay(d).contentItems.push(
         <li key={`s-${i}`} className="call" id="call">
           {idToNameFromLists(callList, entryList, item.id) + " "}
@@ -143,7 +143,7 @@ export function buildPublishedMonthDays({
   vNotes.forEach((n, i) => {
     const [m, dStr, y] = String(n.date).split("/");
     const d = Number(dStr);
-    if (m === monthStr && y === yearStr) {
+    if (Number(m) === monthNum && Number(y) === yearNum) {
       ensureDay(d).contentItems.push(
         <li key={`vn-${i}`} className="note" id="note">
           {n.msg}
@@ -157,7 +157,7 @@ export function buildPublishedMonthDays({
     iNotes.forEach((n, i) => {
       const [m, dStr, y] = String(n.date).split("/");
       const d = Number(dStr);
-      if (m === monthStr && y === yearStr) {
+      if (Number(m) === monthNum && Number(y) === yearNum) {
         ensureDay(d).contentItems.push(
           <li key={`in-${i}`} className="note" id="iNote">
             {n.msg}
@@ -166,16 +166,14 @@ export function buildPublishedMonthDays({
       }
     });
 
-    const numByDay = new Map();
     numNotes.forEach((n) => {
       const [m, dStr, y] = String(n.date).split("/");
       const d = Number(dStr);
-      if (m === monthStr && y === yearStr) numByDay.set(d, n.msg);
+      if (Number(m) === monthNum && Number(y) === yearNum) {
+        const item = ensureDay(d);
+        if (!item.numberNote) item.numberNote = n.msg;
+      }
     });
-    for (const [d, msg] of numByDay.entries()) {
-      const item = ensureDay(d);
-      item.numberNote = msg;
-    }
   }
 
   return Array.from(daysMap.values());
