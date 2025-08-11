@@ -8,6 +8,7 @@ import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
+import { lastPublishedMoment, publishedBaseDate } from "../../utils/date";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
@@ -41,7 +42,7 @@ const PubSchedule = (props) => {
   });
 
   const lastPublished = useMemo(
-    () => moment([2020, 5, 1]).add(published, "month"),
+    () => lastPublishedMoment(published),
     [published]
   );
   const { stamp, updateStamp } = usePdfStamp();
@@ -83,9 +84,7 @@ const PubSchedule = (props) => {
   }, []);
 
   const publishSked = () => {
-    var a = moment([2020, 5, 1]);
-    var b = dateContext;
-    const num = b.diff(a, "months");
+    const num = dateContext.diff(publishedBaseDate(), "months");
     fetch("https://secure-earth-82827.herokuapp.com/published", {
       method: "put",
       headers: { "Content-Type": "application/json" },
@@ -170,42 +169,13 @@ const PubSchedule = (props) => {
     setNote(event.target.value);
   };
 
-  const yearSelect = () => {
-    let arr = [];
-    let fYear = today.year();
-    if (user.isadmin) {
-      for (let i = 2020; i <= fYear + 10; i++) {
-        arr.push(
-          <option key={i} value={i}>
-            {i}
-          </option>
-        );
-      }
-    } else {
-      let nYear = moment([2020, 5, 1]).add(published, "month").year();
-      for (let i = 2020; i <= nYear; i++) {
-        arr.push(
-          <option key={i} value={i}>
-            {i}
-          </option>
-        );
-      }
-    }
-    return arr;
-  };
-
   const publishLeading = () => {
     if (!user.isadmin) return null;
-    let nYear = moment([2020, 5, 1]).add(published, "month").year();
-    let nMonth = moment([2020, 5, 1]).add(published, "month").month();
-    let isAlreadyPublished = true;
-    if (dateContext.year() === nYear) {
-      if (dateContext.month() > nMonth) {
-        isAlreadyPublished = false;
-      }
-    } else if (dateContext.year() > nYear) {
-      isAlreadyPublished = false;
-    }
+
+    const isAlreadyPublished = dateContext.isSameOrAfter(
+      lastPublishedMoment(published),
+      "month"
+    );
     if (isAlreadyPublished) {
       return <h5>Published</h5>;
     }
@@ -518,7 +488,8 @@ const PubSchedule = (props) => {
         onPrevYear={prevYear}
         onNextYear={nextYear}
         onReset={reset}
-        yearOptions={yearSelect()}
+        minDate={publishedBaseDate()}
+        maxDate={user.isadmin ? moment(today).add(10, "year") : lastPublished}
       />
       <Row className="curr">
         <Col xl>

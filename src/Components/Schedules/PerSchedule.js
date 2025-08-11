@@ -7,6 +7,7 @@ import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
+import { publishedBaseDate } from "../../utils/date";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
@@ -514,17 +515,6 @@ const PerSchedule = (props) => {
     }
   };
 
-  let yearSelect = [];
-  let fYear = today.year();
-
-  for (let i = 2020; i <= fYear + 10; i++) {
-    yearSelect.push(
-      <option key={i} value={i}>
-        {i}
-      </option>
-    );
-  }
-
   let radioSelect = [];
   for (let j = 0; j < callList.length; j++) {
     if (callList[j].isactive) {
@@ -608,7 +598,8 @@ const PerSchedule = (props) => {
         onPrevYear={prevYear}
         onNextYear={nextYear}
         onReset={reset}
-        yearOptions={yearSelect}
+        minDate={publishedBaseDate()}
+        maxDate={moment(today).add(10, "year")}
       />
       <div className="curr">
         <h3 id="pcurr">

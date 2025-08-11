@@ -10,10 +10,14 @@ import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import { buildCallMonthDays } from "../../selectors/calendarData";
-import { buildWorkSkedFromPeople } from "../../utils/scheduleUtils";
+import {
+  buildWorkSkedFromPeople,
+  idToNameFromLists,
+} from "../../utils/scheduleUtils";
 import usePdfStamp from "../../hooks/usePdfStamp";
 
 import "./Schedules.css";
+import { publishedBaseDate } from "../../utils/date.js";
 
 const style = {
   position: "relative",
@@ -88,27 +92,7 @@ const CSchedule = (props) => {
     setYear(e.target.value);
   };
 
-  const idToName = (id) => {
-    for (let n = 0; n < callList.length; n++) {
-      if (callList[n].id === id) {
-        return callList[n].name;
-      }
-    }
-  };
-
   const hoverSpan = () => updateStamp();
-
-  let yearSelect = [];
-
-  let fYear = today.year();
-
-  for (let i = 2020; i <= fYear + 10; i++) {
-    yearSelect.push(
-      <option key={i} value={i}>
-        {i}
-      </option>
-    );
-  }
 
   let modalList = [];
   for (let i = 0; i < callSked.length; i++) {
@@ -120,7 +104,7 @@ const CSchedule = (props) => {
     ) {
       modalList.push(
         <li key={-i - 1}>
-          {idToName(callSked[i].id) + " "}
+          {idToNameFromLists(callList, [], callSked[i].id) + " "}
           <span style={{ backgroundColor: callSked[i].colour }}>
             {callSked[i].name}
           </span>
@@ -164,7 +148,8 @@ const CSchedule = (props) => {
         onPrevYear={prevYear}
         onNextYear={nextYear}
         onReset={reset}
-        yearOptions={yearSelect}
+        minDate={publishedBaseDate()}
+        maxDate={moment(today).add(10, "year")}
       />
       <Row className="curr">
         <Col xl>
