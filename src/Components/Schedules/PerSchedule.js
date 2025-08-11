@@ -7,6 +7,8 @@ import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
+import useCalendarNavigation from "../../hooks/useCalendarNavigation";
+import useHolidays from "../../hooks/useHolidays";
 
 import "./Schedules.css";
 
@@ -22,10 +24,8 @@ const PerSchedule = (props) => {
   const [docIndex, setDocIndex] = useState(0);
   const [entryIndex, setEntryIndex] = useState(0);
   const [show, setShow] = useState(false);
-  const [dateContext, setDateContext] = useState(moment());
   const [radio, setRadio] = useState(-1);
   const [day, setDay] = useState(0);
-  const [holiDays, setHoliDays] = useState([]);
   const [personalDays, setPersonalDays] = useState([]);
   const [render, setRender] = useState(false);
   const [pending, setPending] = useState([]);
@@ -41,7 +41,6 @@ const PerSchedule = (props) => {
     processHolidaysForDate,
     entryList,
   } = props;
-  const months = moment.months(); // List of each month
   const isMountedRef = useRef(true);
 
   // Load functions
@@ -67,18 +66,33 @@ const PerSchedule = (props) => {
             }
           }
           setActiveDocs(docs);
+          if (!render) {
+            setRender(true);
+          }
         }
       });
   }, [render, user.id, loadPersonalDays]);
 
-  const loadNewDays = useCallback(
-    (dateContext) => {
-      const newArr = processHolidaysForDate(dateContext);
-      setHoliDays(newArr);
-      setRender(true);
-    },
-    [processHolidaysForDate]
-  );
+  const {
+    dateContext,
+    setMonth,
+    setYear,
+    nextMonth,
+    prevMonth,
+    nextYear,
+    prevYear,
+    reset,
+  } = useCalendarNavigation({
+    initialDate: today,
+    minYear: 2020,
+    maxYear: today.year() + 10,
+  });
+
+  const holiDays = useHolidays({
+    dateContext,
+    nrHolidayList,
+    processHolidaysForDate,
+  });
 
   const loadPersonalSked = useCallback((user) => {
     setActiveDocs((prevActiveDocs) => {
@@ -306,33 +320,6 @@ const PerSchedule = (props) => {
     [entryList, entryIndex, assignOrDelete]
   );
 
-  // Navigation functions
-  const setMonth = useCallback(
-    (month) => {
-      let monthNo = months.indexOf(month);
-      let newDateContext = moment(dateContext).set("month", monthNo);
-      setDateContext(newDateContext);
-      loadNewDays(newDateContext);
-    },
-    [dateContext, months, loadNewDays]
-  );
-
-  const nextMonth = useCallback(() => {
-    let newDateContext = moment(dateContext).add(1, "month");
-    if (newDateContext.year() <= today.year() + 10) {
-      setDateContext(newDateContext);
-      loadNewDays(newDateContext);
-    }
-  }, [dateContext, today, loadNewDays]);
-
-  const prevMonth = useCallback(() => {
-    let newDateContext = moment(dateContext).subtract(1, "month");
-    if (newDateContext.year() >= 2020) {
-      setDateContext(newDateContext);
-      loadNewDays(newDateContext);
-    }
-  }, [dateContext, loadNewDays]);
-
   const nextDoc = useCallback(() => {
     let i = docIndex;
     if (i !== activeDocs.length - 1) {
@@ -376,31 +363,6 @@ const PerSchedule = (props) => {
       setEntryIndex(entryList.length - 1);
     }
   }, [entryIndex, entryList.length]);
-
-  const nextYear = useCallback(() => {
-    if (dateContext.year() + 1 <= today.year() + 10) {
-      let newDateContext = moment(dateContext).add(1, "year");
-      setDateContext(newDateContext);
-      loadNewDays(newDateContext);
-    }
-  }, [dateContext, today, loadNewDays]);
-
-  const prevYear = useCallback(() => {
-    if (dateContext.year() - 1 >= 2020) {
-      let newDateContext = moment(dateContext).subtract(1, "year");
-      setDateContext(newDateContext);
-      loadNewDays(newDateContext);
-    }
-  }, [dateContext, loadNewDays]);
-
-  const setYear = useCallback(
-    (year) => {
-      let newDateContext = moment(dateContext).set("year", year);
-      setDateContext(newDateContext);
-      loadNewDays(newDateContext);
-    },
-    [dateContext, loadNewDays]
-  );
 
   // Form handlers
   const onPhysicianChange = useCallback(
@@ -485,11 +447,6 @@ const PerSchedule = (props) => {
     }
   }, [user.isadmin, prevDoc, nextDoc]);
 
-  const reset = useCallback(() => {
-    setDateContext(today);
-    loadNewDays(today);
-  }, [today, loadNewDays]);
-
   const hoverSpan = useCallback(() => {
     setStamp(moment().format("YYYY-MM-DD HH:mm"));
   }, []);
@@ -507,9 +464,10 @@ const PerSchedule = (props) => {
 
   useEffect(() => {
     if (nrHolidayList.length > 0 && !render) {
-      loadNewDays(today);
+      // first-time render flag to avoid repeating any initial holiday side effects
+      setRender(true);
     }
-  }, [nrHolidayList.length, render, loadNewDays, today]);
+  }, [nrHolidayList.length, render]);
 
   // Cleanup effect to prevent memory leaks
   useEffect(() => {
