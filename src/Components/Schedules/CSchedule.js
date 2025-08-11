@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import Calendar from "./Calendar/Calendar";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -8,6 +8,8 @@ import Modal from "react-bootstrap/Modal";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import moment from "moment";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
+import useHolidays from "../../hooks/useHolidays";
+import CalendarHeader from "./Calendar/CalendarHeader";
 
 import "./Schedules.css";
 
@@ -19,8 +21,6 @@ const style = {
 
 const CSchedule = (props) => {
   const [show, setShow] = useState(false);
-  const [holiDays, setHoliDays] = useState([]);
-  const [render, setRender] = useState(false);
   const [day, setDay] = useState(-1);
   const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
 
@@ -65,15 +65,6 @@ const CSchedule = (props) => {
     return arr;
   }, [callList, peopleList, priorityCheck]);
 
-  const loadNewDays = useCallback(
-    (ctx) => {
-      const newArr = processHolidaysForDate(ctx);
-      setHoliDays(newArr);
-      setRender(true);
-    },
-    [processHolidaysForDate]
-  );
-
   const {
     dateContext,
     setDateContext,
@@ -88,14 +79,14 @@ const CSchedule = (props) => {
     initialDate: today,
     minYear: 2020,
     maxYear: today.year() + 10,
-    onChange: loadNewDays,
   });
 
-  useEffect(() => {
-    if (nrHolidayList.length > 0 && !render) {
-      loadNewDays(today);
-    }
-  }, [nrHolidayList.length, render, today, loadNewDays]);
+  // Holidays recompute when dateContext or holiday data changes
+  const holiDays = useHolidays({
+    dateContext,
+    nrHolidayList,
+    processHolidaysForDate,
+  });
 
   const onDayClick = (e, d) => {
     const ctx = moment(dateContext).set("date", d);
@@ -103,12 +94,15 @@ const CSchedule = (props) => {
     toggleShow(d);
   };
 
-  const toggleShow = (d) => {
+  const toggleShow = (maybeDay) => {
     setShow((prev) => !prev);
-    setDay(d);
+    if (typeof maybeDay === "number" && Number.isFinite(maybeDay)) {
+      setDay(maybeDay);
+    } else {
+      // Reset day when called from events like Modal.onHide/Button.onClick
+      setDay(-1);
+    }
   };
-
-  // Keep initial load behavior on first holidays ready
 
   const onMonthChange = (e) => {
     setMonth(e.target.value);
@@ -163,102 +157,24 @@ const CSchedule = (props) => {
 
   return (
     <div className="screen">
-      <Row className="clabels">
-        <Col>
-          <h5 className="labels-child">Year</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Month</h5>
-        </Col>
-        <Col>
-          <Button
-            onClick={reset}
-            id="today"
-            className="top-child"
-            variant="primary"
-          >
-            Today
-          </Button>
-        </Col>
-      </Row>
-      <Row className="cheader">
-        <Col>
-          <select
-            value={dateContext.format("Y")}
-            onChange={onYearChange}
-            className="top-child year selector"
-          >
-            {yearSelect}
-          </select>
-        </Col>
-        <Col>
-          <select
-            value={dateContext.format("MMMM")}
-            onChange={onMonthChange}
-            className="top-child month selector"
-          >
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
-          </select>
-        </Col>
-        <Col>
-          <p className="vis top-child"></p>
-        </Col>
-      </Row>
-      <Row className="csubheader">
-        <Col>
-          <Button
-            onClick={prevYear}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextYear}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-        <Col>
-          <Button
-            onClick={prevMonth}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextMonth}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-        <Col>
-          <p className="vis top-child"></p>
-        </Col>
-      </Row>
+      <CalendarHeader
+        monthValue={dateContext.format("MMMM")}
+        yearValue={dateContext.format("Y")}
+        onMonthChange={onMonthChange}
+        onYearChange={onYearChange}
+        onPrevMonth={prevMonth}
+        onNextMonth={nextMonth}
+        onPrevYear={prevYear}
+        onNextYear={nextYear}
+        onReset={reset}
+        yearOptions={yearSelect}
+      />
       <Row className="curr">
         <Col xl>
           <h3>{dateContext.format("MMMM") + " " + dateContext.format("Y")}</h3>
         </Col>
       </Row>
       <div className="sked">
-        {nrHolidayList.length > 0 && !render ? loadNewDays(today) : false}
         <Calendar
           callList={callList}
           callSked={callSked}
@@ -343,17 +259,21 @@ const CSchedule = (props) => {
         </Col>
       </div>
       <div className="modal">
-        <Modal show={show} onHide={toggleShow}>
+        <Modal show={show} onHide={() => toggleShow()}>
           <Modal.Header closeButton>
             <Modal.Title id="modalTitle">
-              {dateContext.format("MMMM DD, YYYY")}
+              {`${dateContext.format("MMMM")} ${
+                typeof day === "number" && day > 0
+                  ? String(day).padStart(2, "0")
+                  : dateContext.format("DD")
+              }, ${dateContext.format("YYYY")}`}
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <ul>{modalList}</ul>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={toggleShow}>
+            <Button variant="secondary" onClick={() => toggleShow()}>
               Close
             </Button>
           </Modal.Footer>
