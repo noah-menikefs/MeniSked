@@ -27,7 +27,6 @@ const PerSchedule = (props) => {
   const [radio, setRadio] = useState(-1);
   const [day, setDay] = useState(0);
   const [personalDays, setPersonalDays] = useState([]);
-  const [render, setRender] = useState(false);
   const [pending, setPending] = useState([]);
   const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
 
@@ -56,22 +55,17 @@ const PerSchedule = (props) => {
       .then((response) => response.json())
       .then((docs) => {
         if (isMountedRef.current) {
-          if (!render) {
-            const doctors = [...docs];
-            for (let i = 0; i < doctors.length; i++) {
-              if (doctors[i].id === user.id) {
-                loadPersonalDays(i, doctors);
-                setDocIndex(i);
-              }
+          const doctors = [...docs];
+          for (let i = 0; i < doctors.length; i++) {
+            if (doctors[i].id === user.id) {
+              loadPersonalDays(i, doctors);
+              setDocIndex(i);
             }
           }
           setActiveDocs(docs);
-          if (!render) {
-            setRender(true);
-          }
         }
       });
-  }, [render, user.id, loadPersonalDays]);
+  }, [user.id, loadPersonalDays]);
 
   const {
     dateContext,
@@ -461,13 +455,6 @@ const PerSchedule = (props) => {
       loadPending();
     }
   }, [user.id, loadPending]);
-
-  useEffect(() => {
-    if (nrHolidayList.length > 0 && !render) {
-      // first-time render flag to avoid repeating any initial holiday side effects
-      setRender(true);
-    }
-  }, [nrHolidayList.length, render]);
 
   // Cleanup effect to prevent memory leaks
   useEffect(() => {
