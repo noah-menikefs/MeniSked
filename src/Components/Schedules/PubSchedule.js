@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import Calendar from "./Calendar/Calendar";
+import CalendarGrid from "./Calendar/CalendarGrid";
+import { buildPublishedMonthDays } from "../../selectors/calendarData";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -143,7 +144,7 @@ const PubSchedule = (props) => {
     loadAllNotes();
   }, [loadPublished, loadAllNotes]);
 
-  const onDayClick = (e, day) => {
+  const onDayClick = (day) => {
     setDay(day);
     toggleShow(day);
   };
@@ -542,6 +543,18 @@ const PubSchedule = (props) => {
     }
   }
 
+  const days = buildPublishedMonthDays({
+    dateContext,
+    holiDays,
+    sked,
+    vNotes,
+    iNotes,
+    numNotes,
+    callList,
+    entryList,
+    isAdmin: user.isadmin,
+  });
+
   return (
     <div className="screen">
       <CalendarHeader
@@ -563,20 +576,12 @@ const PubSchedule = (props) => {
         </Col>
       </Row>
       <div className="sked">
-        <Calendar
-          testisadmin={user.isadmin}
-          numNotes={numNotes}
-          vNotes={vNotes}
-          iNotes={iNotes}
-          callList={callList}
-          entries={entryList}
-          sked={sked}
-          holiDays={holiDays}
-          type="Published"
-          dateContext={dateContext}
-          today={today}
+        <CalendarGrid
+          year={Number(dateContext.format("YYYY"))}
+          monthIndex={Number(dateContext.format("M")) - 1}
+          days={days}
           style={style}
-          onDayClick={(e, day) => onDayClick(e, day)}
+          onDayClick={onDayClick}
         />
       </div>
       <div className="bottom">
