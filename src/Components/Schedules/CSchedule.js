@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import Calendar from "./Calendar/Calendar";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -20,15 +20,20 @@ const CSchedule = (props) => {
   const [dateContext, setDateContext] = useState(moment());
   const [show, setShow] = useState(false);
   const [holiDays, setHoliDays] = useState([]);
-  const [rHolidayList, setRHolidayList] = useState([]);
-  const [nrHolidayList, setNrHolidayList] = useState([]);
   const [render, setRender] = useState(false);
-  const [callSked, setCallSked] = useState([]);
   const [day, setDay] = useState(-1);
-  const [depts, setDepts] = useState([]);
   const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
 
-  const { today, user, callList } = props;
+  // Extract shared data from props
+  const {
+    today,
+    user,
+    callList,
+    nrHolidayList,
+    depts,
+    processHolidaysForDate,
+    peopleList,
+  } = props;
 
   const priorityCheck = useCallback(
     (id) => {
@@ -41,86 +46,39 @@ const CSchedule = (props) => {
     [callList]
   );
 
-  const loadCallSked = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/people")
-      .then((response) => response.json())
-      .then((docs) => {
-        let arr = [];
-        let callIds = callList.map((c) => c.id);
-        for (let i = 0; i < docs.length; i++) {
-          for (let j = 0; j < docs[i].worksked.length; j++) {
-            for (let m = 0; m < callIds.length; m++) {
-              if (docs[i].worksked[j].id === callIds[m]) {
-                arr.push({
-                  id: docs[i].worksked[j].id,
-                  date: docs[i].worksked[j].date,
-                  name: docs[i].lastname,
-                  colour: docs[i].colour,
-                  priority: priorityCheck(docs[i].worksked[j].id),
-                });
-              }
-            }
-          }
-        }
-        arr.sort((a, b) => a.priority - b.priority);
-        setCallSked(arr);
-      });
-  }, [callList, priorityCheck]);
-
-  const loadrHolidays = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/holiday/r")
-      .then((response) => response.json())
-      .then((holidays) =>
-        setRHolidayList(holidays.filter((holiday) => holiday.isactive === true))
-      );
-  }, []);
-
-  const loadnrHolidays = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/holiday/nr")
-      .then((response) => response.json())
-      .then((holidays) => setNrHolidayList(holidays));
-  }, []);
-
-  const loadDepts = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/departments")
-      .then((response) => response.json())
-      .then((departments) => setDepts(departments));
-  }, []);
-
-  useEffect(() => {
-    loadrHolidays();
-    loadnrHolidays();
-    loadCallSked();
-    loadDepts();
-  }, [loadCallSked, loadnrHolidays, loadrHolidays, loadDepts]);
-
-  const loadNewDays = (ctx) => {
-    let newArr = [];
-    nrHolidayList.forEach((nholiday) => {
-      nholiday.eventsked.forEach((date) => {
-        let dateArr = date.split("/");
-        if (
-          dateArr[0] === ctx.format("MM") &&
-          dateArr[2] === ctx.format("YYYY")
-        ) {
-          newArr.push({
-            day: parseInt(dateArr[1], 10),
-            name: nholiday.name,
+  const callSked = useMemo(() => {
+    let arr = [];
+    peopleList.forEach((person) => {
+      person.worksked.forEach((work) => {
+        if (callList.some((c) => c.id === work.id)) {
+          arr.push({
+            id: work.id,
+            date: work.date,
+            name: person.lastname,
+            colour: person.colour,
+            priority: priorityCheck(work.id),
           });
         }
       });
     });
-    rHolidayList.forEach((holiday) => {
-      if (holiday.month === ctx.format("MMMM")) {
-        newArr.push({
-          day: holiday.day,
-          name: holiday.name,
-        });
-      }
-    });
-    setHoliDays(newArr);
-    setRender(true);
-  };
+    arr.sort((a, b) => a.priority - b.priority);
+    return arr;
+  }, [callList, peopleList, priorityCheck]);
+
+  const loadNewDays = useCallback(
+    (ctx) => {
+      const newArr = processHolidaysForDate(ctx);
+      setHoliDays(newArr);
+      setRender(true);
+    },
+    [processHolidaysForDate]
+  );
+
+  useEffect(() => {
+    if (nrHolidayList.length > 0 && !render) {
+      loadNewDays(today);
+    }
+  }, [nrHolidayList.length, render, today, loadNewDays]);
 
   const onDayClick = (e, d) => {
     const ctx = moment(dateContext).set("date", d);
