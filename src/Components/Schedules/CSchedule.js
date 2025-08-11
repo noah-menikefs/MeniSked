@@ -3,9 +3,8 @@ import CalendarGrid from "./Calendar/CalendarGrid";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import MyDocument from "./../PDF/MyDocument";
+import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
 import Modal from "react-bootstrap/Modal";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import moment from "moment";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
@@ -140,6 +139,21 @@ const CSchedule = (props) => {
     callList,
   });
 
+  // Precompute common PDF props and filename (kept out of JSX)
+  const commonDocProps = {
+    stamp,
+    depts,
+    holiDays,
+    callList,
+    callSked,
+    type: "Call",
+    dateContext,
+    user,
+  };
+  const pdfFileName = `${dateContext.format("MMMM")}${dateContext.format(
+    "Y"
+  )}callsked.pdf`;
+
   return (
     <div className="screen">
       <CalendarHeader
@@ -170,74 +184,22 @@ const CSchedule = (props) => {
       </div>
       <div className="bottom">
         <Col id="downloadLink">
-          <PDFDownloadLink
-            document={
-              <MyDocument
-                colour={false}
-                stamp={stamp}
-                depts={depts}
-                numNotes={[]}
-                vNotes={[]}
-                iNotes={[]}
-                entries={[]}
-                callList={callList}
-                callSked={callSked}
-                holiDays={holiDays}
-                type="Call"
-                dateContext={dateContext}
-                user={user}
-              />
-            }
-            fileName={
-              dateContext.format("MMMM") +
-              dateContext.format("Y") +
-              "callsked.pdf"
-            }
-          >
-            {({ loading }) =>
-              loading ? (
-                "Loading document..."
-              ) : (
-                <span onMouseOver={hoverSpan}>
-                  Download as Black & White PDF
-                </span>
-              )
-            }
-          </PDFDownloadLink>
+          <ScheduleDownloadLink
+            docProps={commonDocProps}
+            fileName={pdfFileName}
+            colour={false}
+            label="Download as Black & White PDF"
+            onHover={hoverSpan}
+          />
         </Col>
         <Col id="downloadLink">
-          <PDFDownloadLink
-            document={
-              <MyDocument
-                colour={true}
-                stamp={stamp}
-                depts={depts}
-                numNotes={[]}
-                vNotes={[]}
-                iNotes={[]}
-                entries={[]}
-                callList={callList}
-                callSked={callSked}
-                holiDays={holiDays}
-                type="Call"
-                dateContext={dateContext}
-                user={user}
-              />
-            }
-            fileName={
-              dateContext.format("MMMM") +
-              dateContext.format("Y") +
-              "callsked.pdf"
-            }
-          >
-            {({ loading }) =>
-              loading ? (
-                "Loading document..."
-              ) : (
-                <span onMouseOver={hoverSpan}>Download as Colour PDF</span>
-              )
-            }
-          </PDFDownloadLink>
+          <ScheduleDownloadLink
+            docProps={commonDocProps}
+            fileName={pdfFileName}
+            colour={true}
+            label="Download as Colour PDF"
+            onHover={hoverSpan}
+          />
         </Col>
       </div>
       <div className="modal">

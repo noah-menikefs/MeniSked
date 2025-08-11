@@ -3,10 +3,9 @@ import Calendar from "./Calendar/Calendar";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import MyDocument from "./../PDF/MyDocument";
+import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import moment from "moment";
 
 import "./Schedules.css";
@@ -410,82 +409,51 @@ const PubSchedule = (props) => {
     setStamp(moment().format("YYYY-MM-DD HH:mm"));
   };
 
+  // Precompute shared MyDocument props and filename for public downloads
+  const publicDocProps = {
+    stamp,
+    depts,
+    numNotes,
+    vNotes,
+    iNotes,
+    holiDays,
+    callList,
+    entries: entryList,
+    sked,
+    type: "Published",
+    dateContext,
+    user,
+  };
+  const publicFileName =
+    dateContext.format("MMMM") + dateContext.format("Y") + "publishedsked.pdf";
+
   const adminDownload = () => {
     if (user.isadmin) {
-      let userCopy = { ...user };
-      userCopy.isadmin = false;
+      // Precompute admin employee-view PDF props and filename
+      const adminEmployeeDocProps = {
+        ...publicDocProps,
+        user: { ...user, isadmin: false },
+      };
 
       return (
         <Row>
           <Col id="downloadLink">
-            <PDFDownloadLink
-              document={
-                <MyDocument
-                  colour={false}
-                  stamp={stamp}
-                  depts={depts}
-                  numNotes={numNotes}
-                  vNotes={vNotes}
-                  iNotes={iNotes}
-                  holiDays={holiDays}
-                  callList={callList}
-                  entries={entryList}
-                  sked={sked}
-                  type="Published"
-                  dateContext={dateContext}
-                  user={userCopy}
-                />
-              }
-              fileName={
-                dateContext.format("MMMM") +
-                dateContext.format("Y") +
-                "publishedsked.pdf"
-              }
-            >
-              {({ loading }) =>
-                loading ? (
-                  "Loading document..."
-                ) : (
-                  <span onMouseOver={hoverSpan}>
-                    Employee Black & White Download
-                  </span>
-                )
-              }
-            </PDFDownloadLink>
+            <ScheduleDownloadLink
+              docProps={adminEmployeeDocProps}
+              fileName={publicFileName}
+              colour={false}
+              label="Employee Black & White Download"
+              onHover={hoverSpan}
+            />
           </Col>
           <Col id="downloadLink">
-            <PDFDownloadLink
-              document={
-                <MyDocument
-                  colour={true}
-                  stamp={stamp}
-                  depts={depts}
-                  numNotes={numNotes}
-                  vNotes={vNotes}
-                  iNotes={iNotes}
-                  holiDays={holiDays}
-                  callList={callList}
-                  entries={entryList}
-                  sked={sked}
-                  type="Published"
-                  dateContext={dateContext}
-                  user={userCopy}
-                />
-              }
-              fileName={
-                dateContext.format("MMMM") +
-                dateContext.format("Y") +
-                "publishedsked.pdf"
-              }
-            >
-              {({ loading }) =>
-                loading ? (
-                  "Loading document..."
-                ) : (
-                  <span onMouseOver={hoverSpan}>Employee Colour Download</span>
-                )
-              }
-            </PDFDownloadLink>
+            <ScheduleDownloadLink
+              docProps={adminEmployeeDocProps}
+              fileName={publicFileName}
+              colour={true}
+              label="Employee Colour Download"
+              onHover={hoverSpan}
+            />
           </Col>
         </Row>
       );
@@ -782,74 +750,22 @@ const PubSchedule = (props) => {
       </div>
       <div className="bottom">
         <Col id="downloadLink">
-          <PDFDownloadLink
-            document={
-              <MyDocument
-                colour={false}
-                stamp={stamp}
-                depts={depts}
-                numNotes={numNotes}
-                vNotes={vNotes}
-                iNotes={iNotes}
-                holiDays={holiDays}
-                callList={callList}
-                entries={entryList}
-                sked={sked}
-                type="Published"
-                dateContext={dateContext}
-                user={user}
-              />
-            }
-            fileName={
-              dateContext.format("MMMM") +
-              dateContext.format("Y") +
-              "publishedsked.pdf"
-            }
-          >
-            {({ loading }) =>
-              loading ? (
-                "Loading document..."
-              ) : (
-                <span onMouseOver={hoverSpan}>
-                  Download as Black & White PDF
-                </span>
-              )
-            }
-          </PDFDownloadLink>
+          <ScheduleDownloadLink
+            docProps={publicDocProps}
+            fileName={publicFileName}
+            colour={false}
+            label="Download as Black & White PDF"
+            onHover={hoverSpan}
+          />
         </Col>
         <Col id="downloadLink">
-          <PDFDownloadLink
-            document={
-              <MyDocument
-                colour={true}
-                stamp={stamp}
-                depts={depts}
-                numNotes={numNotes}
-                vNotes={vNotes}
-                iNotes={iNotes}
-                holiDays={holiDays}
-                callList={callList}
-                entries={entryList}
-                sked={sked}
-                type="Published"
-                dateContext={dateContext}
-                user={user}
-              />
-            }
-            fileName={
-              dateContext.format("MMMM") +
-              dateContext.format("Y") +
-              "publishedsked.pdf"
-            }
-          >
-            {({ loading }) =>
-              loading ? (
-                "Loading document..."
-              ) : (
-                <span onMouseOver={hoverSpan}>Download as Colour PDF</span>
-              )
-            }
-          </PDFDownloadLink>
+          <ScheduleDownloadLink
+            docProps={publicDocProps}
+            fileName={publicFileName}
+            colour={true}
+            label="Download as Colour PDF"
+            onHover={hoverSpan}
+          />
         </Col>
       </div>
       {adminDownload()}

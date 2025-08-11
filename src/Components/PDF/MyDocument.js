@@ -1,7 +1,7 @@
 import React from "react";
 import { Page, Text, Document, StyleSheet, View } from "@react-pdf/renderer";
 
-// Create styles
+// Styles
 const styles = StyleSheet.create({
   header: {
     fontSize: 12,
@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
     width: "auto",
     borderStyle: "solid",
     borderWidth: 0.75,
-    //borderRightWidth: 0,
     borderBottomWidth: 0,
     borderLeftWidth: 0,
   },
@@ -64,194 +63,177 @@ const styles = StyleSheet.create({
   },
 });
 
-// Create Document Component
-const MyDocument = (props) => {
-  const determineColour = (name2, colour) => {
-    if (props.colour) {
-      return <Text style={{ backgroundColor: "" + colour }}>{name2}</Text>;
+// PDF Document component
+const MyDocument = ({
+  user,
+  type,
+  dateContext,
+  holiDays = [],
+  personalDays = [],
+  entries = [],
+  callList = [],
+  callSked = [],
+  sked = [],
+  numNotes = [],
+  iNotes = [],
+  vNotes = [],
+  depts = [],
+  stamp = "",
+  colour = false,
+}) => {
+  const firstDayOfWeekIndex = Number(dateContext.startOf("month").format("d")); // 0-6
+  const daysInMonth = dateContext.daysInMonth();
+
+  // Select which list to render
+  const listType =
+    Array.isArray(callSked) && callSked.length > 0
+      ? callSked
+      : Array.isArray(sked) && sked.length > 0
+      ? sked
+      : personalDays;
+
+  // Index lookups
+  const entryById = new Map(entries.map((e) => [e.id, e.name]));
+  const callById = new Map(callList.map((c) => [c.id, c.name]));
+  const holidayByDay = new Map(holiDays.map((h) => [h.day, h.name]));
+
+  const toDateStr = (d) =>
+    `${dateContext.format("MM")}/${d}/${dateContext.format("YYYY")}`;
+
+  // Build maps for notes (visible, invisible, numeric)
+  const groupByDate = (arr) => {
+    const map = new Map();
+    for (const n of arr) {
+      const key = n.date;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(n.msg);
     }
-    return <Text>{name2}</Text>;
+    return map;
   };
-
-  const {
-    user,
-    type,
-    dateContext,
-    holiDays,
-    personalDays,
-    entries,
-    callList,
-    callSked,
-    sked,
-    numNotes,
-    iNotes,
-    vNotes,
-    depts,
-    stamp,
-  } = props;
-
-  let firstDay = dateContext.startOf("month").format("d"); //Day of week 0-6
-  let daysInMonth = dateContext.daysInMonth();
-  let ctr = 1;
-  let day = "";
-  let tableRows = [];
-  let holiday = "";
-  let today = [];
-  let name = "";
-  let name2 = "";
-  let numNote = "";
-  let iNote = "";
-  let vNote = "";
-  let colour = "";
-
-  let listType = [];
-
-  if (callSked) {
-    listType = [...callSked];
-  } else if (sked) {
-    listType = [...sked];
-  } else {
-    listType = [...personalDays];
+  const visibleNotesByDate = groupByDate(vNotes);
+  const invisibleNotesByDate = groupByDate(iNotes);
+  const numberNotesByDate = new Map();
+  for (const n of numNotes) {
+    numberNotesByDate.set(n.date, n.msg);
   }
 
-  for (let i = 0; i < 6; i++) {
-    let tableCols = [];
-    for (let j = 0; j < 7; j++) {
-      today = [];
-      day = "";
-      holiday = "";
-      numNote = "";
-      iNote = "";
-      vNote = "";
-      if ((i !== 0 || j >= firstDay) && ctr <= daysInMonth) {
-        day = ctr;
-        for (let n = 0; n < holiDays.length; n++) {
-          if (holiDays[n].day === ctr) {
-            holiday = holiDays[n].name;
-          }
-        }
-        for (let m = 0; m < listType.length; m++) {
-          name = "";
-          if (
-            listType[m].date ===
-            dateContext.format("MM") +
-              "/" +
-              ctr +
-              "/" +
-              dateContext.format("YYYY")
-          ) {
-            for (let x = 0; x < entries.length; x++) {
-              if (entries[x].id === listType[m].id) {
-                name = entries[x].name;
-                if (listType[m].name) {
-                  name2 = listType[m].name;
-                  colour = listType[m].colour.substring(0, 7);
-                }
-                break;
-              }
-            }
-            for (let t = 0; t < callList.length; t++) {
-              if (callList[t].id === listType[m].id) {
-                name = callList[t].name;
-                if (listType[m].name) {
-                  name2 = listType[m].name;
-                  colour = listType[m].colour.substring(0, 7);
-                }
-                break;
-              }
-            }
+  const showAdminNotes =
+    Boolean(user?.isadmin) && Array.isArray(sked) && sked.length > 0;
 
-            today.push(
-              <Text key={m} style={styles.tableCellList}>
-                {name} {determineColour(name2, colour)}
+  const renderSecondaryName = (secondaryName, hexColour) => {
+    if (!secondaryName) return null;
+    if (colour && hexColour) {
+      return (
+        <Text style={{ backgroundColor: String(hexColour) }}>
+          {secondaryName}
+        </Text>
+      );
+    }
+    return <Text>{secondaryName}</Text>;
+  };
+
+  // Build calendar cells (6 rows x 7 cols)
+  const rows = [];
+  let dayCounter = 1;
+  for (let rowIdx = 0; rowIdx < 6; rowIdx++) {
+    const cols = [];
+    for (let colIdx = 0; colIdx < 7; colIdx++) {
+      let items = [];
+      let headerDay = "";
+      let headerHoliday = "";
+      let headerNumNote = "";
+
+      const isCurrentMonthCell =
+        (rowIdx !== 0 || colIdx >= firstDayOfWeekIndex) &&
+        dayCounter <= daysInMonth;
+      if (isCurrentMonthCell) {
+        headerDay = dayCounter;
+        headerHoliday = holidayByDay.get(dayCounter) || "";
+
+        const dateStr = toDateStr(dayCounter);
+
+        // Assignments for this date
+        for (let idx = 0; idx < listType.length; idx++) {
+          const item = listType[idx];
+          if (item.date === dateStr) {
+            const baseName =
+              callById.get(item.id) ?? entryById.get(item.id) ?? "";
+            const secondaryName = item.name || "";
+            const bg = item.colour
+              ? String(item.colour).substring(0, 7)
+              : undefined;
+            items.push(
+              <Text key={`a-${idx}`} style={styles.tableCellList}>
+                {baseName} {renderSecondaryName(secondaryName, bg)}
               </Text>
             );
           }
         }
-        for (let b = 0; b < vNotes.length; b++) {
-          if (
-            vNotes[b].date ===
-            dateContext.format("MM") +
-              "/" +
-              ctr +
-              "/" +
-              dateContext.format("YYYY")
-          ) {
-            vNote = vNotes[b].msg;
-            today.push(
-              <Text key={b} style={styles.tableCellList}>
-                {" - " + vNote}
+
+        // Visible notes for everyone
+        const vMsgs = visibleNotesByDate.get(dateStr) || [];
+        vMsgs.forEach((msg, i) =>
+          items.push(
+            <Text key={`v-${i}`} style={styles.tableCellList}>
+              {` - ${msg}`}
+            </Text>
+          )
+        );
+
+        if (showAdminNotes) {
+          // Invisible notes
+          const iMsgs = invisibleNotesByDate.get(dateStr) || [];
+          iMsgs.forEach((msg, i) =>
+            items.push(
+              <Text key={`i-${i}`} style={styles.tableCellList}>
+                {` - ${msg}`}
               </Text>
-            );
-          }
-        }
-        if (user.isadmin && sked) {
-          for (let a = 0; a < iNotes.length; a++) {
-            if (
-              iNotes[a].date ===
-              dateContext.format("MM") +
-                "/" +
-                ctr +
-                "/" +
-                dateContext.format("YYYY")
-            ) {
-              iNote = iNotes[a].msg;
-              today.push(
-                <Text key={a} style={styles.tableCellList}>
-                  {" - " + iNote}
-                </Text>
-              );
-            }
-          }
-          for (let s = 0; s < numNotes.length; s++) {
-            if (
-              numNotes[s].date ===
-              dateContext.format("MM") +
-                "/" +
-                ctr +
-                "/" +
-                dateContext.format("YYYY")
-            ) {
-              numNote = numNotes[s].msg;
-            }
-          }
+            )
+          );
+          // Numeric note for header
+          headerNumNote = numberNotesByDate.get(dateStr) || "";
         }
 
-        ctr++;
+        dayCounter++;
       }
-      if (user.isadmin && sked) {
-        tableCols.push(
-          <View key={j} style={styles.tableCol}>
-            <View key={-j - 1} style={styles.tableCell}>
-              <Text>{day + "  " + numNote}</Text>
-              <Text>{holiday}</Text>
+
+      if (showAdminNotes) {
+        cols.push(
+          <View key={colIdx} style={styles.tableCol}>
+            <View key={`h-${colIdx}`} style={styles.tableCell}>
+              <Text>{`${headerDay || ""}  ${headerNumNote}`}</Text>
+              <Text>{headerHoliday}</Text>
             </View>
-            {today}
+            {items}
           </View>
         );
       } else {
-        tableCols.push(
-          <View key={j} style={styles.tableCol}>
-            <Text style={styles.tableCell}>{day + "   " + holiday}</Text>
-            {today}
+        cols.push(
+          <View key={colIdx} style={styles.tableCol}>
+            <Text style={styles.tableCell}>{`${
+              headerDay || ""
+            }   ${headerHoliday}`}</Text>
+            {items}
           </View>
         );
       }
     }
-    tableRows.push(tableCols);
+    rows.push(cols);
   }
 
-  let dept = user.department.replace(" Admin", "");
+  // Department header
+  let department = String(user?.department || "").replace(" Admin", "");
   for (let i = 0; i < depts.length; i++) {
-    if (depts[i].code === dept) {
-      dept = depts[i].name;
+    if (depts[i].code === department) {
+      department = depts[i].name;
+      break;
     }
   }
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <Text style={styles.header}>{dept + ", " + type + " Schedule"}</Text>
+        <Text style={styles.header}>{`${department}, ${type} Schedule`}</Text>
         <Text style={styles.title}>{dateContext.format("MMMM Y")}</Text>
         <Text style={styles.weekday}>
           {
@@ -260,15 +242,15 @@ const MyDocument = (props) => {
         </Text>
         <View style={styles.tableBody}>
           <View style={styles.table}>
-            <View style={styles.tableRow}>{tableRows[0]}</View>
-            <View style={styles.tableRow}>{tableRows[1]}</View>
-            <View style={styles.tableRow}>{tableRows[2]}</View>
-            <View style={styles.tableRow}>{tableRows[3]}</View>
-            <View style={styles.tableRow}>{tableRows[4]}</View>
-            <View style={styles.tableRow}>{tableRows[5]}</View>
+            <View style={styles.tableRow}>{rows[0]}</View>
+            <View style={styles.tableRow}>{rows[1]}</View>
+            <View style={styles.tableRow}>{rows[2]}</View>
+            <View style={styles.tableRow}>{rows[3]}</View>
+            <View style={styles.tableRow}>{rows[4]}</View>
+            <View style={styles.tableRow}>{rows[5]}</View>
           </View>
         </View>
-        <Text style={styles.footer}>{"Created: " + stamp}</Text>
+        <Text style={styles.footer}>{`Created: ${stamp}`}</Text>
       </Page>
     </Document>
   );

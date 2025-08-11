@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Calendar from "./Calendar/Calendar";
-import MyDocument from "./../PDF/MyDocument";
+import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import moment from "moment";
 
 import "./Schedules.css";
@@ -599,6 +598,21 @@ const PerSchedule = (props) => {
     }
   }
 
+  // Precompute MyDocument props and filename
+  const personalDocProps = {
+    stamp,
+    depts,
+    entries: entryList,
+    callList,
+    personalDays,
+    holiDays,
+    type: `${user.firstname} ${user.lastname}'s Personal`,
+    dateContext,
+    user,
+  };
+  const personalFileName =
+    dateContext.format("MMMM") + dateContext.format("Y") + "pesonalsked.pdf";
+
   return (
     <div className="screen">
       <Row className="labels">
@@ -850,41 +864,13 @@ const PerSchedule = (props) => {
       </div>
       <div className="bottom">
         <Col id="downloadLink">
-          <PDFDownloadLink
-            document={
-              <MyDocument
-                colour={false}
-                stamp={stamp}
-                depts={depts}
-                numNotes={[]}
-                vNotes={[]}
-                iNotes={[]}
-                entries={entryList}
-                callList={callList}
-                personalDays={personalDays}
-                holiDays={holiDays}
-                type={user.firstname + " " + user.lastname + "'s Personal"}
-                dateContext={dateContext}
-                today={today}
-                style={style}
-                onDayClick={(e, day) => onDayClick(e, day)}
-                user={user}
-              />
-            }
-            fileName={
-              dateContext.format("MMMM") +
-              dateContext.format("Y") +
-              "pesonalsked.pdf"
-            }
-          >
-            {({ loading }) =>
-              loading ? (
-                "Loading document..."
-              ) : (
-                <span onMouseOver={hoverSpan}>Download as PDF</span>
-              )
-            }
-          </PDFDownloadLink>
+          <ScheduleDownloadLink
+            docProps={personalDocProps}
+            fileName={personalFileName}
+            colour={false}
+            label="Download as PDF"
+            onHover={hoverSpan}
+          />
         </Col>
       </div>
 
