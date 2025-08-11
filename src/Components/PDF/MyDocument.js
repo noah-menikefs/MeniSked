@@ -117,11 +117,10 @@ const MyDocument = ({
     numberNotesByDate.set(n.date, n.msg);
   }
 
-  const showAdminNotes =
-    Boolean(user?.isadmin) && Array.isArray(sked) && sked.length > 0;
+  const showAdminNotes = Boolean(user?.isadmin);
 
   const renderSecondaryName = (secondaryName, hexColour) => {
-    if (!secondaryName) return null;
+    if (!secondaryName) return <Text />;
     if (colour && hexColour) {
       return (
         <Text style={{ backgroundColor: String(hexColour) }}>
