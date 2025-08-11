@@ -54,8 +54,7 @@ const CSchedule = (props) => {
     reset,
   } = useCalendarNavigation({
     initialDate: today,
-    minYear: 2020,
-    maxYear: today.year() + 10,
+    maxDate: today.year() + 10,
   });
 
   // Holidays recompute when dateContext or holiday data changes

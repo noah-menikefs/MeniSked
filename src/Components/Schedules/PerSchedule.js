@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import Calendar from "./Calendar/Calendar";
 import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
 import Button from "react-bootstrap/Button";
-import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
+import CalendarHeader from "./Calendar/CalendarHeader";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
 
@@ -43,12 +43,10 @@ const PerSchedule = (props) => {
   const isMountedRef = useRef(true);
 
   // Load functions
-  const loadPersonalDays = useCallback(
-    (index, docs = activeDocs) => {
-      setPersonalDays([...docs[index].worksked]);
-    },
-    [activeDocs]
-  );
+  // Keep this function identity stable; callers must pass the docs array explicitly
+  const loadPersonalDays = useCallback((index, docs) => {
+    setPersonalDays([...docs[index].worksked]);
+  }, []);
 
   const loadActiveDocs = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/sked/docs")
@@ -78,8 +76,7 @@ const PerSchedule = (props) => {
     reset,
   } = useCalendarNavigation({
     initialDate: today,
-    minYear: 2020,
-    maxYear: today.year() + 10,
+    maxDate: today.year() + 10,
   });
 
   const holiDays = useHolidays({
@@ -317,11 +314,11 @@ const PerSchedule = (props) => {
   const nextDoc = useCallback(() => {
     let i = docIndex;
     if (i !== activeDocs.length - 1) {
-      loadPersonalDays(i + 1);
+      loadPersonalDays(i + 1, activeDocs);
       loadPending(activeDocs[i + 1].id);
       setDocIndex(i + 1);
     } else {
-      loadPersonalDays(0);
+      loadPersonalDays(0, activeDocs);
       loadPending(activeDocs[0].id);
       setDocIndex(0);
     }
@@ -330,11 +327,11 @@ const PerSchedule = (props) => {
   const prevDoc = useCallback(() => {
     let i = docIndex;
     if (i !== 0) {
-      loadPersonalDays(i - 1);
+      loadPersonalDays(i - 1, activeDocs);
       loadPending(activeDocs[i - 1].id);
       setDocIndex(i - 1);
     } else {
-      loadPersonalDays(activeDocs.length - 1);
+      loadPersonalDays(activeDocs.length - 1, activeDocs);
       loadPending(activeDocs[activeDocs.length - 1].id);
       setDocIndex(activeDocs.length - 1);
     }
@@ -362,7 +359,7 @@ const PerSchedule = (props) => {
   const onPhysicianChange = useCallback(
     (event) => {
       if (event.target.key) {
-        loadPersonalDays(event.target.key);
+        loadPersonalDays(event.target.key, activeDocs);
         setDocIndex(event.target.key);
       } else {
         let index = -1;
@@ -372,7 +369,7 @@ const PerSchedule = (props) => {
             break;
           }
         }
-        loadPersonalDays(index);
+        loadPersonalDays(index, activeDocs);
         loadPending(activeDocs[index].id);
         setDocIndex(index);
       }
@@ -560,239 +557,54 @@ const PerSchedule = (props) => {
 
   return (
     <div className="screen">
-      <Row className="labels">
-        <Col>
-          <h5 className="labels-child">Physician</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Type of Entry</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Month</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Year</h5>
-        </Col>
-        <Col>
-          <Button
-            onClick={reset}
-            id="today"
-            className="top-child"
-            variant="primary"
-          >
-            Today
-          </Button>
-        </Col>
-      </Row>
-      <Row className="header">
-        <Col>{adminSelect()}</Col>
-        <Col>{eSelect()}</Col>
-        <Col>
-          <select
-            value={dateContext.format("MMMM")}
-            onChange={onMonthChange}
-            className="top-child month selector"
-          >
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
-          </select>
-        </Col>
-        <Col>
-          <select
-            value={dateContext.format("Y")}
-            onChange={onYearChange}
-            className="top-child year selector"
-          >
-            {yearSelect}
-          </select>
-        </Col>
-        <Col id="smallCol">
-          <p className="vis labels-child"></p>
-        </Col>
-      </Row>
-      <Row className="subheader">
-        <Col>{adminButton()}</Col>
-        <Col>
-          <Button
-            onClick={prevEntry}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextEntry}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-        <Col>
-          <Button
-            onClick={prevMonth}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextMonth}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-        <Col>
-          <Button
-            onClick={prevYear}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextYear}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-        <Col>
-          <p className="vis top-child"></p>
-        </Col>
-      </Row>
-      <Row className="labels1">
-        <Col>
-          <h5 className="labels-child">Physician</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Type of Entry</h5>
-        </Col>
-      </Row>
-      <Row className="header1">
-        <Col>{adminSelect()}</Col>
-        <Col>{eSelect()}</Col>
-      </Row>
-
-      <Row className="subheader1">
-        <Col>{adminButton()}</Col>
-        <Col>
-          <Button
-            onClick={prevEntry}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextEntry}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-      </Row>
-      <Row className="labels2">
-        <Col>
-          <h5 className="labels-child">Month</h5>
-        </Col>
-        <Col>
-          <h5 className="labels-child">Year</h5>
-        </Col>
-      </Row>
-      <Row className="header2">
-        <Col>
-          <select
-            value={dateContext.format("MMMM")}
-            onChange={onMonthChange}
-            className="top-child month selector"
-          >
-            <option value="January">January</option>
-            <option value="February">February</option>
-            <option value="March">March</option>
-            <option value="April">April</option>
-            <option value="May">May</option>
-            <option value="June">June</option>
-            <option value="July">July</option>
-            <option value="August">August</option>
-            <option value="September">September</option>
-            <option value="October">October</option>
-            <option value="November">November</option>
-            <option value="December">December</option>
-          </select>
-        </Col>
-        <Col>
-          <select
-            value={dateContext.format("Y")}
-            onChange={onYearChange}
-            className="top-child year selector"
-          >
-            {yearSelect}
-          </select>
-        </Col>
-      </Row>
-      <Row className="subheader2">
-        <Col>
-          <Button
-            onClick={prevMonth}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextMonth}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-        <Col>
-          <Button
-            onClick={prevYear}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25C0;
-          </Button>
-          <Button
-            onClick={nextYear}
-            className="arrow top-child"
-            variant="secondary"
-          >
-            &#x25B6;
-          </Button>
-        </Col>
-      </Row>
+      <CalendarHeader
+        leadingCols={[
+          {
+            label: "Physician",
+            content: adminSelect(),
+            controls: adminButton(),
+          },
+          {
+            label: "Type of Entry",
+            content: eSelect(),
+            controls: (
+              <>
+                <Button
+                  onClick={prevEntry}
+                  className="arrow top-child"
+                  size="sm"
+                  variant="secondary"
+                >
+                  &#x25C0;
+                </Button>
+                <Button
+                  onClick={nextEntry}
+                  className="arrow top-child"
+                  size="sm"
+                  variant="secondary"
+                >
+                  &#x25B6;
+                </Button>
+              </>
+            ),
+          },
+        ]}
+        monthValue={dateContext.format("MMMM")}
+        yearValue={dateContext.format("Y")}
+        onMonthChange={onMonthChange}
+        onYearChange={onYearChange}
+        onPrevMonth={prevMonth}
+        onNextMonth={nextMonth}
+        onPrevYear={prevYear}
+        onNextYear={nextYear}
+        onReset={reset}
+        yearOptions={yearSelect}
+      />
       <div className="curr">
         <h3 id="pcurr">
           {dateContext.format("MMMM") + " " + dateContext.format("Y")}
         </h3>
-        <Button
-          onClick={reset}
-          id="today1"
-          className="top-child"
-          variant="primary"
-        >
-          Today
-        </Button>
       </div>
-
       <div className="sked">
         <Calendar
           pending={pending}
