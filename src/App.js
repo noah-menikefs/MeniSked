@@ -196,7 +196,18 @@ const App = () => {
       case "Entries":
         return <Entries />;
       default:
-        return <PerSchedule today={today} user={user} />;
+        return (
+          <PerSchedule
+            callList={callList}
+            today={today}
+            user={user}
+            // NEW: Pass shared data
+            nrHolidayList={nrHolidayList}
+            depts={depts}
+            processHolidaysForDate={processHolidaysForDate}
+            entryList={filteredEntries}
+          />
+        );
     }
   };
 
