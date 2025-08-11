@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import Calendar from "./Calendar/Calendar";
+import CalendarGrid from "./Calendar/CalendarGrid";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -88,7 +88,7 @@ const CSchedule = (props) => {
     processHolidaysForDate,
   });
 
-  const onDayClick = (e, d) => {
+  const onDayClick = (d) => {
     const ctx = moment(dateContext).set("date", d);
     setDateContext(ctx);
     toggleShow(d);
@@ -155,6 +155,38 @@ const CSchedule = (props) => {
     }
   }
 
+  // Build DayCell[] for CalendarGrid (only Call schedule content)
+  const monthStr = dateContext.format("MM");
+  const yearStr = dateContext.format("YYYY");
+  const daysMap = new Map();
+  const ensureDay = (d) => {
+    if (!daysMap.has(d)) {
+      daysMap.set(d, { day: d, contentItems: [] });
+    }
+    return daysMap.get(d);
+  };
+  // Holidays
+  for (const h of holiDays) {
+    const item = ensureDay(h.day);
+    item.holidayName = h.name;
+  }
+  // Calls
+  for (let i = 0; i < callSked.length; i++) {
+    const { date, id, colour, name } = callSked[i];
+    const [m, dStr, y] = date.split("/");
+    const d = Number(dStr);
+    if (m === monthStr && y === yearStr) {
+      const item = ensureDay(d);
+      item.contentItems.push(
+        <li key={`c-${i}`} className="call" id="call">
+          {idToName(id) + " "}
+          <span style={{ backgroundColor: colour }}>{name}</span>
+        </li>
+      );
+    }
+  }
+  const days = Array.from(daysMap.values());
+
   return (
     <div className="screen">
       <CalendarHeader
@@ -175,15 +207,12 @@ const CSchedule = (props) => {
         </Col>
       </Row>
       <div className="sked">
-        <Calendar
-          callList={callList}
-          callSked={callSked}
-          holiDays={holiDays}
-          type="Call"
-          dateContext={dateContext}
-          today={today}
+        <CalendarGrid
+          year={Number(dateContext.format("YYYY"))}
+          monthIndex={Number(dateContext.format("M")) - 1}
+          days={days}
           style={style}
-          onDayClick={(e, day) => onDayClick(e, day)}
+          onDayClick={onDayClick}
         />
       </div>
       <div className="bottom">
