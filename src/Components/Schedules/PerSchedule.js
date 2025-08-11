@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import Calendar from "./Calendar/Calendar";
+import CalendarGrid from "./Calendar/CalendarGrid";
+import { buildPersonalMonthDays } from "../../selectors/calendarData";
 import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
@@ -299,7 +300,7 @@ const PerSchedule = (props) => {
 
   // Event handlers
   const onDayClick = useCallback(
-    (e, day) => {
+    (day) => {
       const id = entryList[entryIndex].id;
       if (id === 1) {
         setDay(day);
@@ -555,6 +556,15 @@ const PerSchedule = (props) => {
   const personalFileName =
     dateContext.format("MMMM") + dateContext.format("Y") + "pesonalsked.pdf";
 
+  const days = buildPersonalMonthDays({
+    dateContext,
+    holiDays,
+    personalDays,
+    pending,
+    callList,
+    entryList,
+  });
+
   return (
     <div className="screen">
       <CalendarHeader
@@ -606,17 +616,12 @@ const PerSchedule = (props) => {
         </h3>
       </div>
       <div className="sked">
-        <Calendar
-          pending={pending}
-          entries={entryList}
-          callList={callList}
-          personalDays={personalDays}
-          holiDays={holiDays}
-          type="Personal"
-          dateContext={dateContext}
-          today={today}
+        <CalendarGrid
+          year={Number(dateContext.format("YYYY"))}
+          monthIndex={Number(dateContext.format("M")) - 1}
+          days={days}
           style={style}
-          onDayClick={(e, day) => onDayClick(e, day)}
+          onDayClick={onDayClick}
         />
       </div>
       <div className="bottom">
