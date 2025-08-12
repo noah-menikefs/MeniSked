@@ -4,8 +4,6 @@ import { buildPersonalMonthDays } from "../../selectors/calendarData";
 import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
-import Modal from "react-bootstrap/Modal";
-import Form from "react-bootstrap/Form";
 import moment from "moment";
 import { publishedBaseDate } from "../../utils/date";
 import CalendarHeader from "./Calendar/CalendarHeader";
@@ -14,6 +12,7 @@ import useHolidays from "../../hooks/useHolidays";
 import usePdfStamp from "../../hooks/usePdfStamp";
 
 import "./Schedules.css";
+import CallTypeSelectModal from "./Modals/CallTypeSelectModal.jsx";
 
 const style = {
   position: "relative",
@@ -27,7 +26,6 @@ const PerSchedule = (props) => {
   const [docIndex, setDocIndex] = useState(0);
   const [entryIndex, setEntryIndex] = useState(0);
   const [show, setShow] = useState(false);
-  const [radio, setRadio] = useState(-1);
   const [day, setDay] = useState(0);
   const [personalDays, setPersonalDays] = useState([]);
   const [pending, setPending] = useState([]);
@@ -136,11 +134,9 @@ const PerSchedule = (props) => {
             loadPersonalSked(user);
           }
         });
-      if (radio !== -1) {
-        setShow(false);
-      }
+      setShow(false);
     },
-    [activeDocs, docIndex, radio, loadPersonalSked]
+    [activeDocs, docIndex, loadPersonalSked]
   );
 
   const requestCall = useCallback(
@@ -161,11 +157,9 @@ const PerSchedule = (props) => {
             loadPending();
           }
         });
-      if (radio !== -1) {
-        setShow(false);
-      }
+      setShow(false);
     },
-    [user.id, today, radio, loadPending]
+    [user.id, today, loadPending]
   );
 
   const editCall = useCallback(
@@ -185,11 +179,9 @@ const PerSchedule = (props) => {
             loadPending();
           }
         });
-      if (radio !== -1) {
-        setShow(false);
-      }
+      setShow(false);
     },
-    [user.id, radio, loadPending]
+    [user.id, loadPending]
   );
 
   const deleteCall = useCallback(
@@ -210,16 +202,13 @@ const PerSchedule = (props) => {
             loadPending();
           }
         });
-      if (radio !== -1) {
-        setShow(false);
-      }
+      setShow(false);
     },
-    [user.id, pending, radio, loadPending]
+    [user.id, pending, loadPending]
   );
 
   const assignOrDelete = useCallback(
     (typeId, selectedDay = day) => {
-      if (typeId === -1) return;
       const typeID = Number(typeId);
       const date = moment(dateContext).date(selectedDay).format("MM/D/YYYY");
       const selectedDocId = activeDocs[docIndex]?.id;
@@ -254,7 +243,6 @@ const PerSchedule = (props) => {
       }
 
       setDay(0);
-      setRadio(-1);
     },
     [
       day,
@@ -359,8 +347,6 @@ const PerSchedule = (props) => {
 
   const onYearChange = (event) => setYear(event.target.value);
 
-  const radioChange = (event) => setRadio(event.target.id);
-
   const toggleShow = () => setShow(!show);
 
   const adminButton = useCallback(() => {
@@ -449,18 +435,9 @@ const PerSchedule = (props) => {
       <p id="entriesP">Entries</p>
     );
 
-  const radioOptions = callList
+  const callTypeOptions = callList
     .filter((call) => call.isactive)
-    .map((call) => (
-      <Form.Check
-        required
-        key={call.id}
-        name="callType"
-        type="radio"
-        id={call.id}
-        label={call.name}
-      />
-    ));
+    .map((call) => ({ id: call.id, label: call.name }));
 
   // Precompute MyDocument props and filename
   const personalDocProps = {
@@ -558,28 +535,12 @@ const PerSchedule = (props) => {
         </Col>
       </div>
 
-      <div className="modal">
-        <Modal show={show} onHide={toggleShow}>
-          <Modal.Header closeButton>
-            <Modal.Title id="modalTitle">Select Call Type</Modal.Title>
-          </Modal.Header>
-          <Form>
-            <Modal.Body>
-              <Form.Group onChange={radioChange} controlId="formBasicRadio">
-                {radioOptions}
-              </Form.Group>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button onClick={toggleShow} variant="secondary">
-                Close
-              </Button>
-              <Button onClick={() => assignOrDelete(radio)} variant="primary">
-                Submit
-              </Button>
-            </Modal.Footer>
-          </Form>
-        </Modal>
-      </div>
+      <CallTypeSelectModal
+        show={show}
+        onHide={toggleShow}
+        options={callTypeOptions}
+        onSubmit={(selectedId) => assignOrDelete(selectedId)}
+      />
     </div>
   );
 };

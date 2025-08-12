@@ -5,8 +5,9 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
-import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
+import DayDetailsModal from "./Modals/DayDetailsModal.jsx";
+import EditNoteModal from "./Modals/EditNoteModal.jsx";
 import moment from "moment";
 import {
   lastPublishedMoment,
@@ -467,57 +468,23 @@ const PubSchedule = (props) => {
         </Col>
       </div>
       {adminDownload()}
-      <div className="modal">
-        <Modal show={show} onHide={toggleShow}>
-          <Modal.Header closeButton>
-            <Modal.Title id="modalTitle">
-              {dateContext.format("MMMM") +
-                " " +
-                day +
-                " " +
-                dateContext.format("Y")}
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <ul>{modalList}</ul>
-            <ul>{noteList}</ul>
-            {adminNotes()}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={toggleShow}>
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
-      <div className="modal">
-        <Modal show={nShow} onHide={toggleNote}>
-          <Modal.Header closeButton>
-            <Modal.Title id="modalTitle">Edit Note</Modal.Title>
-          </Modal.Header>
-          <Form>
-            <Modal.Body>
-              <Form.Group id="note">
-                <Form.Control
-                  required
-                  value={msg}
-                  onChange={onMsgChange}
-                  type="text"
-                  placeholder="Note"
-                />
-              </Form.Group>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={toggleNote}>
-                Close
-              </Button>
-              <Button onClick={() => editNote(id)} variant="primary">
-                Submit
-              </Button>
-            </Modal.Footer>
-          </Form>
-        </Modal>
-      </div>
+      <DayDetailsModal
+        show={show}
+        onHide={toggleShow}
+        title={`${dateContext.format("MMMM")} ${day} ${dateContext.format(
+          "Y"
+        )}`}
+        assignments={modalList}
+        notes={noteList}
+        adminNotesContent={adminNotes()}
+      />
+      <EditNoteModal
+        show={nShow}
+        onHide={() => toggleNote()}
+        value={msg}
+        onChange={onMsgChange}
+        onSubmit={() => editNote(id)}
+      />
     </div>
   );
 };

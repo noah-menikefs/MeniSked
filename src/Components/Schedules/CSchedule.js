@@ -1,10 +1,8 @@
 import React, { useState, useMemo } from "react";
 import CalendarGrid from "./Calendar/CalendarGrid";
-import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
-import Modal from "react-bootstrap/Modal";
 import moment from "moment";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
@@ -18,6 +16,7 @@ import usePdfStamp from "../../hooks/usePdfStamp";
 
 import "./Schedules.css";
 import { publishedBaseDate } from "../../utils/date.js";
+import DayDetailsModal from "./Modals/DayDetailsModal.jsx";
 
 const style = {
   position: "relative",
@@ -185,27 +184,18 @@ const CSchedule = (props) => {
           />
         </Col>
       </div>
-      <div className="modal">
-        <Modal show={show} onHide={() => toggleShow()}>
-          <Modal.Header closeButton>
-            <Modal.Title id="modalTitle">
-              {`${dateContext.format("MMMM")} ${
-                typeof day === "number" && day > 0
-                  ? String(day).padStart(2, "0")
-                  : dateContext.format("DD")
-              }, ${dateContext.format("YYYY")}`}
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <ul>{modalList}</ul>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => toggleShow()}>
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
+      <DayDetailsModal
+        show={show}
+        onHide={() => toggleShow()}
+        title={`${dateContext.format("MMMM")} ${
+          typeof day === "number" && day > 0
+            ? String(day).padStart(2, "0")
+            : dateContext.format("DD")
+        }, ${dateContext.format("YYYY")}`}
+        assignments={modalList}
+        notes={null}
+        adminNotesContent={null}
+      />
     </div>
   );
 };
