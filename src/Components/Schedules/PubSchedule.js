@@ -22,6 +22,7 @@ import {
   idToNameFromLists,
 } from "../../utils/scheduleUtils";
 import usePdfStamp from "../../hooks/usePdfStamp";
+import useFormattedDateContext from "../../hooks/useFormattedDateContext";
 
 import "./Schedules.css";
 
@@ -121,6 +122,14 @@ const PubSchedule = (props) => {
     processHolidaysForDate,
   });
 
+  const {
+    monthLong,
+    year,
+    monthNumberTwoDigit,
+    formatMonthYear,
+    formatTitleForDay,
+  } = useFormattedDateContext(dateContext);
+
   useEffect(() => {
     loadPublished();
     loadAllNotes();
@@ -148,12 +157,7 @@ const PubSchedule = (props) => {
         method: "post",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          date:
-            dateContext.format("MM") +
-            "/" +
-            day +
-            "/" +
-            dateContext.format("Y"),
+          date: `${monthNumberTwoDigit}/${day}/${year}`,
           type: parseInt(radio, 10),
           msg: note,
         }),
@@ -421,8 +425,8 @@ const PubSchedule = (props) => {
     <div className="screen">
       <CalendarHeader
         leadingCols={[{ content: publishLeading() }]}
-        monthValue={dateContext.format("MMMM")}
-        yearValue={dateContext.format("Y")}
+        monthValue={monthLong}
+        yearValue={year}
         onMonthChange={onMonthChange}
         onYearChange={onYearChange}
         onPrevMonth={prevMonth}
@@ -435,7 +439,7 @@ const PubSchedule = (props) => {
       />
       <Row className="curr">
         <Col xl>
-          <h3>{dateContext.format("MMMM") + " " + dateContext.format("Y")}</h3>
+          <h3>{formatMonthYear()}</h3>
         </Col>
       </Row>
       <div className="sked">
@@ -471,9 +475,7 @@ const PubSchedule = (props) => {
       <DayDetailsModal
         show={show}
         onHide={toggleShow}
-        title={`${dateContext.format("MMMM")} ${day} ${dateContext.format(
-          "Y"
-        )}`}
+        title={formatTitleForDay(day)}
         assignments={modalList}
         notes={noteList}
         adminNotesContent={adminNotes()}

@@ -10,6 +10,7 @@ import CalendarHeader from "./Calendar/CalendarHeader";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
 import usePdfStamp from "../../hooks/usePdfStamp";
+import useFormattedDateContext from "../../hooks/useFormattedDateContext";
 
 import "./Schedules.css";
 import CallTypeSelectModal from "./Modals/CallTypeSelectModal.jsx";
@@ -451,8 +452,10 @@ const PerSchedule = (props) => {
     dateContext,
     user,
   };
-  const personalFileName =
-    dateContext.format("MMMM") + dateContext.format("Y") + "pesonalsked.pdf";
+  const { monthLong, year, formatMonthYear } =
+    useFormattedDateContext(dateContext);
+
+  const personalFileName = `${monthLong}${year}pesonalsked.pdf`;
 
   const days = buildPersonalMonthDays({
     dateContext,
@@ -497,8 +500,8 @@ const PerSchedule = (props) => {
             ),
           },
         ]}
-        monthValue={dateContext.format("MMMM")}
-        yearValue={dateContext.format("Y")}
+        monthValue={monthLong}
+        yearValue={year}
         onMonthChange={onMonthChange}
         onYearChange={onYearChange}
         onPrevMonth={prevMonth}
@@ -510,13 +513,11 @@ const PerSchedule = (props) => {
         maxDate={moment(today).add(10, "year")}
       />
       <div className="curr">
-        <h3 id="pcurr">
-          {dateContext.format("MMMM") + " " + dateContext.format("Y")}
-        </h3>
+        <h3 id="pcurr">{formatMonthYear()}</h3>
       </div>
       <div className="sked">
         <CalendarGrid
-          year={Number(dateContext.format("YYYY"))}
+          year={Number(year)}
           monthIndex={Number(dateContext.format("M")) - 1}
           days={days}
           style={style}

@@ -17,6 +17,7 @@ import usePdfStamp from "../../hooks/usePdfStamp";
 import "./Schedules.css";
 import { publishedBaseDate } from "../../utils/date.js";
 import DayDetailsModal from "./Modals/DayDetailsModal.jsx";
+import useFormattedDateContext from "../../hooks/useFormattedDateContext";
 
 const style = {
   position: "relative",
@@ -134,12 +135,19 @@ const CSchedule = (props) => {
   const pdfFileName = `${dateContext.format("MMMM")}${dateContext.format(
     "Y"
   )}callsked.pdf`;
+  const {
+    monthLong,
+    year,
+    currentDayTwoDigit,
+    formatMonthYear,
+    formatTitleForDayPadded,
+  } = useFormattedDateContext(dateContext);
 
   return (
     <div className="screen">
       <CalendarHeader
-        monthValue={dateContext.format("MMMM")}
-        yearValue={dateContext.format("Y")}
+        monthValue={monthLong}
+        yearValue={year}
         onMonthChange={onMonthChange}
         onYearChange={onYearChange}
         onPrevMonth={prevMonth}
@@ -152,7 +160,7 @@ const CSchedule = (props) => {
       />
       <Row className="curr">
         <Col xl>
-          <h3>{dateContext.format("MMMM") + " " + dateContext.format("Y")}</h3>
+          <h3>{formatMonthYear()}</h3>
         </Col>
       </Row>
       <div className="sked">
@@ -187,11 +195,9 @@ const CSchedule = (props) => {
       <DayDetailsModal
         show={show}
         onHide={() => toggleShow()}
-        title={`${dateContext.format("MMMM")} ${
-          typeof day === "number" && day > 0
-            ? String(day).padStart(2, "0")
-            : dateContext.format("DD")
-        }, ${dateContext.format("YYYY")}`}
+        title={formatTitleForDayPadded(
+          typeof day === "number" && day > 0 ? day : currentDayTwoDigit
+        )}
         assignments={modalList}
         notes={null}
         adminNotesContent={null}
