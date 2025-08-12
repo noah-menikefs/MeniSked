@@ -8,9 +8,19 @@ import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
+import {
+  lastPublishedMoment,
+  publishedBaseDate,
+  isSameMonthYearDay,
+} from "../../utils/date";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
+import {
+  buildWorkSkedFromPeople,
+  idToNameFromLists,
+} from "../../utils/scheduleUtils";
+import usePdfStamp from "../../hooks/usePdfStamp";
 
 import "./Schedules.css";
 
@@ -27,7 +37,6 @@ const PubSchedule = (props) => {
   const [radio, setRadio] = useState(0);
   const [day, setDay] = useState(-1);
   const [published, setPublished] = useState(-1);
-  const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
   const [msg, setMsg] = useState("");
   const [id, setId] = useState(-1);
   const [allNotes, setAllNotes] = useState({
@@ -36,11 +45,11 @@ const PubSchedule = (props) => {
     iNotes: [],
   });
 
-  const months = moment.months(); // List of each month
   const lastPublished = useMemo(
-    () => moment([2020, 5, 1]).add(published, "month"),
+    () => lastPublishedMoment(published),
     [published]
   );
+  const { stamp, updateStamp } = usePdfStamp();
 
   const { numNotes, vNotes, iNotes } = allNotes;
 
@@ -56,35 +65,9 @@ const PubSchedule = (props) => {
     entryList,
   } = props;
 
-  const priorityCheck = useCallback(
-    (id) => {
-      for (let n = 0; n < callList.length; n++) {
-        if (callList[n].id === id) {
-          return callList[n].priority;
-        }
-      }
-      return 1000;
-    },
-    [callList]
-  );
-
-  // NEW: Shared data processing
   const sked = useMemo(() => {
-    let allSked = [];
-    peopleList.forEach((person) => {
-      person.worksked.forEach((work) => {
-        allSked.push({
-          id: work.id,
-          date: work.date,
-          name: person.lastname,
-          colour: person.colour,
-          priority: priorityCheck(work.id),
-        });
-      });
-    });
-    allSked.sort((a, b) => a.priority - b.priority);
-    return allSked;
-  }, [peopleList, priorityCheck]);
+    return buildWorkSkedFromPeople(peopleList, callList, false);
+  }, [callList, peopleList]);
 
   const loadAllNotes = useCallback(() => {
     fetch("https://secure-earth-82827.herokuapp.com/sked/allNotes")
@@ -105,9 +88,7 @@ const PubSchedule = (props) => {
   }, []);
 
   const publishSked = () => {
-    var a = moment([2020, 5, 1]);
-    var b = dateContext;
-    const num = b.diff(a, "months");
+    const num = dateContext.diff(publishedBaseDate(), "months");
     fetch("https://secure-earth-82827.herokuapp.com/published", {
       method: "put",
       headers: { "Content-Type": "application/json" },
@@ -129,7 +110,7 @@ const PubSchedule = (props) => {
     prevYear,
     reset,
   } = useCalendarNavigation({
-    initialDate: today,
+    initialDate: user.isadmin ? today : lastPublished,
     maxDate: user.isadmin ? moment(today).add(10, "year") : lastPublished,
   });
 
@@ -155,18 +136,6 @@ const PubSchedule = (props) => {
 
   const onMonthChange = (event) => setMonth(event.target.value);
   const onYearChange = (event) => setYear(event.target.value);
-  const onReset = () => {
-    if (
-      !user.isadmin &&
-      lastPublished &&
-      moment(today).isAfter(lastPublished, "month")
-    ) {
-      setYear(lastPublished.year());
-      setMonth(months[lastPublished.month()]);
-    } else {
-      reset();
-    }
-  };
 
   const noteRadioChange = (event) => {
     setRadio(event.target.id);
@@ -204,42 +173,13 @@ const PubSchedule = (props) => {
     setNote(event.target.value);
   };
 
-  const yearSelect = () => {
-    let arr = [];
-    let fYear = today.year();
-    if (user.isadmin) {
-      for (let i = 2020; i <= fYear + 10; i++) {
-        arr.push(
-          <option key={i} value={i}>
-            {i}
-          </option>
-        );
-      }
-    } else {
-      let nYear = moment([2020, 5, 1]).add(published, "month").year();
-      for (let i = 2020; i <= nYear; i++) {
-        arr.push(
-          <option key={i} value={i}>
-            {i}
-          </option>
-        );
-      }
-    }
-    return arr;
-  };
-
   const publishLeading = () => {
     if (!user.isadmin) return null;
-    let nYear = moment([2020, 5, 1]).add(published, "month").year();
-    let nMonth = moment([2020, 5, 1]).add(published, "month").month();
-    let isAlreadyPublished = true;
-    if (dateContext.year() === nYear) {
-      if (dateContext.month() > nMonth) {
-        isAlreadyPublished = false;
-      }
-    } else if (dateContext.year() > nYear) {
-      isAlreadyPublished = false;
-    }
+
+    const isAlreadyPublished = dateContext.isSameOrBefore(
+      lastPublishedMoment(published),
+      "month"
+    );
     if (isAlreadyPublished) {
       return <h5>Published</h5>;
     }
@@ -298,23 +238,7 @@ const PubSchedule = (props) => {
     }
   };
 
-  const idToName = (id) => {
-    for (let n = 0; n < callList.length; n++) {
-      if (callList[n].id === id) {
-        return callList[n].name;
-      }
-    }
-    for (let i = 0; i < entryList.length; i++) {
-      if (entryList[i].id === id) {
-        return entryList[i].name;
-      }
-    }
-  };
-
-  const hoverSpan = () => {
-    setStamp(moment().format("YYYY-MM-DD HH:mm"));
-  };
-
+  const hoverSpan = () => updateStamp();
   // Precompute shared MyDocument props and filename for public downloads
   const publicDocProps = {
     stamp,
@@ -412,15 +336,10 @@ const PubSchedule = (props) => {
 
   let modalList = [];
   sked.forEach((item, index) => {
-    const splitArr = item.date.split("/");
-    if (
-      splitArr[0] === dateContext.format("MM") &&
-      parseInt(splitArr[1], 10) === day &&
-      splitArr[2] === dateContext.format("YYYY")
-    ) {
+    if (isSameMonthYearDay(item.date, dateContext, day)) {
       modalList.push(
         <li key={index}>
-          {idToName(item.id) + " "}
+          {idToNameFromLists(callList, entryList, item.id) + " "}
           <span style={{ backgroundColor: item.colour }}>{item.name}</span>
         </li>
       );
@@ -429,114 +348,56 @@ const PubSchedule = (props) => {
 
   let noteList = [];
 
+  const renderNoteWithActions = (key, typeId, note) => (
+    <li key={key} id={typeId}>
+      {note.msg}
+      <Button
+        key={`${key}-e`}
+        onClick={() => toggleNote(note.id, note.msg)}
+        className="edit butn"
+        size="sm"
+        variant="secondary"
+      >
+        Edit
+      </Button>
+      <Button
+        key={`${key}-d`}
+        onClick={() => deleteNote(note.id)}
+        className="delete butn"
+        size="sm"
+        variant="danger"
+      >
+        Delete
+      </Button>
+    </li>
+  );
+
   if (user.isadmin) {
     for (let n = 0; n < numNotes.length; n++) {
-      const split = numNotes[n].date.split("/");
-      if (
-        split[0] === dateContext.format("MM") &&
-        parseInt(split[1], 10) === day &&
-        split[2] === dateContext.format("YYYY")
-      ) {
-        noteList.push(
-          <li key={n} id="numNotes">
-            {numNotes[n].msg}
-            <Button
-              key={n}
-              onClick={() => toggleNote(numNotes[n].id, numNotes[n].msg)}
-              className="edit butn"
-              size="sm"
-              variant="secondary"
-            >
-              Edit
-            </Button>
-            <Button
-              key={-n - 1}
-              onClick={() => deleteNote(numNotes[n].id)}
-              className="delete butn"
-              size="sm"
-              variant="danger"
-            >
-              Delete
-            </Button>
-          </li>
-        );
+      const note = numNotes[n];
+      if (isSameMonthYearDay(note.date, dateContext, day)) {
+        noteList.push(renderNoteWithActions(n, "numNotes", note));
       }
     }
     for (let i = 0; i < iNotes.length; i++) {
-      const splitArr = iNotes[i].date.split("/");
-      if (
-        splitArr[0] === dateContext.format("MM") &&
-        parseInt(splitArr[1], 10) === day &&
-        splitArr[2] === dateContext.format("YYYY")
-      ) {
-        noteList.push(
-          <li key={i} id="iNotes">
-            {iNotes[i].msg}
-            <Button
-              key={i}
-              onClick={() => toggleNote(iNotes[i].id, iNotes[i].msg)}
-              className="edit butn"
-              size="sm"
-              variant="secondary"
-            >
-              Edit
-            </Button>
-            <Button
-              key={-i - 1}
-              onClick={() => deleteNote(iNotes[i].id)}
-              className="delete butn"
-              size="sm"
-              variant="danger"
-            >
-              Delete
-            </Button>
-          </li>
-        );
+      const note = iNotes[i];
+      if (isSameMonthYearDay(note.date, dateContext, day)) {
+        noteList.push(renderNoteWithActions(i, "iNotes", note));
       }
     }
     for (let i = 0; i < vNotes.length; i++) {
-      const splitArr = vNotes[i].date.split("/");
-      if (
-        splitArr[0] === dateContext.format("MM") &&
-        parseInt(splitArr[1], 10) === day &&
-        splitArr[2] === dateContext.format("YYYY")
-      ) {
-        noteList.push(
-          <li key={i} id="notes">
-            {vNotes[i].msg}
-            <Button
-              key={i}
-              onClick={() => toggleNote(vNotes[i].id, vNotes[i].msg)}
-              className="edit butn"
-              size="sm"
-              variant="secondary"
-            >
-              Edit
-            </Button>
-            <Button
-              key={-i - 1}
-              onClick={() => deleteNote(vNotes[i].id)}
-              className="delete butn"
-              size="sm"
-              variant="danger"
-            >
-              Delete
-            </Button>
-          </li>
-        );
+      const note = vNotes[i];
+      if (isSameMonthYearDay(note.date, dateContext, day)) {
+        noteList.push(renderNoteWithActions(i, "notes", note));
       }
     }
   } else {
     for (let i = 0; i < vNotes.length; i++) {
-      const splitArr = vNotes[i].date.split("/");
-      if (
-        splitArr[0] === dateContext.format("MM") &&
-        parseInt(splitArr[1], 10) === day &&
-        splitArr[2] === dateContext.format("YYYY")
-      ) {
+      const note = vNotes[i];
+      if (isSameMonthYearDay(note.date, dateContext, day)) {
         noteList.push(
           <li key={i} id="notes">
-            {vNotes[i].msg}
+            {note.msg}
           </li>
         );
       }
@@ -567,8 +428,9 @@ const PubSchedule = (props) => {
         onNextMonth={nextMonth}
         onPrevYear={prevYear}
         onNextYear={nextYear}
-        onReset={onReset}
-        yearOptions={yearSelect()}
+        onReset={reset}
+        minDate={publishedBaseDate()}
+        maxDate={user.isadmin ? moment(today).add(10, "year") : lastPublished}
       />
       <Row className="curr">
         <Col xl>

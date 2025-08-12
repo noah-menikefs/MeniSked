@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import moment from "moment";
+import { publishedBaseDate } from "../utils/date";
 
 /**
  * Navigation hook for month/year calendar views with date bounds.
@@ -12,7 +13,7 @@ import moment from "moment";
  */
 export default function useCalendarNavigation({
   initialDate,
-  minDate = moment([2020, 5, 1]),
+  minDate = publishedBaseDate(),
   maxDate,
   onChange,
 }) {

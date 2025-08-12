@@ -14,10 +14,25 @@ const CalendarHeader = ({
   onPrevYear,
   onNextYear,
   onReset,
-  yearOptions,
+  minDate,
+  maxDate,
   leadingCols = [], // optional: [{ label, content, controls }]
 }) => {
   const months = useMemo(() => moment.months(), []);
+  const computedYearOptions = useMemo(() => {
+    if (!minDate || !maxDate) return null;
+    const start = moment(minDate).year();
+    const end = moment(maxDate).year();
+    const arr = [];
+    for (let y = start; y <= end; y++) {
+      arr.push(
+        <option key={y} value={y}>
+          {y}
+        </option>
+      );
+    }
+    return arr;
+  }, [minDate, maxDate]);
 
   return (
     <>
@@ -78,7 +93,7 @@ const CalendarHeader = ({
             onChange={onYearChange}
             className="top-child year selector"
           >
-            {yearOptions}
+            {computedYearOptions}
           </select>
         </Col>
         <Col>

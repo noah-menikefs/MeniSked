@@ -7,9 +7,11 @@ import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
+import { publishedBaseDate } from "../../utils/date";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
+import usePdfStamp from "../../hooks/usePdfStamp";
 
 import "./Schedules.css";
 
@@ -29,7 +31,7 @@ const PerSchedule = (props) => {
   const [day, setDay] = useState(0);
   const [personalDays, setPersonalDays] = useState([]);
   const [pending, setPending] = useState([]);
-  const [stamp, setStamp] = useState(moment().format("YYYY-MM-DD HH:mm"));
+  const { stamp, updateStamp } = usePdfStamp();
 
   // Extract shared data from props
   const {
@@ -217,65 +219,37 @@ const PerSchedule = (props) => {
 
   const assignOrDelete = useCallback(
     (typeId, selectedDay = day) => {
-      if (typeId !== -1) {
-        const typeID = parseInt(typeId, 10);
-        const date =
-          dateContext.format("MM") +
-          "/" +
-          selectedDay +
-          "/" +
-          dateContext.format("YYYY");
-        if (user.isadmin) {
-          let method = "post";
-          for (let i = 0; i < personalDays.length; i++) {
-            if (
-              personalDays[i].date === date &&
-              typeID === personalDays[i].id
-            ) {
-              method = "delete";
-              break;
-            }
-          }
-          assignCall(typeID, method, date);
-          for (let j = 0; j < pending.length; j++) {
-            for (let n = 0; n < pending[j].dates.length; n++) {
-              if (pending[j].dates[n] === date) {
-                deleteCall(pending[j].entryid, date, activeDocs[docIndex].id);
-                break;
-              }
-            }
-          }
-        } else if (!user.isadmin) {
-          let flag = false;
-          let flag2 = false;
+      if (typeId === -1) return;
+      const typeID = Number(typeId);
+      const date = moment(dateContext).date(selectedDay).format("M/D/YYYY");
+      const selectedDocId = activeDocs[docIndex]?.id;
 
-          for (let j = 0; j < pending.length; j++) {
-            for (let n = 0; n < pending[j].dates.length; n++) {
-              if (pending[j].dates[n] === date) {
-                if (parseInt(pending[j].entryid, 10) === typeID) {
-                  flag2 = true;
-                }
-                deleteCall(typeID, date);
-                break;
-              }
-            }
+      // Helpers that clarify intent
+      const isAssignedForDateAndType = personalDays.some(
+        (d) => d.date === date && d.id === typeID
+      );
+      const hasPendingOnDateForType = pending.some(
+        (p) => p.dates?.includes(date) && Number(p.entryid) === typeID
+      );
+      const hasPendingForType = pending.some(
+        (p) =>
+          Number(p.docid) === Number(user.id) && Number(p.entryid) === typeID
+      );
+      if (user.isadmin) {
+        const method = isAssignedForDateAndType ? "delete" : "post";
+        assignCall(typeID, method, date);
+        pending.forEach((p) => {
+          if (p.dates?.includes(date)) {
+            deleteCall(p.entryid, date, selectedDocId);
           }
-
-          if (!flag2) {
-            for (let i = 0; i < pending.length; i++) {
-              if (
-                user.id === parseInt(pending[i].docid, 10) &&
-                typeID === parseInt(pending[i].entryid, 10)
-              ) {
-                flag = true;
-              }
-            }
-            if (!flag) {
-              requestCall(typeID, date);
-            } else {
-              editCall(typeID, date);
-            }
-          }
+        });
+      } else {
+        if (hasPendingOnDateForType) {
+          deleteCall(typeID, date);
+        } else if (hasPendingForType) {
+          editCall(typeID, date);
+        } else {
+          requestCall(typeID, date);
         }
       }
 
@@ -359,60 +333,35 @@ const PerSchedule = (props) => {
   // Form handlers
   const onPhysicianChange = useCallback(
     (event) => {
-      if (event.target.key) {
-        loadPersonalDays(event.target.key, activeDocs);
-        setDocIndex(event.target.key);
-      } else {
-        let index = -1;
-        for (let i = 0; i < activeDocs.length; i++) {
-          if (activeDocs[i].lastname === event.target.value) {
-            index = i;
-            break;
-          }
-        }
-        loadPersonalDays(index, activeDocs);
-        loadPending(activeDocs[index].id);
-        setDocIndex(index);
-      }
+      const index = activeDocs.findIndex(
+        (doc) => doc.lastname === event.target.value
+      );
+      if (index === -1) return;
+      loadPersonalDays(index, activeDocs);
+      loadPending(activeDocs[index].id);
+      setDocIndex(index);
     },
     [activeDocs, loadPersonalDays, loadPending]
   );
 
   const onEntryChange = useCallback(
     (event) => {
-      let index = -1;
-      for (let i = 0; i < entryList.length; i++) {
-        if (entryList[i].name === event.target.value) {
-          index = i;
-          break;
-        }
-      }
+      const index = entryList.findIndex(
+        (entry) => entry.name === event.target.value
+      );
+      if (index === -1) return;
       setEntryIndex(index);
     },
     [entryList]
   );
 
-  const onMonthChange = useCallback(
-    (event) => {
-      setMonth(event.target.value);
-    },
-    [setMonth]
-  );
+  const onMonthChange = (event) => setMonth(event.target.value);
 
-  const onYearChange = useCallback(
-    (event) => {
-      setYear(event.target.value);
-    },
-    [setYear]
-  );
+  const onYearChange = (event) => setYear(event.target.value);
 
-  const radioChange = useCallback((event) => {
-    setRadio(event.target.id);
-  }, []);
+  const radioChange = (event) => setRadio(event.target.id);
 
-  const toggleShow = useCallback(() => {
-    setShow(!show);
-  }, [show]);
+  const toggleShow = () => setShow(!show);
 
   const adminButton = useCallback(() => {
     if (user.isadmin) {
@@ -439,9 +388,7 @@ const PerSchedule = (props) => {
     }
   }, [user.isadmin, prevDoc, nextDoc]);
 
-  const hoverSpan = useCallback(() => {
-    setStamp(moment().format("YYYY-MM-DD HH:mm"));
-  }, []);
+  const hoverSpan = () => updateStamp();
 
   // useEffect hooks for lifecycle management
   useEffect(() => {
@@ -462,84 +409,58 @@ const PerSchedule = (props) => {
   }, []);
 
   // Render logic
-  let docSelect = activeDocs.map((doc, i) => {
-    return (
-      <option key={i} value={doc.lastname}>
-        {doc.lastname}
-      </option>
+  const doctorOptions = activeDocs.map((doc) => (
+    <option key={doc.id} value={doc.lastname}>
+      {doc.lastname}
+    </option>
+  ));
+
+  const doctorSelectControl =
+    user.isadmin && activeDocs.length !== 0 ? (
+      <select
+        value={activeDocs[docIndex].lastname}
+        onChange={onPhysicianChange}
+        className="top-child doc selector"
+      >
+        {doctorOptions}
+      </select>
+    ) : (
+      <h6 className="top-child">{user.lastname}</h6>
     );
-  });
 
-  let adminSelect = () => {
-    if (user.isadmin && activeDocs.length !== 0) {
-      return (
-        <select
-          value={activeDocs[docIndex].lastname}
-          onChange={onPhysicianChange}
-          className="top-child doc selector"
-        >
-          {docSelect}
-        </select>
-      );
-    } else {
-      return <h6 className="top-child">{user.lastname}</h6>;
-    }
-  };
-
-  let entryFilter = entryList.filter((entry) => {
-    return entry.isactive;
-  });
-
-  let entrySelect = entryFilter.map((entry, i) => {
-    return (
-      <option key={i} value={entry.name}>
+  const entryOptions = entryList
+    .filter((entry) => entry.isactive)
+    .map((entry) => (
+      <option key={entry.name} value={entry.name}>
         {entry.name}
       </option>
+    ));
+
+  const entrySelectControl =
+    entryList.length !== 0 ? (
+      <select
+        value={entryList[entryIndex].name}
+        onChange={onEntryChange}
+        className="top-child types selector"
+      >
+        {entryOptions}
+      </select>
+    ) : (
+      <p id="entriesP">Entries</p>
     );
-  });
 
-  let eSelect = () => {
-    if (entryList.length !== 0) {
-      return (
-        <select
-          value={entryList[entryIndex].name}
-          onChange={onEntryChange}
-          className="top-child types selector"
-        >
-          {entrySelect}
-        </select>
-      );
-    } else {
-      return <p id="entriesP">Entries</p>;
-    }
-  };
-
-  let yearSelect = [];
-  let fYear = today.year();
-
-  for (let i = 2020; i <= fYear + 10; i++) {
-    yearSelect.push(
-      <option key={i} value={i}>
-        {i}
-      </option>
-    );
-  }
-
-  let radioSelect = [];
-  for (let j = 0; j < callList.length; j++) {
-    if (callList[j].isactive) {
-      radioSelect.push(
-        <Form.Check
-          required
-          key={j}
-          name="callType"
-          type="radio"
-          id={callList[j].id}
-          label={callList[j].name}
-        />
-      );
-    }
-  }
+  const radioOptions = callList
+    .filter((call) => call.isactive)
+    .map((call) => (
+      <Form.Check
+        required
+        key={call.id}
+        name="callType"
+        type="radio"
+        id={call.id}
+        label={call.name}
+      />
+    ));
 
   // Precompute MyDocument props and filename
   const personalDocProps = {
@@ -571,12 +492,12 @@ const PerSchedule = (props) => {
         leadingCols={[
           {
             label: "Physician",
-            content: adminSelect(),
+            content: doctorSelectControl,
             controls: adminButton(),
           },
           {
             label: "Type of Entry",
-            content: eSelect(),
+            content: entrySelectControl,
             controls: (
               <>
                 <Button
@@ -608,7 +529,8 @@ const PerSchedule = (props) => {
         onPrevYear={prevYear}
         onNextYear={nextYear}
         onReset={reset}
-        yearOptions={yearSelect}
+        minDate={publishedBaseDate()}
+        maxDate={moment(today).add(10, "year")}
       />
       <div className="curr">
         <h3 id="pcurr">
@@ -644,7 +566,7 @@ const PerSchedule = (props) => {
           <Form>
             <Modal.Body>
               <Form.Group onChange={radioChange} controlId="formBasicRadio">
-                {radioSelect}
+                {radioOptions}
               </Form.Group>
             </Modal.Body>
             <Modal.Footer>
