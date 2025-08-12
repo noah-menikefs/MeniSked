@@ -8,7 +8,11 @@ import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
-import { lastPublishedMoment, publishedBaseDate } from "../../utils/date";
+import {
+  lastPublishedMoment,
+  publishedBaseDate,
+  isSameMonthYearDay,
+} from "../../utils/date";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
@@ -332,12 +336,7 @@ const PubSchedule = (props) => {
 
   let modalList = [];
   sked.forEach((item, index) => {
-    const splitArr = item.date.split("/");
-    if (
-      splitArr[0] === dateContext.format("MM") &&
-      parseInt(splitArr[1], 10) === day &&
-      splitArr[2] === dateContext.format("YYYY")
-    ) {
+    if (isSameMonthYearDay(item.date, dateContext, day)) {
       modalList.push(
         <li key={index}>
           {idToNameFromLists(callList, entryList, item.id) + " "}
@@ -349,114 +348,56 @@ const PubSchedule = (props) => {
 
   let noteList = [];
 
+  const renderNoteWithActions = (key, typeId, note) => (
+    <li key={key} id={typeId}>
+      {note.msg}
+      <Button
+        key={`${key}-e`}
+        onClick={() => toggleNote(note.id, note.msg)}
+        className="edit butn"
+        size="sm"
+        variant="secondary"
+      >
+        Edit
+      </Button>
+      <Button
+        key={`${key}-d`}
+        onClick={() => deleteNote(note.id)}
+        className="delete butn"
+        size="sm"
+        variant="danger"
+      >
+        Delete
+      </Button>
+    </li>
+  );
+
   if (user.isadmin) {
     for (let n = 0; n < numNotes.length; n++) {
-      const split = numNotes[n].date.split("/");
-      if (
-        split[0] === dateContext.format("MM") &&
-        parseInt(split[1], 10) === day &&
-        split[2] === dateContext.format("YYYY")
-      ) {
-        noteList.push(
-          <li key={n} id="numNotes">
-            {numNotes[n].msg}
-            <Button
-              key={n}
-              onClick={() => toggleNote(numNotes[n].id, numNotes[n].msg)}
-              className="edit butn"
-              size="sm"
-              variant="secondary"
-            >
-              Edit
-            </Button>
-            <Button
-              key={-n - 1}
-              onClick={() => deleteNote(numNotes[n].id)}
-              className="delete butn"
-              size="sm"
-              variant="danger"
-            >
-              Delete
-            </Button>
-          </li>
-        );
+      const note = numNotes[n];
+      if (isSameMonthYearDay(note.date, dateContext, day)) {
+        noteList.push(renderNoteWithActions(n, "numNotes", note));
       }
     }
     for (let i = 0; i < iNotes.length; i++) {
-      const splitArr = iNotes[i].date.split("/");
-      if (
-        splitArr[0] === dateContext.format("MM") &&
-        parseInt(splitArr[1], 10) === day &&
-        splitArr[2] === dateContext.format("YYYY")
-      ) {
-        noteList.push(
-          <li key={i} id="iNotes">
-            {iNotes[i].msg}
-            <Button
-              key={i}
-              onClick={() => toggleNote(iNotes[i].id, iNotes[i].msg)}
-              className="edit butn"
-              size="sm"
-              variant="secondary"
-            >
-              Edit
-            </Button>
-            <Button
-              key={-i - 1}
-              onClick={() => deleteNote(iNotes[i].id)}
-              className="delete butn"
-              size="sm"
-              variant="danger"
-            >
-              Delete
-            </Button>
-          </li>
-        );
+      const note = iNotes[i];
+      if (isSameMonthYearDay(note.date, dateContext, day)) {
+        noteList.push(renderNoteWithActions(i, "iNotes", note));
       }
     }
     for (let i = 0; i < vNotes.length; i++) {
-      const splitArr = vNotes[i].date.split("/");
-      if (
-        splitArr[0] === dateContext.format("MM") &&
-        parseInt(splitArr[1], 10) === day &&
-        splitArr[2] === dateContext.format("YYYY")
-      ) {
-        noteList.push(
-          <li key={i} id="notes">
-            {vNotes[i].msg}
-            <Button
-              key={i}
-              onClick={() => toggleNote(vNotes[i].id, vNotes[i].msg)}
-              className="edit butn"
-              size="sm"
-              variant="secondary"
-            >
-              Edit
-            </Button>
-            <Button
-              key={-i - 1}
-              onClick={() => deleteNote(vNotes[i].id)}
-              className="delete butn"
-              size="sm"
-              variant="danger"
-            >
-              Delete
-            </Button>
-          </li>
-        );
+      const note = vNotes[i];
+      if (isSameMonthYearDay(note.date, dateContext, day)) {
+        noteList.push(renderNoteWithActions(i, "notes", note));
       }
     }
   } else {
     for (let i = 0; i < vNotes.length; i++) {
-      const splitArr = vNotes[i].date.split("/");
-      if (
-        splitArr[0] === dateContext.format("MM") &&
-        parseInt(splitArr[1], 10) === day &&
-        splitArr[2] === dateContext.format("YYYY")
-      ) {
+      const note = vNotes[i];
+      if (isSameMonthYearDay(note.date, dateContext, day)) {
         noteList.push(
           <li key={i} id="notes">
-            {vNotes[i].msg}
+            {note.msg}
           </li>
         );
       }

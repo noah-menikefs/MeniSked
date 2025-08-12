@@ -1,5 +1,6 @@
 import React from "react";
 import { idToNameFromLists } from "../utils/scheduleUtils";
+import { isSameMonthYear, parseMDYNumbers } from "../utils/date";
 
 export function buildCallMonthDays({
   dateContext,
@@ -7,9 +8,6 @@ export function buildCallMonthDays({
   callSked = [],
   callList = [],
 }) {
-  const monthNum = Number(dateContext.format("M"));
-  const yearNum = Number(dateContext.format("YYYY"));
-
   const daysMap = new Map();
   const ensureDay = (d) => {
     if (!daysMap.has(d)) {
@@ -27,9 +25,8 @@ export function buildCallMonthDays({
   // Call assignments
   for (let i = 0; i < callSked.length; i++) {
     const { date, id, colour, name } = callSked[i];
-    const [m, dStr, y] = String(date).split("/");
-    const d = Number(dStr);
-    if (Number(m) === monthNum && Number(y) === yearNum) {
+    if (isSameMonthYear(date, dateContext)) {
+      const { dayNum: d } = parseMDYNumbers(date);
       const item = ensureDay(d);
       item.contentItems.push(
         <li key={`c-${i}`} className="call" id="call">
@@ -51,9 +48,6 @@ export function buildPersonalMonthDays({
   callList = [],
   entryList = [],
 }) {
-  const monthNum = Number(dateContext.format("M"));
-  const yearNum = Number(dateContext.format("YYYY"));
-
   const daysMap = new Map();
   const ensureDay = (d) => {
     if (!daysMap.has(d)) daysMap.set(d, { day: d, contentItems: [] });
@@ -66,9 +60,8 @@ export function buildPersonalMonthDays({
   }
 
   personalDays.forEach((pd, i) => {
-    const [m, dStr, y] = String(pd.date).split("/");
-    const d = Number(dStr);
-    if (Number(m) === monthNum && Number(y) === yearNum) {
+    if (isSameMonthYear(pd.date, dateContext)) {
+      const { dayNum: d } = parseMDYNumbers(pd.date);
       const name = idToNameFromLists(callList, entryList, pd.id);
       ensureDay(d).contentItems.push(
         <li key={`pd-${i}`} className="personal" id="personal">
@@ -80,9 +73,9 @@ export function buildPersonalMonthDays({
 
   pending.forEach((p, i) => {
     for (let n = 0; n < p.dates.length; n++) {
-      const [m, dStr, y] = String(p.dates[n]).split("/");
-      const d = Number(dStr);
-      if (Number(m) === monthNum && Number(y) === yearNum) {
+      const dateStr = p.dates[n];
+      if (isSameMonthYear(dateStr, dateContext)) {
+        const { dayNum: d } = parseMDYNumbers(dateStr);
         const name = idToNameFromLists(callList, entryList, Number(p.entryid));
         ensureDay(d).contentItems.push(
           p.maybe ? (
@@ -113,9 +106,6 @@ export function buildPublishedMonthDays({
   entryList = [],
   isAdmin = false,
 }) {
-  const monthNum = Number(dateContext.format("M"));
-  const yearNum = Number(dateContext.format("YYYY"));
-
   const daysMap = new Map();
   const ensureDay = (d) => {
     if (!daysMap.has(d)) daysMap.set(d, { day: d, contentItems: [] });
@@ -128,9 +118,8 @@ export function buildPublishedMonthDays({
   }
 
   sked.forEach((item, i) => {
-    const [m, dStr, y] = String(item.date).split("/");
-    const d = Number(dStr);
-    if (Number(m) === monthNum && Number(y) === yearNum) {
+    if (isSameMonthYear(item.date, dateContext)) {
+      const { dayNum: d } = parseMDYNumbers(item.date);
       ensureDay(d).contentItems.push(
         <li key={`s-${i}`} className="call" id="call">
           {idToNameFromLists(callList, entryList, item.id) + " "}
@@ -141,9 +130,8 @@ export function buildPublishedMonthDays({
   });
 
   vNotes.forEach((n, i) => {
-    const [m, dStr, y] = String(n.date).split("/");
-    const d = Number(dStr);
-    if (Number(m) === monthNum && Number(y) === yearNum) {
+    if (isSameMonthYear(n.date, dateContext)) {
+      const { dayNum: d } = parseMDYNumbers(n.date);
       ensureDay(d).contentItems.push(
         <li key={`vn-${i}`} className="note" id="note">
           {n.msg}
@@ -155,9 +143,8 @@ export function buildPublishedMonthDays({
   // Invisible notes only visible to admins
   if (isAdmin) {
     iNotes.forEach((n, i) => {
-      const [m, dStr, y] = String(n.date).split("/");
-      const d = Number(dStr);
-      if (Number(m) === monthNum && Number(y) === yearNum) {
+      if (isSameMonthYear(n.date, dateContext)) {
+        const { dayNum: d } = parseMDYNumbers(n.date);
         ensureDay(d).contentItems.push(
           <li key={`in-${i}`} className="note" id="iNote">
             {n.msg}
@@ -167,9 +154,8 @@ export function buildPublishedMonthDays({
     });
 
     numNotes.forEach((n) => {
-      const [m, dStr, y] = String(n.date).split("/");
-      const d = Number(dStr);
-      if (Number(m) === monthNum && Number(y) === yearNum) {
+      if (isSameMonthYear(n.date, dateContext)) {
+        const { dayNum: d } = parseMDYNumbers(n.date);
         const item = ensureDay(d);
         if (!item.numberNote) item.numberNote = n.msg;
       }
