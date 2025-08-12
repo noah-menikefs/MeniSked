@@ -172,7 +172,7 @@ const PubSchedule = (props) => {
   const publishLeading = () => {
     if (!user.isadmin) return null;
 
-    const isAlreadyPublished = dateContext.isSameOrAfter(
+    const isAlreadyPublished = dateContext.isSameOrBefore(
       lastPublishedMoment(published),
       "month"
     );
