@@ -5,24 +5,17 @@ import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
-import Form from "react-bootstrap/Form";
 import DayDetailsModal from "./Modals/DayDetailsModal.jsx";
 import EditNoteModal from "./Modals/EditNoteModal.jsx";
 import moment from "moment";
-import {
-  lastPublishedMoment,
-  publishedBaseDate,
-  isSameMonthYearDay,
-} from "../../utils/date";
+import { lastPublishedMoment, publishedBaseDate } from "../../utils/date";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
-import {
-  buildWorkSkedFromPeople,
-  idToNameFromLists,
-} from "../../utils/scheduleUtils";
+import { buildWorkSkedFromPeople } from "../../utils/scheduleUtils";
 import usePdfStamp from "../../hooks/usePdfStamp";
 import useFormattedDateContext from "../../hooks/useFormattedDateContext";
+import Form from "react-bootstrap/Form";
 
 import "./Schedules.css";
 
@@ -339,76 +332,7 @@ const PubSchedule = (props) => {
     setMsg(e.target.value);
   };
 
-  let modalList = [];
-  sked.forEach((item, index) => {
-    if (isSameMonthYearDay(item.date, dateContext, day)) {
-      modalList.push(
-        <li key={index}>
-          {idToNameFromLists(callList, entryList, item.id) + " "}
-          <span style={{ backgroundColor: item.colour }}>{item.name}</span>
-        </li>
-      );
-    }
-  });
-
-  let noteList = [];
-
-  const renderNoteWithActions = (key, typeId, note) => (
-    <li key={key} id={typeId}>
-      {note.msg}
-      <Button
-        key={`${key}-e`}
-        onClick={() => toggleNote(note.id, note.msg)}
-        className="edit butn"
-        size="sm"
-        variant="secondary"
-      >
-        Edit
-      </Button>
-      <Button
-        key={`${key}-d`}
-        onClick={() => deleteNote(note.id)}
-        className="delete butn"
-        size="sm"
-        variant="danger"
-      >
-        Delete
-      </Button>
-    </li>
-  );
-
-  if (user.isadmin) {
-    for (let n = 0; n < numNotes.length; n++) {
-      const note = numNotes[n];
-      if (isSameMonthYearDay(note.date, dateContext, day)) {
-        noteList.push(renderNoteWithActions(n, "numNotes", note));
-      }
-    }
-    for (let i = 0; i < iNotes.length; i++) {
-      const note = iNotes[i];
-      if (isSameMonthYearDay(note.date, dateContext, day)) {
-        noteList.push(renderNoteWithActions(i, "iNotes", note));
-      }
-    }
-    for (let i = 0; i < vNotes.length; i++) {
-      const note = vNotes[i];
-      if (isSameMonthYearDay(note.date, dateContext, day)) {
-        noteList.push(renderNoteWithActions(i, "notes", note));
-      }
-    }
-  } else {
-    for (let i = 0; i < vNotes.length; i++) {
-      const note = vNotes[i];
-      if (isSameMonthYearDay(note.date, dateContext, day)) {
-        noteList.push(
-          <li key={i} id="notes">
-            {note.msg}
-          </li>
-        );
-      }
-    }
-  }
-
+  // Get the selected day data from the pre-built days array
   const days = buildPublishedMonthDays({
     dateContext,
     holiDays,
@@ -419,7 +343,14 @@ const PubSchedule = (props) => {
     callList,
     entryList,
     isAdmin: user.isadmin,
+    onEditNote: toggleNote,
+    onDeleteNote: deleteNote,
   });
+
+  const selectedDayData = days.find((d) => d.day === day) || {
+    assignments: [],
+    notes: [],
+  };
 
   return (
     <div className="screen">
@@ -476,8 +407,8 @@ const PubSchedule = (props) => {
         show={show}
         onHide={toggleShow}
         title={formatTitleForDay(day)}
-        assignments={modalList}
-        notes={noteList}
+        assignments={selectedDayData.assignments}
+        notes={selectedDayData.notes}
         adminNotesContent={adminNotes()}
       />
       <EditNoteModal

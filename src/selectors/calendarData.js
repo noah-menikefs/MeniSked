@@ -1,6 +1,8 @@
 import React from "react";
 import { idToNameFromLists } from "../utils/scheduleUtils";
 import { isSameMonthYear, parseMDYNumbers } from "../utils/date";
+import AssignmentItem from "../Components/Schedules/CalendarItems/AssignmentItem";
+import NoteItem from "../Components/Schedules/CalendarItems/NoteItem";
 
 export function buildCallMonthDays({
   dateContext,
@@ -105,10 +107,20 @@ export function buildPublishedMonthDays({
   callList = [],
   entryList = [],
   isAdmin = false,
+  onEditNote = null,
+  onDeleteNote = null,
 }) {
   const daysMap = new Map();
   const ensureDay = (d) => {
-    if (!daysMap.has(d)) daysMap.set(d, { day: d, contentItems: [] });
+    if (!daysMap.has(d))
+      daysMap.set(d, {
+        day: d,
+        contentItems: [],
+        assignments: [],
+        notes: [],
+        holidayName: null,
+        numberNote: null,
+      });
     return daysMap.get(d);
   };
 
@@ -120,23 +132,38 @@ export function buildPublishedMonthDays({
   sked.forEach((item, i) => {
     if (isSameMonthYear(item.date, dateContext)) {
       const { dayNum: d } = parseMDYNumbers(item.date);
-      ensureDay(d).contentItems.push(
-        <li key={`s-${i}`} className="call" id="call">
-          {idToNameFromLists(callList, entryList, item.id) + " "}
-          <span style={{ backgroundColor: item.colour }}>{item.name}</span>
-        </li>
+      const dayItem = ensureDay(d);
+      const assignmentElement = (
+        <AssignmentItem
+          key={`s-${i}`}
+          item={item}
+          index={i}
+          callList={callList}
+          entryList={entryList}
+        />
       );
+      dayItem.contentItems.push(assignmentElement);
+      dayItem.assignments.push(assignmentElement);
     }
   });
 
   vNotes.forEach((n, i) => {
     if (isSameMonthYear(n.date, dateContext)) {
       const { dayNum: d } = parseMDYNumbers(n.date);
-      ensureDay(d).contentItems.push(
-        <li key={`vn-${i}`} className="note" id="note">
-          {n.msg}
-        </li>
+      const dayItem = ensureDay(d);
+      const noteElement = (
+        <NoteItem
+          key={`vn-${i}`}
+          note={n}
+          index={i}
+          type="vn"
+          isAdmin={isAdmin}
+          onEditNote={onEditNote}
+          onDeleteNote={onDeleteNote}
+        />
       );
+      dayItem.contentItems.push(noteElement);
+      dayItem.notes.push(noteElement);
     }
   });
 
@@ -145,19 +172,45 @@ export function buildPublishedMonthDays({
     iNotes.forEach((n, i) => {
       if (isSameMonthYear(n.date, dateContext)) {
         const { dayNum: d } = parseMDYNumbers(n.date);
-        ensureDay(d).contentItems.push(
-          <li key={`in-${i}`} className="note" id="iNote">
-            {n.msg}
-          </li>
+        const dayItem = ensureDay(d);
+        const noteElement = (
+          <NoteItem
+            key={`in-${i}`}
+            note={n}
+            index={i}
+            type="in"
+            isAdmin={isAdmin}
+            onEditNote={onEditNote}
+            onDeleteNote={onDeleteNote}
+          />
         );
+        dayItem.contentItems.push(noteElement);
+        dayItem.notes.push(noteElement);
       }
     });
 
-    numNotes.forEach((n) => {
+    numNotes.forEach((n, i) => {
       if (isSameMonthYear(n.date, dateContext)) {
         const { dayNum: d } = parseMDYNumbers(n.date);
-        const item = ensureDay(d);
-        if (!item.numberNote) item.numberNote = n.msg;
+        const dayItem = ensureDay(d);
+
+        // Store the number note message for backward compatibility
+        if (!dayItem.numberNote) dayItem.numberNote = n.msg;
+
+        // Add the number note to the notes array so it appears in the modal
+        const noteElement = (
+          <NoteItem
+            key={`nn-${i}`}
+            note={n}
+            index={i}
+            type="nn"
+            isAdmin={isAdmin}
+            onEditNote={onEditNote}
+            onDeleteNote={onDeleteNote}
+          />
+        );
+        dayItem.contentItems.push(noteElement);
+        dayItem.notes.push(noteElement);
       }
     });
   }
