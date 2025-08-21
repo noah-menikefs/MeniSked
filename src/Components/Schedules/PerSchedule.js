@@ -221,7 +221,7 @@ const PerSchedule = (props) => {
     (typeId, selectedDay = day) => {
       if (typeId === -1) return;
       const typeID = Number(typeId);
-      const date = moment(dateContext).date(selectedDay).format("M/D/YYYY");
+      const date = moment(dateContext).date(selectedDay).format("MM/D/YYYY");
       const selectedDocId = activeDocs[docIndex]?.id;
 
       // Helpers that clarify intent
