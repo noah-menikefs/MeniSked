@@ -176,7 +176,7 @@ const PerSchedule = (props) => {
         body: JSON.stringify({
           docid: parseInt(user.id),
           entryid: parseInt(typeID, 10),
-          date: date,
+          dates: date,
         }),
       })
         .then((response) => response.json())
