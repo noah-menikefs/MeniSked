@@ -7,7 +7,7 @@ import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
-import { publishedBaseDate } from "../../utils/date";
+import { publishedBaseDate, findOptimalConsolidation } from "../../utils/date";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
@@ -215,6 +215,79 @@ const PerSchedule = (props) => {
       }
     },
     [user.id, pending, radio, loadPending]
+  );
+
+  // Consolidation logic functions
+  const findPendingRequestsForType = useCallback(
+    (typeID) => {
+      return pending.filter(
+        (p) =>
+          Number(p.docid) === Number(user.id) && Number(p.entryid) === typeID
+      );
+    },
+    [pending, user.id]
+  );
+
+  const getAllDatesForType = useCallback(
+    (typeID) => {
+      const requests = findPendingRequestsForType(typeID);
+      const allDates = [];
+      requests.forEach((request) => {
+        if (request.dates && Array.isArray(request.dates)) {
+          allDates.push(...request.dates);
+        }
+      });
+      return allDates;
+    },
+    [findPendingRequestsForType]
+  );
+
+  const shouldConsolidateRequests = useCallback(
+    (typeID, newDate) => {
+      const existingDates = getAllDatesForType(typeID);
+      if (existingDates.length === 0) return false;
+
+      const consolidation = findOptimalConsolidation(existingDates, newDate);
+      return consolidation.shouldConsolidate;
+    },
+    [getAllDatesForType]
+  );
+
+  const getConsolidationStrategy = useCallback(
+    (typeID, newDate) => {
+      const existingDates = getAllDatesForType(typeID);
+      if (existingDates.length === 0) {
+        return {
+          shouldConsolidate: false,
+          newDateRanges: [newDate],
+          datesToRemove: [],
+          datesToUpdate: [],
+        };
+      }
+
+      return findOptimalConsolidation(existingDates, newDate);
+    },
+    [getAllDatesForType]
+  );
+
+  const findRequestsToUpdate = useCallback(
+    (typeID, datesToUpdate) => {
+      const requests = findPendingRequestsForType(typeID);
+      return requests.filter((request) =>
+        request.dates?.some((date) => datesToUpdate.includes(date))
+      );
+    },
+    [findPendingRequestsForType]
+  );
+
+  const findRequestsToDelete = useCallback(
+    (typeID, datesToRemove) => {
+      const requests = findPendingRequestsForType(typeID);
+      return requests.filter((request) =>
+        request.dates?.some((date) => datesToRemove.includes(date))
+      );
+    },
+    [findPendingRequestsForType]
   );
 
   const assignOrDelete = useCallback(
