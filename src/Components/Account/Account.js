@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useDispatch } from "react-redux";
+import { onRouteChange } from "../../store/slices/userSlice";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import "./Account.css";
 import { validateEmail } from "../../utils";
 
 const Account = ({ loadUser, user }) => {
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
@@ -149,6 +152,10 @@ const Account = ({ loadUser, user }) => {
     }
   };
 
+  const handleLogout = () => {
+    dispatch(onRouteChange({ route: "Login", signedIn: false }));
+  };
+
   return (
     <div>
       <div>
@@ -208,6 +215,11 @@ const Account = ({ loadUser, user }) => {
         <Button onClick={onSubmitChoose} id="submit" variant="primary">
           Submit
         </Button>
+        <div style={{ marginTop: "20px", textAlign: "center" }}>
+          <Button onClick={handleLogout} variant="outline-danger">
+            Logout
+          </Button>
+        </div>
       </div>
       <div className="modal">
         <Modal show={show} onHide={() => toggleShow()}>

@@ -1,4 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  loginUser,
+  forgotPassword,
+  selectUserError,
+  clearError,
+} from "../../store/slices/userSlice";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -6,6 +13,10 @@ import Logo from "../../logo512.png";
 import "./Login.css";
 
 const Login = (props) => {
+  const dispatch = useDispatch();
+  const error = useSelector(selectUserError);
+  // const loading = useSelector(selectUserLoading); // Will be used in future PRs for loading states
+
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [show, setShow] = useState(false);
@@ -30,24 +41,15 @@ const Login = (props) => {
     }
   };
 
-  const onSLogin = () => {
-    fetch("https://secure-earth-82827.herokuapp.com/login", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: loginEmail,
-        password: loginPassword,
-      }),
-    })
-      .then((response) => response.json())
-      .then((user) => {
-        if (user.lastname) {
-          props.onRouteChange("Personal Schedule");
-          props.loadUser(user);
-        } else {
-          toggleErrorShow();
-        }
-      });
+  const onSLogin = async () => {
+    try {
+      await dispatch(
+        loginUser({ email: loginEmail, password: loginPassword })
+      ).unwrap();
+      // Success - Redux will handle the state changes
+    } catch (error) {
+      toggleErrorShow();
+    }
   };
 
   const toggleShow = () => {
@@ -71,24 +73,22 @@ const Login = (props) => {
     setPWordShow(!pWordShow);
   };
 
-  const forgotPassword = () => {
-    fetch("https://secure-earth-82827.herokuapp.com/forgot", {
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: forgotEmail,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data === "unable to get user") {
-          toggleErrorShow("email");
-        } else {
-          toggleShow();
-        }
-      });
-    setPWordShow(!pWordShow);
+  const handleForgotPassword = async () => {
+    try {
+      await dispatch(forgotPassword({ email: forgotEmail })).unwrap();
+      setShow(true);
+    } catch (error) {
+      toggleErrorShow("email");
+    }
+    setPWordShow(false);
   };
+
+  // Clear error when component unmounts or error changes
+  useEffect(() => {
+    if (error) {
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
 
   const { onRouteChange } = props;
 
@@ -142,7 +142,9 @@ const Login = (props) => {
           <p>
             New user?{" "}
             <span
-              onClick={() => onRouteChange("Register", false)}
+              onClick={() =>
+                onRouteChange({ route: "Register", signedIn: false })
+              }
               className="label"
             >
               Register Now
@@ -203,7 +205,7 @@ const Login = (props) => {
               <Button onClick={forgotPWordShow} variant="secondary">
                 Close
               </Button>
-              <Button onClick={forgotPassword} variant="primary">
+              <Button onClick={handleForgotPassword} variant="primary">
                 Submit
               </Button>
             </Modal.Footer>
