@@ -1,32 +1,45 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { onRouteChange, selectIsAdmin } from "../../store/slices/userSlice";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Logo from "../../logo512.png";
 import "./Navigation.css";
 
-const Navigation = (props) => {
+const Navigation = () => {
+  const dispatch = useDispatch();
+  const isAdmin = useSelector(selectIsAdmin);
+
   const adminNavbar = () => {
-    if (props.testisadmin) {
+    if (isAdmin) {
       return (
         <NavDropdown className="" title="Settings" id="collasible-nav-dropdown">
           <NavDropdown.Item
-            onClick={() => props.onRouteChange("Holidays")} /*href="#h"*/
+            onClick={() =>
+              dispatch(onRouteChange({ route: "Holidays" }))
+            } /*href="#h"*/
           >
             Holidays
           </NavDropdown.Item>
           <NavDropdown.Item
-            onClick={() => props.onRouteChange("Call Types")} /*href="#ct"*/
+            onClick={() =>
+              dispatch(onRouteChange({ route: "Call Types" }))
+            } /*href="#ct"*/
           >
             Call Types
           </NavDropdown.Item>
           <NavDropdown.Item
-            onClick={() => props.onRouteChange("People")} /*href="#pe"*/
+            onClick={() =>
+              dispatch(onRouteChange({ route: "People" }))
+            } /*href="#pe"*/
           >
             People
           </NavDropdown.Item>
           <NavDropdown.Item
-            onClick={() => props.onRouteChange("Entries")} /*href="#e"*/
+            onClick={() =>
+              dispatch(onRouteChange({ route: "Entries" }))
+            } /*href="#e"*/
           >
             Entries
           </NavDropdown.Item>
@@ -35,16 +48,12 @@ const Navigation = (props) => {
     }
   };
 
-  const { testisadmin, onRouteChange } = props;
-  let ad = "";
-  if (testisadmin) {
-    ad = "Admin ";
-  }
+  const ad = isAdmin ? "Admin " : "";
 
   return (
     <Navbar id="myNav">
       <Navbar.Brand
-        onClick={() => onRouteChange("Personal Schedule")}
+        onClick={() => dispatch(onRouteChange({ route: "Personal Schedule" }))}
         /*href="#p"*/ id="navbrand"
       >
         <img
@@ -68,17 +77,23 @@ const Navigation = (props) => {
             id="collasible-nav-dropdown"
           >
             <NavDropdown.Item
-              onClick={() => onRouteChange("Personal Schedule")} /*href="#p"*/
+              onClick={() =>
+                dispatch(onRouteChange({ route: "Personal Schedule" }))
+              } /*href="#p"*/
             >
               Personal
             </NavDropdown.Item>
             <NavDropdown.Item
-              onClick={() => onRouteChange("Call Schedule")} /*href="#c"*/
+              onClick={() =>
+                dispatch(onRouteChange({ route: "Call Schedule" }))
+              } /*href="#c"*/
             >
               Call
             </NavDropdown.Item>
             <NavDropdown.Item
-              onClick={() => onRouteChange("Master Schedule")} /*href="#pu"*/
+              onClick={() =>
+                dispatch(onRouteChange({ route: "Master Schedule" }))
+              } /*href="#pu"*/
             >
               Master
             </NavDropdown.Item>
@@ -89,29 +104,35 @@ const Navigation = (props) => {
             id="collasible-nav-dropdown"
           >
             <NavDropdown.Item
-              onClick={() => onRouteChange("Personal Schedule")} /*href="#p"*/
+              onClick={() =>
+                dispatch(onRouteChange({ route: "Personal Schedule" }))
+              } /*href="#p"*/
             >
               Personal
             </NavDropdown.Item>
             <NavDropdown.Item
-              onClick={() => onRouteChange("Call Schedule")} /*href="#c"*/
+              onClick={() =>
+                dispatch(onRouteChange({ route: "Call Schedule" }))
+              } /*href="#c"*/
             >
               Call
             </NavDropdown.Item>
             <NavDropdown.Item
-              onClick={() => onRouteChange("Master Schedule")} /*href="#pu"*/
+              onClick={() =>
+                dispatch(onRouteChange({ route: "Master Schedule" }))
+              } /*href="#pu"*/
             >
               Master
             </NavDropdown.Item>
           </NavDropdown>
           <Nav.Link
-            onClick={() => props.onRouteChange(ad + "Messages")}
+            onClick={() => dispatch(onRouteChange({ route: ad + "Messages" }))}
             className="full-text linky" /*href="#m"*/
           >
             Messages
           </Nav.Link>
           <img
-            onClick={() => props.onRouteChange(ad + "Messages")}
+            onClick={() => dispatch(onRouteChange({ route: ad + "Messages" }))}
             alt="Messages"
             src="https://img.icons8.com/material-rounded/96/000000/mail.png"
             width="30"
@@ -119,13 +140,17 @@ const Navigation = (props) => {
             className="logo linky"
           />
           <Nav.Link
-            onClick={() => onRouteChange("Account Information")}
+            onClick={() =>
+              dispatch(onRouteChange({ route: "Account Information" }))
+            }
             className="full-text linky" /*href="#a"*/
           >
             Account
           </Nav.Link>
           <img
-            onClick={() => onRouteChange("Account Information")}
+            onClick={() =>
+              dispatch(onRouteChange({ route: "Account Information" }))
+            }
             alt="Account"
             src="https://img.icons8.com/material-rounded/96/000000/user-male-circle.png"
             width="30"

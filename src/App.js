@@ -1,4 +1,12 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  selectUser,
+  selectIsSignedIn,
+  selectRoute,
+  onRouteChange,
+  setUser,
+} from "./store/slices/userSlice";
 import Navigation from "./Components/Navigation/Navigation";
 import Login from "./Components/Login/Login";
 import Register from "./Components/Login/Register";
@@ -15,24 +23,17 @@ import Entries from "./Components/Settings/Entries";
 import moment from "moment";
 import "./App.css";
 
-const initialUser = {
-  id: "",
-  firstname: "",
-  lastname: "",
-  email: "",
-  colour: "",
-  department: "",
-  isadmin: false,
-  isactive: false,
-  worksked: [],
-};
-
 const App = () => {
+  const dispatch = useDispatch();
   const today = useMemo(() => moment(), []);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [route, setRoute] = useState("Login");
+
+  // Get state from Redux
+  const user = useSelector(selectUser);
+  const isSignedIn = useSelector(selectIsSignedIn);
+  const route = useSelector(selectRoute);
+
+  // Local state for data that will be moved to Redux in future PRs
   const [callList, setCallList] = useState([]);
-  const [user, setUser] = useState(initialUser);
   const [entryList, setEntryList] = useState([]);
   const [peopleList, setPeopleList] = useState([]);
 
@@ -41,17 +42,19 @@ const App = () => {
   const [nrHolidayList, setNrHolidayList] = useState([]);
   const [depts, setDepts] = useState([]);
 
-  const loadUser = useCallback((data) => {
-    setUser({
-      ...initialUser,
-      ...data,
-    });
-  }, []);
+  const loadUser = useCallback(
+    (data) => {
+      dispatch(setUser(data));
+    },
+    [dispatch]
+  );
 
-  const onRouteChange = useCallback((route, signedIn = true) => {
-    setRoute(route);
-    setIsSignedIn(signedIn);
-  }, []);
+  const handleRouteChange = useCallback(
+    (route, signedIn = true) => {
+      dispatch(onRouteChange({ route, signedIn }));
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     const fetchSharedData = async () => {
@@ -214,9 +217,9 @@ const App = () => {
   //Used for rendering when signed out
   const outRenderSwitch = (route) => {
     return route === "Login" ? (
-      <Login loadUser={loadUser} onRouteChange={onRouteChange} />
+      <Login loadUser={loadUser} onRouteChange={handleRouteChange} />
     ) : (
-      <Register loadUser={loadUser} onRouteChange={onRouteChange} />
+      <Register loadUser={loadUser} onRouteChange={handleRouteChange} />
     );
   };
 
@@ -226,10 +229,7 @@ const App = () => {
         outRenderSwitch(route)
       ) : (
         <>
-          <Navigation
-            onRouteChange={onRouteChange}
-            testisadmin={user.isadmin}
-          />
+          <Navigation />
           <br />
           <h1>{route}</h1>
           {inRenderSwitch(route)}

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setUser, onRouteChange } from "../../store/slices/userSlice";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -7,6 +9,7 @@ import "./Login.css";
 import { validateEmail } from "../../utils";
 
 const Register = (props) => {
+  const dispatch = useDispatch();
   const [lastname, setLastname] = useState("");
   const [firstname, setFirstname] = useState("");
   const [email, setEmail] = useState("");
@@ -98,8 +101,8 @@ const Register = (props) => {
         .then((response) => response.json())
         .then((user) => {
           if (user.lastname) {
-            props.loadUser(user);
-            props.onRouteChange("Personal Schedule");
+            dispatch(setUser(user));
+            dispatch(onRouteChange({ route: "Personal Schedule" }));
           } else if (user === "user with this email already exists.") {
             toggleErrorShow("email");
           }
@@ -216,7 +219,9 @@ const Register = (props) => {
           <p>
             Already a user?{" "}
             <span
-              onClick={() => props.onRouteChange("Login", false)}
+              onClick={() =>
+                dispatch(onRouteChange({ route: "Login", signedIn: false }))
+              }
               className="label"
             >
               Login
