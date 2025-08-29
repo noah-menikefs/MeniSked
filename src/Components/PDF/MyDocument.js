@@ -97,6 +97,12 @@ const MyDocument = ({
   const callById = new Map(callList.map((c) => [c.id, c.name]));
   const holidayByDay = new Map(holiDays.map((h) => [h.day, h.name]));
 
+  // Helper function to normalize date strings (remove leading zeros)
+  const normalizeDate = (dateStr) => {
+    if (!dateStr || typeof dateStr !== "string") return dateStr;
+    return dateStr.replace(/\b0+/g, ""); // Remove leading zeros from month and day
+  };
+
   const toDateStr = (d) =>
     `${dateContext.format("MM")}/${d}/${dateContext.format("YYYY")}`;
 
@@ -104,7 +110,7 @@ const MyDocument = ({
   const groupByDate = (arr) => {
     const map = new Map();
     for (const n of arr) {
-      const key = n.date;
+      const key = normalizeDate(n.date);
       if (!map.has(key)) map.set(key, []);
       map.get(key).push(n.msg);
     }
@@ -114,7 +120,7 @@ const MyDocument = ({
   const invisibleNotesByDate = groupByDate(iNotes);
   const numberNotesByDate = new Map();
   for (const n of numNotes) {
-    numberNotesByDate.set(n.date, n.msg);
+    numberNotesByDate.set(normalizeDate(n.date), n.msg);
   }
 
   const showAdminNotes = Boolean(user?.isadmin);
@@ -150,11 +156,12 @@ const MyDocument = ({
         headerHoliday = holidayByDay.get(dayCounter) || "";
 
         const dateStr = toDateStr(dayCounter);
+        const normalizedDateStr = normalizeDate(dateStr);
 
         // Assignments for this date
         for (let idx = 0; idx < listType.length; idx++) {
           const item = listType[idx];
-          if (item.date === dateStr) {
+          if (normalizeDate(item.date) === normalizedDateStr) {
             const baseName =
               callById.get(item.id) ?? entryById.get(item.id) ?? "";
             const secondaryName = item.name || "";
@@ -170,7 +177,7 @@ const MyDocument = ({
         }
 
         // Visible notes for everyone
-        const vMsgs = visibleNotesByDate.get(dateStr) || [];
+        const vMsgs = visibleNotesByDate.get(normalizedDateStr) || [];
         vMsgs.forEach((msg, i) =>
           items.push(
             <Text key={`v-${i}`} style={styles.tableCellList}>
@@ -181,7 +188,7 @@ const MyDocument = ({
 
         if (showAdminNotes) {
           // Invisible notes
-          const iMsgs = invisibleNotesByDate.get(dateStr) || [];
+          const iMsgs = invisibleNotesByDate.get(normalizedDateStr) || [];
           iMsgs.forEach((msg, i) =>
             items.push(
               <Text key={`i-${i}`} style={styles.tableCellList}>
@@ -190,7 +197,7 @@ const MyDocument = ({
             )
           );
           // Numeric note for header
-          headerNumNote = numberNotesByDate.get(dateStr) || "";
+          headerNumNote = numberNotesByDate.get(normalizedDateStr) || "";
         }
 
         dayCounter++;
