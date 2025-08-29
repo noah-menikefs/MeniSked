@@ -79,7 +79,7 @@ Login/Register → Redux Store → App.js → All Components
 
 ## 🔄 What's Next (Future PRs)
 
-### PR #2: Shared Reference Data
+### PR #2: Shared Reference Data ✅ **COMPLETED**
 
 - Move `callList`, `entryList`, `peopleList`, `depts` to Redux
 - Create `referenceData` slice
@@ -147,6 +147,39 @@ const MyComponent = () => {
 - Legacy OpenSSL provider needed for builds
 - Loading states prepared for future UI enhancements
 - Error handling centralized and ready for user feedback
+
+## 🚀 PR #2: Shared Reference Data - COMPLETED
+
+### What Was Implemented
+
+- **New Slice**: `referenceDataSlice.js` for managing shared reference data
+- **Store Integration**: Added `referenceData` reducer to main store
+- **Data Centralization**: Moved `callList`, `entryList`, `peopleList`, `depts` from App.js to Redux
+- **API Consolidation**: Single `fetchReferenceData` thunk for all reference data
+- **Smart Selectors**: `selectFilteredEntries` automatically filters active entries
+
+### Benefits Achieved
+
+1. **Eliminated More Prop Drilling**: Reference data no longer passed through App.js
+2. **Centralized Data Fetching**: Single API call manages all reference data
+3. **Better Performance**: Data fetched once and shared across all components
+4. **Cleaner App.js**: Removed 4 state variables and complex useEffect
+5. **Reusable Data**: Any component can now access reference data directly
+
+### Files Modified
+
+- `src/store/slices/referenceDataSlice.js` (new)
+- `src/store/index.js` (updated)
+- `src/App.js` (updated - removed local state and API calls)
+
+### Data Flow
+
+```
+Redux Store → App.js → Schedule Components
+     ↓           ↓           ↓
+Reference   Selectors   No More Props
+  Data
+```
 
 ## 🔧 Bug Fixes Applied
 

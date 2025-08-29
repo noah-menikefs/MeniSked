@@ -7,6 +7,13 @@ import {
   onRouteChange,
   setUser,
 } from "./store/slices/userSlice";
+import {
+  selectCallList,
+  selectFilteredEntries,
+  selectPeopleList,
+  selectDepts,
+  fetchReferenceData,
+} from "./store/slices/referenceDataSlice";
 import Navigation from "./Components/Navigation/Navigation";
 import Login from "./Components/Login/Login";
 import Register from "./Components/Login/Register";
@@ -32,15 +39,15 @@ const App = () => {
   const isSignedIn = useSelector(selectIsSignedIn);
   const route = useSelector(selectRoute);
 
-  // Local state for data that will be moved to Redux in future PRs
-  const [callList, setCallList] = useState([]);
-  const [entryList, setEntryList] = useState([]);
-  const [peopleList, setPeopleList] = useState([]);
+  // Get reference data from Redux
+  const callList = useSelector(selectCallList);
+  const entryList = useSelector(selectFilteredEntries);
+  const peopleList = useSelector(selectPeopleList);
+  const depts = useSelector(selectDepts);
 
-  // NEW: Shared state for schedule components
+  // Local state for data that will be moved to Redux in future PRs
   const [rHolidayList, setRHolidayList] = useState([]);
   const [nrHolidayList, setNrHolidayList] = useState([]);
-  const [depts, setDepts] = useState([]);
 
   const loadUser = useCallback(
     (data) => {
@@ -57,42 +64,27 @@ const App = () => {
   );
 
   useEffect(() => {
-    const fetchSharedData = async () => {
-      const [
-        entriesRes,
-        peopleRes,
-        callTypesRes,
-        rHolidaysRes,
-        nrHolidaysRes,
-        deptsRes,
-      ] = await Promise.all([
-        fetch("https://secure-earth-82827.herokuapp.com/sked/entries"),
-        fetch("https://secure-earth-82827.herokuapp.com/people"),
-        fetch("https://secure-earth-82827.herokuapp.com/callTypes"),
+    // Fetch reference data when component mounts
+    dispatch(fetchReferenceData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const fetchHolidayData = async () => {
+      const [rHolidaysRes, nrHolidaysRes] = await Promise.all([
         fetch("https://secure-earth-82827.herokuapp.com/holiday/r"),
         fetch("https://secure-earth-82827.herokuapp.com/holiday/nr"),
-        fetch("https://secure-earth-82827.herokuapp.com/departments"),
       ]);
 
-      const [entries, people, calls, rHolidays, nrHolidays, departments] =
-        await Promise.all([
-          entriesRes.json(),
-          peopleRes.json(),
-          callTypesRes.json(),
-          rHolidaysRes.json(),
-          nrHolidaysRes.json(),
-          deptsRes.json(),
-        ]);
+      const [rHolidays, nrHolidays] = await Promise.all([
+        rHolidaysRes.json(),
+        nrHolidaysRes.json(),
+      ]);
 
-      setEntryList(entries);
-      setPeopleList(people);
-      setCallList(calls.sort((a, b) => a.priority - b.priority));
       setRHolidayList(rHolidays.filter((holiday) => holiday.isactive === true));
       setNrHolidayList(nrHolidays);
-      setDepts(departments);
     };
 
-    fetchSharedData();
+    fetchHolidayData();
   }, []);
 
   // NEW: Shared utility functions
