@@ -84,7 +84,7 @@ Login/Register → Redux Store → App.js → All Components
 - Move `callList`, `entryList`, `peopleList`, `depts` to Redux
 - Create `referenceData` slice
 
-### PR #3: Holiday Management
+### PR #3: Holiday Management ✅ **COMPLETED**
 
 - Move holiday state to Redux
 - Create `holidays` slice
@@ -147,6 +147,39 @@ const MyComponent = () => {
 - Legacy OpenSSL provider needed for builds
 - Loading states prepared for future UI enhancements
 - Error handling centralized and ready for user feedback
+
+## 🚀 PR #3: Holiday Management - COMPLETED
+
+### What Was Implemented
+
+- **New Slice**: `holidaySlice.js` for managing holiday data
+- **Store Integration**: Added `holidays` reducer to main store
+- **Data Centralization**: Moved `rHolidayList`, `nrHolidayList` from App.js to Redux
+- **API Consolidation**: Single `fetchHolidayData` thunk for all holiday data
+- **Smart Selectors**: `selectHolidaysForDate` with memoized holiday processing logic
+
+### Benefits Achieved
+
+1. **Eliminated More Prop Drilling**: Holiday data no longer passed through App.js
+2. **Centralized Holiday Logic**: Holiday processing function now in Redux selectors
+3. **Better Performance**: Holiday data fetched once and shared across all components
+4. **Cleaner App.js**: Removed 2 state variables and holiday fetching useEffect
+5. **Reusable Holiday Logic**: Any component can now access holiday data directly
+
+### Files Modified
+
+- `src/store/slices/holidaySlice.js` (new)
+- `src/store/index.js` (updated)
+- `src/App.js` (updated - removed holiday state and API calls)
+
+### Holiday Data Flow
+
+```
+Redux Store → App.js → Schedule Components
+     ↓           ↓           ↓
+Holiday     Selectors   No More Props
+  Data
+```
 
 ## 🚀 PR #2: Shared Reference Data - COMPLETED
 

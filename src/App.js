@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   selectUser,
@@ -14,6 +14,11 @@ import {
   selectDepts,
   fetchReferenceData,
 } from "./store/slices/referenceDataSlice";
+import {
+  selectRHolidayList,
+  selectNrHolidayList,
+  fetchHolidayData,
+} from "./store/slices/holidaySlice";
 import Navigation from "./Components/Navigation/Navigation";
 import Login from "./Components/Login/Login";
 import Register from "./Components/Login/Register";
@@ -45,9 +50,9 @@ const App = () => {
   const peopleList = useSelector(selectPeopleList);
   const depts = useSelector(selectDepts);
 
-  // Local state for data that will be moved to Redux in future PRs
-  const [rHolidayList, setRHolidayList] = useState([]);
-  const [nrHolidayList, setNrHolidayList] = useState([]);
+  // Get holiday data from Redux
+  const rHolidayList = useSelector(selectRHolidayList);
+  const nrHolidayList = useSelector(selectNrHolidayList);
 
   const loadUser = useCallback(
     (data) => {
@@ -64,28 +69,10 @@ const App = () => {
   );
 
   useEffect(() => {
-    // Fetch reference data when component mounts
+    // Fetch all data when component mounts
     dispatch(fetchReferenceData());
+    dispatch(fetchHolidayData());
   }, [dispatch]);
-
-  useEffect(() => {
-    const fetchHolidayData = async () => {
-      const [rHolidaysRes, nrHolidaysRes] = await Promise.all([
-        fetch("https://secure-earth-82827.herokuapp.com/holiday/r"),
-        fetch("https://secure-earth-82827.herokuapp.com/holiday/nr"),
-      ]);
-
-      const [rHolidays, nrHolidays] = await Promise.all([
-        rHolidaysRes.json(),
-        nrHolidaysRes.json(),
-      ]);
-
-      setRHolidayList(rHolidays.filter((holiday) => holiday.isactive === true));
-      setNrHolidayList(nrHolidays);
-    };
-
-    fetchHolidayData();
-  }, []);
 
   // NEW: Shared utility functions
   const processHolidaysForDate = useCallback(
