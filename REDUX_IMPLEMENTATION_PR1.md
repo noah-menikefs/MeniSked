@@ -89,10 +89,10 @@ Login/Register → Redux Store → App.js → All Components
 - Move holiday state to Redux
 - Create `holidays` slice
 
-### PR #4: Schedule Data
+### PR #4: Eliminate Prop Drilling ✅ **COMPLETED**
 
-- Move schedule state to Redux
-- Create `schedules` slice
+- Update schedule components to use Redux selectors directly
+- Remove all prop drilling for shared data
 
 ### PR #5: Messages
 
@@ -147,6 +147,57 @@ const MyComponent = () => {
 - Legacy OpenSSL provider needed for builds
 - Loading states prepared for future UI enhancements
 - Error handling centralized and ready for user feedback
+
+## 🚀 PR #4: Eliminate Prop Drilling - COMPLETED
+
+### What Was Implemented
+
+- **Updated Schedule Components**: PerSchedule, PubSchedule, CSchedule now use Redux directly
+- **Updated Message Components**: AMessages, EMessages now use Redux directly
+- **Eliminated All Prop Drilling**: No more passing of shared data through App.js
+- **Cleaner Component Calls**: Components now render without props: `<PerSchedule today={today} />`
+
+### Benefits Achieved
+
+1. **Zero Prop Drilling**: All shared data now accessed directly from Redux
+2. **Self-Contained Components**: Components can access any data they need independently
+3. **Much Cleaner App.js**: No more complex prop passing, just simple component rendering
+4. **Better Performance**: No unnecessary re-renders from prop changes
+5. **Easier Testing**: Components can be tested in isolation with Redux store
+
+### Files Modified
+
+- `src/Components/Schedules/PerSchedule.js` (updated - uses Redux selectors)
+- `src/Components/Schedules/PubSchedule.js` (updated - uses Redux selectors)
+- `src/Components/Schedules/CSchedule.js` (updated - uses Redux selectors)
+- `src/Components/Messages/AMessages.js` (updated - uses Redux selectors)
+- `src/Components/Messages/EMessages.js` (updated - uses Redux selectors)
+- `src/App.js` (updated - removed all prop drilling)
+
+### Before vs After
+
+```
+// BEFORE: Complex prop drilling
+<PerSchedule
+  callList={callList}
+  user={user}
+  nrHolidayList={nrHolidayList}
+  depts={depts}
+  processHolidaysForDate={processHolidaysForDate}
+  entryList={filteredEntries}
+/>
+
+// AFTER: Clean, no props needed
+<PerSchedule today={today} />
+```
+
+### Data Flow Now
+
+```
+Redux Store → Components (via selectors)
+     ↓              ↓
+All Data    Direct Access
+```
 
 ## 🚀 PR #3: Holiday Management - COMPLETED
 

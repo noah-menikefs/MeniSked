@@ -1,4 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../store/slices/userSlice";
+import {
+  selectCallList,
+  selectFilteredEntries,
+  selectDepts,
+} from "../../store/slices/referenceDataSlice";
 import CalendarGrid from "./Calendar/CalendarGrid";
 import { buildPersonalMonthDays } from "../../selectors/calendarData";
 import ScheduleDownloadLink from "./../PDF/ScheduleDownloadLink.jsx";
@@ -21,7 +28,13 @@ const style = {
   width: "90%",
 };
 
-const PerSchedule = (props) => {
+const PerSchedule = ({ today }) => {
+  // Get data from Redux instead of props
+  const user = useSelector(selectUser);
+  const callList = useSelector(selectCallList);
+  const entryList = useSelector(selectFilteredEntries);
+  const depts = useSelector(selectDepts);
+
   // State management with hooks
   const [activeDocs, setActiveDocs] = useState([]);
   const [docIndex, setDocIndex] = useState(0);
@@ -33,16 +46,6 @@ const PerSchedule = (props) => {
   const [pending, setPending] = useState([]);
   const { stamp, updateStamp } = usePdfStamp();
 
-  // Extract shared data from props
-  const {
-    user,
-    today,
-    callList,
-    nrHolidayList,
-    depts,
-    processHolidaysForDate,
-    entryList,
-  } = props;
   const isMountedRef = useRef(true);
 
   // Load functions
@@ -82,11 +85,7 @@ const PerSchedule = (props) => {
     maxDate: moment(today).add(10, "year"),
   });
 
-  const holiDays = useHolidays({
-    dateContext,
-    nrHolidayList,
-    processHolidaysForDate,
-  });
+  const holiDays = useHolidays({ dateContext });
 
   const loadPersonalSked = useCallback((user) => {
     setActiveDocs((prevActiveDocs) => {

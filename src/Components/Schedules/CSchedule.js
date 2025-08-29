@@ -1,4 +1,11 @@
 import React, { useState, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../store/slices/userSlice";
+import {
+  selectCallList,
+  selectPeopleList,
+  selectDepts,
+} from "../../store/slices/referenceDataSlice";
 import CalendarGrid from "./Calendar/CalendarGrid";
 import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
@@ -25,21 +32,16 @@ const style = {
   width: "90%",
 };
 
-const CSchedule = (props) => {
+const CSchedule = ({ today }) => {
+  // Get data from Redux instead of props
+  const user = useSelector(selectUser);
+  const callList = useSelector(selectCallList);
+  const peopleList = useSelector(selectPeopleList);
+  const depts = useSelector(selectDepts);
+
   const [show, setShow] = useState(false);
   const [day, setDay] = useState(-1);
   const { stamp, updateStamp } = usePdfStamp();
-
-  // Extract shared data from props
-  const {
-    today,
-    user,
-    callList,
-    nrHolidayList,
-    depts,
-    processHolidaysForDate,
-    peopleList,
-  } = props;
 
   const callSked = useMemo(
     () => buildWorkSkedFromPeople(peopleList, callList, true),
@@ -62,11 +64,7 @@ const CSchedule = (props) => {
   });
 
   // Holidays recompute when dateContext or holiday data changes
-  const holiDays = useHolidays({
-    dateContext,
-    nrHolidayList,
-    processHolidaysForDate,
-  });
+  const holiDays = useHolidays({ dateContext });
 
   const onDayClick = (d) => {
     const ctx = moment(dateContext).set("date", d);

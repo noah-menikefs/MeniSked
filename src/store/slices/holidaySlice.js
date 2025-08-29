@@ -1,8 +1,4 @@
-import {
-  createSlice,
-  createAsyncThunk,
-  createSelector,
-} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const initialState = {
   rHolidayList: [],
@@ -68,43 +64,5 @@ export const selectRHolidayList = (state) => state.holidays.rHolidayList;
 export const selectNrHolidayList = (state) => state.holidays.nrHolidayList;
 export const selectHolidayLoading = (state) => state.holidays.loading;
 export const selectHolidayError = (state) => state.holidays.error;
-
-// Memoized selector for processing holidays for a specific date
-export const selectHolidaysForDate = createSelector(
-  [selectRHolidayList, selectNrHolidayList],
-  (rHolidayList, nrHolidayList) => {
-    return (dateContext) => {
-      let newArr = [];
-
-      // Process non-regular holidays
-      nrHolidayList.forEach((nholiday) => {
-        nholiday.eventsked.forEach((date) => {
-          let dateArr = date.split("/");
-          if (
-            dateArr[0] === dateContext.format("MM") &&
-            dateArr[2] === dateContext.format("YYYY")
-          ) {
-            newArr.push({
-              day: parseInt(dateArr[1], 10),
-              name: nholiday.name,
-            });
-          }
-        });
-      });
-
-      // Process regular holidays
-      rHolidayList.forEach((holiday) => {
-        if (holiday.month === dateContext.format("MMMM")) {
-          newArr.push({
-            day: holiday.day,
-            name: holiday.name,
-          });
-        }
-      });
-
-      return newArr;
-    };
-  }
-);
 
 export default holidaySlice.reducer;

@@ -1,11 +1,22 @@
 import React, { useState, useCallback, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../store/slices/userSlice";
+import {
+  selectFilteredEntries,
+  selectCallList,
+} from "../../store/slices/referenceDataSlice";
 import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { dateStyler, sortDates } from "../../utils";
 import "./Messages.css";
 
-const EMessages = ({ user, entryList, callList }) => {
+const EMessages = () => {
+  // Get data from Redux instead of props
+  const user = useSelector(selectUser);
+  const entryList = useSelector(selectFilteredEntries);
+  const callList = useSelector(selectCallList);
+
   const [messages, setMessages] = useState([]);
   const [ctr, setCtr] = useState(10);
   const [show, setShow] = useState(false);
