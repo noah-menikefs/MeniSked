@@ -1,4 +1,8 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  createSelector,
+} from "@reduxjs/toolkit";
 
 const initialState = {
   callList: [],
@@ -71,7 +75,7 @@ const referenceDataSlice = createSlice({
 
 export const { clearReferenceData } = referenceDataSlice.actions;
 
-// Selectors
+// Base selectors
 export const selectCallList = (state) => state.referenceData.callList;
 export const selectEntryList = (state) => state.referenceData.entryList;
 export const selectPeopleList = (state) => state.referenceData.peopleList;
@@ -80,8 +84,10 @@ export const selectReferenceDataLoading = (state) =>
   state.referenceData.loading;
 export const selectReferenceDataError = (state) => state.referenceData.error;
 
-// Derived selectors
-export const selectFilteredEntries = (state) =>
-  state.referenceData.entryList.filter((entry) => entry.isactive === true);
+// Memoized derived selector to prevent unnecessary re-renders
+export const selectFilteredEntries = createSelector(
+  [selectEntryList],
+  (entryList) => entryList.filter((entry) => entry.isactive === true)
+);
 
 export default referenceDataSlice.reducer;
