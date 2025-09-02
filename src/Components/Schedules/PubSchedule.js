@@ -1,4 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../store/slices/userSlice";
+import {
+  selectCallList,
+  selectFilteredEntries,
+  selectPeopleList,
+  selectDepts,
+} from "../../store/slices/referenceDataSlice";
 import CalendarGrid from "./Calendar/CalendarGrid";
 import { buildPublishedMonthDays } from "../../selectors/calendarData";
 import Button from "react-bootstrap/Button";
@@ -30,7 +38,14 @@ const style = {
   width: "90%",
 };
 
-const PubSchedule = (props) => {
+const PubSchedule = ({ today }) => {
+  // Get data from Redux instead of props
+  const user = useSelector(selectUser);
+  const callList = useSelector(selectCallList);
+  const entryList = useSelector(selectFilteredEntries);
+  const peopleList = useSelector(selectPeopleList);
+  const depts = useSelector(selectDepts);
+
   const [show, setShow] = useState(false);
   const [nShow, setNShow] = useState(false);
   const [note, setNote] = useState("");
@@ -52,18 +67,6 @@ const PubSchedule = (props) => {
   const { stamp, updateStamp } = usePdfStamp();
 
   const { numNotes, vNotes, iNotes } = allNotes;
-
-  // Extract shared data from props
-  const {
-    today,
-    user,
-    callList,
-    nrHolidayList,
-    depts,
-    processHolidaysForDate,
-    peopleList,
-    entryList,
-  } = props;
 
   const sked = useMemo(() => {
     return buildWorkSkedFromPeople(peopleList, callList, false);
@@ -114,11 +117,7 @@ const PubSchedule = (props) => {
     maxDate: user.isadmin ? moment(today).add(10, "year") : lastPublished,
   });
 
-  const holiDays = useHolidays({
-    dateContext,
-    nrHolidayList,
-    processHolidaysForDate,
-  });
+  const holiDays = useHolidays({ dateContext });
 
   useEffect(() => {
     loadPublished();

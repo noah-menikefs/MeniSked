@@ -7,18 +7,8 @@ import {
   onRouteChange,
   setUser,
 } from "./store/slices/userSlice";
-import {
-  selectCallList,
-  selectFilteredEntries,
-  selectPeopleList,
-  selectDepts,
-  fetchReferenceData,
-} from "./store/slices/referenceDataSlice";
-import {
-  selectRHolidayList,
-  selectNrHolidayList,
-  fetchHolidayData,
-} from "./store/slices/holidaySlice";
+import { fetchReferenceData } from "./store/slices/referenceDataSlice";
+import { fetchHolidayData } from "./store/slices/holidaySlice";
 import Navigation from "./Components/Navigation/Navigation";
 import Login from "./Components/Login/Login";
 import Register from "./Components/Login/Register";
@@ -44,16 +34,6 @@ const App = () => {
   const isSignedIn = useSelector(selectIsSignedIn);
   const route = useSelector(selectRoute);
 
-  // Get reference data from Redux
-  const callList = useSelector(selectCallList);
-  const entryList = useSelector(selectFilteredEntries);
-  const peopleList = useSelector(selectPeopleList);
-  const depts = useSelector(selectDepts);
-
-  // Get holiday data from Redux
-  const rHolidayList = useSelector(selectRHolidayList);
-  const nrHolidayList = useSelector(selectNrHolidayList);
-
   const loadUser = useCallback(
     (data) => {
       dispatch(setUser(data));
@@ -74,101 +54,21 @@ const App = () => {
     dispatch(fetchHolidayData());
   }, [dispatch]);
 
-  // NEW: Shared utility functions
-  const processHolidaysForDate = useCallback(
-    (dateContext) => {
-      let newArr = [];
-      nrHolidayList.forEach((nholiday) => {
-        nholiday.eventsked.forEach((date) => {
-          let dateArr = date.split("/");
-          if (
-            dateArr[0] === dateContext.format("MM") &&
-            dateArr[2] === dateContext.format("YYYY")
-          ) {
-            newArr.push({
-              day: parseInt(dateArr[1], 10),
-              name: nholiday.name,
-            });
-          }
-        });
-      });
-
-      rHolidayList.forEach((holiday) => {
-        if (holiday.month === dateContext.format("MMMM")) {
-          newArr.push({
-            day: holiday.day,
-            name: holiday.name,
-          });
-        }
-      });
-      return newArr;
-    },
-    [nrHolidayList, rHolidayList]
-  );
-
-  const filteredEntries = useMemo(() => {
-    return entryList.filter((entry) => entry.isactive === true);
-  }, [entryList]);
-
   //used for rendering when signed in
   const inRenderSwitch = (route) => {
     switch (route) {
       case "Personal Schedule":
-        return (
-          <PerSchedule
-            callList={callList}
-            today={today}
-            user={user}
-            // NEW: Pass shared data
-            nrHolidayList={nrHolidayList}
-            depts={depts}
-            processHolidaysForDate={processHolidaysForDate}
-            entryList={filteredEntries}
-          />
-        );
+        return <PerSchedule today={today} />;
       case "Master Schedule":
-        return (
-          <PubSchedule
-            callList={callList}
-            today={today}
-            user={user}
-            // NEW: Pass shared data
-            nrHolidayList={nrHolidayList}
-            depts={depts}
-            processHolidaysForDate={processHolidaysForDate}
-            entryList={filteredEntries}
-            peopleList={peopleList}
-          />
-        );
+        return <PubSchedule today={today} />;
       case "Call Schedule":
-        return (
-          <CSchedule
-            callList={callList}
-            today={today}
-            user={user}
-            // NEW: Pass shared data
-            rHolidayList={rHolidayList}
-            nrHolidayList={nrHolidayList}
-            depts={depts}
-            processHolidaysForDate={processHolidaysForDate}
-            peopleList={peopleList}
-          />
-        );
+        return <CSchedule today={today} />;
       case "Account Information":
         return <Account loadUser={loadUser} user={user} />;
       case "Admin Messages":
-        return (
-          <AMessages
-            today={today}
-            entryList={entryList}
-            peopleList={peopleList}
-            callList={callList}
-          />
-        );
+        return <AMessages today={today} />;
       case "Messages":
-        return (
-          <EMessages user={user} entryList={entryList} callList={callList} />
-        );
+        return <EMessages />;
       case "Holidays":
         return <Holidays today={today} />;
       case "Call Types":
@@ -178,18 +78,7 @@ const App = () => {
       case "Entries":
         return <Entries />;
       default:
-        return (
-          <PerSchedule
-            callList={callList}
-            today={today}
-            user={user}
-            // NEW: Pass shared data
-            nrHolidayList={nrHolidayList}
-            depts={depts}
-            processHolidaysForDate={processHolidaysForDate}
-            entryList={filteredEntries}
-          />
-        );
+        return <PerSchedule today={today} />;
     }
   };
 
