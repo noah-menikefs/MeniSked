@@ -40,6 +40,61 @@ export const fetchReferenceData = createAsyncThunk(
   }
 );
 
+// CRUD operations for CallTypes
+export const addCallType = createAsyncThunk(
+  "referenceData/addCallType",
+  async ({ name, active, priority }) => {
+    const response = await fetch(
+      "https://secure-earth-82827.herokuapp.com/callTypes",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          active,
+          priority: parseInt(priority, 10),
+        }),
+      }
+    );
+    return await response.json();
+  }
+);
+
+export const updateCallType = createAsyncThunk(
+  "referenceData/updateCallType",
+  async ({ id, name, active, priority }) => {
+    const response = await fetch(
+      "https://secure-earth-82827.herokuapp.com/callTypes",
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id,
+          name,
+          active,
+          priority: parseInt(priority, 10),
+        }),
+      }
+    );
+    return await response.json();
+  }
+);
+
+export const deleteCallType = createAsyncThunk(
+  "referenceData/deleteCallType",
+  async (id) => {
+    const response = await fetch(
+      "https://secure-earth-82827.herokuapp.com/callTypes",
+      {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      }
+    );
+    return await response.json();
+  }
+);
+
 const referenceDataSlice = createSlice({
   name: "referenceData",
   initialState,
