@@ -1,10 +1,23 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   selectFilteredEntries,
   selectPeopleList,
   selectCallList,
 } from "../../store/slices/referenceDataSlice";
+import {
+  selectMessages,
+  selectFilteredMessages,
+  selectMessageCounter,
+  fetchAdminMessages,
+  respondToMessage,
+  acceptRequest,
+  deleteMessage as deleteMessageAction,
+  updateMessage,
+  setFilteredMessages,
+  incrementCounter,
+  resetCounter,
+} from "../../store/slices/messageSlice";
 import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -13,117 +26,82 @@ import { dateStyler, sortDates } from "../../utils";
 import "./Messages.css";
 
 const AMessages = ({ today }) => {
+  const dispatch = useDispatch();
   // Get data from Redux instead of props
   const entryList = useSelector(selectFilteredEntries);
   const peopleList = useSelector(selectPeopleList);
   const callList = useSelector(selectCallList);
+  const messages = useSelector(selectMessages);
+  const filteredMsgs = useSelector(selectFilteredMessages);
+  const ctr = useSelector(selectMessageCounter);
 
   const [show, setShow] = useState(false);
   const [msg, setMsg] = useState("");
   const [dshow, setDShow] = useState(false);
   const [mshow, setMShow] = useState(false);
   const [id, setId] = useState(-1);
-  const [ctr, setCtr] = useState(10);
 
-  const [messages, setMessages] = useState([]);
-  const [filteredMsgs, setFilteredMsgs] = useState([]);
-
-  // Loaders
-  const loadMessages = useCallback(() => {
-    fetch("https://secure-earth-82827.herokuapp.com/amessages")
-      .then((res) => res.json())
-      .then((msgs) => {
-        const filtered = msgs.filter((m) => m.deleted !== "A");
-        setMessages(filtered);
-        setFilteredMsgs(filtered);
-      });
-  }, []);
-
+  // Load messages on component mount and reset counter
   useEffect(() => {
-    loadMessages();
-  }, [loadMessages]);
+    dispatch(resetCounter()); // Reset counter to 10 when component mounts
+    dispatch(fetchAdminMessages());
+  }, [dispatch]);
 
   // Respond
   const respond = (reqId, status) => {
-    fetch("https://secure-earth-82827.herokuapp.com/amessages", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: reqId,
+    dispatch(
+      respondToMessage({
+        reqId,
         status,
         msg,
         stamp: today.format("MM/DD/YYYY"),
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        if (res) loadMessages();
-      });
-
-    if (status === "accepted") {
-      accept(reqId);
-    }
+      })
+    ).then(() => {
+      if (status === "accepted") {
+        dispatch(acceptRequest(reqId));
+      }
+      // Refresh messages after response
+      dispatch(fetchAdminMessages());
+    });
 
     setMsg("");
     setShow(false);
   };
 
-  const accept = (reqId) => {
-    fetch("https://secure-earth-82827.herokuapp.com/arequest", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: reqId }),
-    })
-      .then((res) => res.json())
-      .then((user) => {
-        if (user.lastname) loadMessages();
-      });
-  };
-
   const deleteMessage = useCallback(
     (id, deleted) => {
-      fetch("https://secure-earth-82827.herokuapp.com/messages", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      dispatch(
+        deleteMessageAction({
           id,
           deleted,
           user: "A",
-        }),
-      })
-        .then((res) => res.json())
-        .then((message) => {
-          if (message) {
-            loadMessages();
-          }
-        });
+        })
+      ).then(() => {
+        // Refresh messages after deletion
+        dispatch(fetchAdminMessages());
+      });
     },
-    [loadMessages]
+    [dispatch]
   );
 
   const maybeResponse = useCallback(
     (id) => {
-      fetch("https://secure-earth-82827.herokuapp.com/messages", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      dispatch(
+        updateMessage({
           id,
           msg2: msg,
           stamp2: today.format("MM/DD/YYYY"),
-        }),
-      })
-        .then((res) => res.json())
-        .then((message) => {
-          if (message) {
-            loadMessages();
-          }
-        });
+        })
+      ).then(() => {
+        // Refresh messages after update
+        dispatch(fetchAdminMessages());
+      });
 
       setMsg("");
       setMShow(false);
       setId(-1);
     },
-    [msg, today, loadMessages]
+    [dispatch, msg, today]
   );
 
   // Toggle Modals
@@ -166,19 +144,21 @@ const AMessages = ({ today }) => {
     [entryList, callList]
   );
 
-  const showMore = () => setCtr((prev) => prev + 10);
+  const showMore = () => dispatch(incrementCounter());
 
   const filter = useCallback(
     (doc) => {
       if (doc === "All") {
-        setFilteredMsgs(messages);
+        dispatch(setFilteredMessages(messages));
       } else {
-        setFilteredMsgs(
-          messages.filter((m) => parseInt(m.docid, 10) === doc.id)
+        dispatch(
+          setFilteredMessages(
+            messages.filter((m) => parseInt(m.docid, 10) === doc.id)
+          )
         );
       }
     },
-    [messages]
+    [dispatch, messages]
   );
 
   const onPhysicianChange = (event) => {

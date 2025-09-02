@@ -94,7 +94,7 @@ Login/Register → Redux Store → App.js → All Components
 - Update schedule components to use Redux selectors directly
 - Remove all prop drilling for shared data
 
-### PR #5: Messages
+### PR #5: Message State Management ✅ **COMPLETED**
 
 - Move message state to Redux
 - Create `messages` slice
@@ -273,3 +273,66 @@ Reference   Selectors   No More Props
 - **Root Cause**: `onRouteChange` action expects `{ route, signedIn }` but was being called with just the route string
 - **Solution**: Updated all route change calls to use proper object format: `dispatch(onRouteChange({ route: "Route Name" }))`
 - **Files Fixed**: Navigation.js, Login.js, Register.js, Account.js
+
+## 🚀 PR #5: Message State Management - COMPLETED
+
+### What Was Implemented
+
+- **New Slice**: `messageSlice.js` for managing message state and operations
+- **Store Integration**: Added `messages` reducer to main store
+- **API Centralization**: All message operations (fetch, respond, delete, update) now in Redux thunks
+- **Component Updates**: AMessages and EMessages now use Redux directly
+- **State Management**: Messages, loading states, error handling, and UI state (counter, filtered messages)
+
+### Benefits Achieved
+
+1. **Centralized Message Logic**: All message operations now go through Redux
+2. **Eliminated Local State**: No more useState for messages in components
+3. **Better Error Handling**: Centralized error states for message operations
+4. **Consistent Loading States**: Built-in loading management for all message operations
+5. **Reusable Message Logic**: Any component can now access message data and operations
+6. **Cleaner Components**: Removed complex local state management from message components
+
+### Files Modified
+
+- `src/store/slices/messageSlice.js` (new)
+- `src/store/index.js` (updated)
+- `src/Components/Messages/AMessages.js` (updated - uses Redux)
+- `src/Components/Messages/EMessages.js` (updated - uses Redux)
+- `src/App.js` (updated - removed today prop from AMessages)
+
+### Message Operations Now in Redux
+
+- **fetchAdminMessages**: Load admin messages
+- **fetchEmployeeMessages**: Load employee messages
+- **respondToMessage**: Respond to requests (accept/deny)
+- **acceptRequest**: Accept a request
+- **deleteMessage**: Delete messages
+- **updateMessage**: Update message responses
+
+### Data Flow
+
+```
+Redux Store → Message Components
+     ↓              ↓
+Message Data   Direct Access
+Operations
+```
+
+### Before vs After
+
+```
+// BEFORE: Local state and API calls in components
+const [messages, setMessages] = useState([]);
+const loadMessages = useCallback(() => {
+  fetch("...").then(res => res.json()).then(msgs => {
+    setMessages(msgs);
+  });
+}, []);
+
+// AFTER: Redux state and actions
+const messages = useSelector(selectMessages);
+useEffect(() => {
+  dispatch(fetchAdminMessages());
+}, [dispatch]);
+```
