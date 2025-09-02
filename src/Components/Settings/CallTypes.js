@@ -1,32 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  selectCallList,
+  addCallType,
+  updateCallType,
+  deleteCallType,
+  fetchReferenceData,
+} from "../../store/slices/referenceDataSlice";
 import Button from "react-bootstrap/Button";
 import Scroll from "./../Scroll/Scroll";
 import Form from "react-bootstrap/Form";
 import "./Settings.css";
 
 const CallTypes = () => {
-  const [callList, setCallList] = useState([]);
+  const dispatch = useDispatch();
+
+  // Get callList from Redux instead of local state
+  const callList = useSelector(selectCallList);
+
   const [callName, setCallName] = useState("");
   const [priority, setPriority] = useState(1);
   const [isactive, setIsactive] = useState(false);
   const [add, setAdd] = useState(true);
   const [id, setId] = useState(-1);
 
-  useEffect(() => {
-    loadCallTypes();
-  }, []);
-
-  const loadCallTypes = () => {
-    fetch("https://secure-earth-82827.herokuapp.com/callTypes")
-      .then((response) => response.json())
-      .then((calls) =>
-        setCallList(
-          calls.sort(function (a, b) {
-            return a.priority - b.priority;
-          })
-        )
-      );
-  };
+  // No need for useEffect - data comes from Redux
 
   const addOrEdit = () => {
     if (add) {
@@ -38,61 +36,42 @@ const CallTypes = () => {
 
   const addCall = () => {
     if (callName.length > 0) {
-      fetch("https://secure-earth-82827.herokuapp.com/callTypes", {
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      dispatch(
+        addCallType({
           name: callName,
           active: isactive,
-          priority: parseInt(priority, 10),
-        }),
-      })
-        .then((response) => response.json())
-        .then((call) => {
-          if (call) {
-            loadCallTypes();
-          }
-        });
+          priority: priority,
+        })
+      ).then(() => {
+        // Refresh reference data after adding
+        dispatch(fetchReferenceData());
+      });
       setCallName("");
       setPriority(1);
       setIsactive(false);
     }
   };
 
-  const deleteCall = (e) => {
-    fetch("https://secure-earth-82827.herokuapp.com/callTypes", {
-      method: "delete",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: parseInt(e.target.parentNode.id, 10),
-      }),
-    })
-      .then((response) => response.json())
-      .then((calls) => {
-        if (calls) {
-          loadCallTypes();
-        }
-      });
+  const deleteCall = (callId) => {
+    dispatch(deleteCallType(callId)).then(() => {
+      // Refresh reference data after deleting
+      dispatch(fetchReferenceData());
+    });
   };
 
   const editCall = () => {
     if (callName.length > 0) {
-      fetch("https://secure-earth-82827.herokuapp.com/callTypes", {
-        method: "put",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      dispatch(
+        updateCallType({
+          id: parseInt(id, 10),
           name: callName,
           active: isactive,
-          priority: parseInt(priority, 10),
-          id: parseInt(id, 10),
-        }),
-      })
-        .then((response) => response.json())
-        .then((call) => {
-          if (call) {
-            loadCallTypes();
-          }
-        });
+          priority: priority,
+        })
+      ).then(() => {
+        // Refresh reference data after updating
+        dispatch(fetchReferenceData());
+      });
       setCallName("");
       setPriority(1);
       setIsactive(false);
@@ -113,17 +92,14 @@ const CallTypes = () => {
     setIsactive((prev) => !prev);
   };
 
-  const onEdit = (e) => {
-    const editId = parseInt(e.target.parentNode.id, 10);
-    for (let i = 0; i < callList.length; i++) {
-      if (callList[i].id === editId) {
-        setCallName(callList[i].name);
-        setPriority(callList[i].priority);
-        setIsactive(callList[i].isactive);
-        setAdd(false);
-        setId(editId);
-        break;
-      }
+  const onEdit = (callId) => {
+    const call = callList.find((c) => c.id === callId);
+    if (call) {
+      setCallName(call.name);
+      setPriority(call.priority);
+      setIsactive(call.isactive);
+      setAdd(false);
+      setId(callId);
     }
   };
 
@@ -142,7 +118,7 @@ const CallTypes = () => {
         {callList[j].name}
         <Button
           key={j}
-          onClick={onEdit}
+          onClick={() => onEdit(callList[j].id)}
           className="edit butn"
           size="sm"
           variant="secondary"
@@ -151,7 +127,7 @@ const CallTypes = () => {
         </Button>
         <Button
           key={-j - 1}
-          onClick={deleteCall}
+          onClick={() => deleteCall(callList[j].id)}
           className="delete butn"
           size="sm"
           variant="danger"

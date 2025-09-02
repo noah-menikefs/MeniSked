@@ -162,30 +162,6 @@ const messageSlice = createSlice({
       .addCase(fetchEmployeeMessages.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
-      })
-      // Respond to message
-      .addCase(respondToMessage.fulfilled, (state, action) => {
-        if (action.payload) {
-          // Messages will be refetched by the component
-        }
-      })
-      // Accept request
-      .addCase(acceptRequest.fulfilled, (state, action) => {
-        if (action.payload?.lastname) {
-          // Messages will be refetched by the component
-        }
-      })
-      // Delete message
-      .addCase(deleteMessage.fulfilled, (state, action) => {
-        if (action.payload) {
-          // Messages will be refetched by the component
-        }
-      })
-      // Update message
-      .addCase(updateMessage.fulfilled, (state, action) => {
-        if (action.payload) {
-          // Messages will be refetched by the component
-        }
       });
   },
 });
@@ -208,22 +184,6 @@ export const selectPastMessages = createSelector(
   [selectFilteredMessages],
   (filteredMessages) =>
     filteredMessages.filter((m) => m.status !== "pending" || m.maybe)
-);
-
-export const selectSortedPendingMessages = createSelector(
-  [selectPendingMessages],
-  (pendingMessages) => {
-    // Import sortDates from utils - we'll need to handle this
-    return pendingMessages; // Will be sorted in component for now
-  }
-);
-
-export const selectSortedPastMessages = createSelector(
-  [selectPastMessages],
-  (pastMessages) => {
-    // Import sortDates from utils - we'll need to handle this
-    return pastMessages; // Will be sorted in component for now
-  }
 );
 
 // Actions
