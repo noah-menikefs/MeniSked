@@ -1,10 +1,18 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { selectUser } from "../../store/slices/userSlice";
 import {
   selectFilteredEntries,
   selectCallList,
 } from "../../store/slices/referenceDataSlice";
+import {
+  selectMessages,
+  selectMessageCounter,
+  fetchEmployeeMessages,
+  deleteMessage as deleteMessageAction,
+  incrementCounter,
+  resetCounter,
+} from "../../store/slices/messageSlice";
 import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
@@ -12,38 +20,29 @@ import { dateStyler, sortDates } from "../../utils";
 import "./Messages.css";
 
 const EMessages = () => {
-  // Get data from Redux instead of props
+  const dispatch = useDispatch();
+
+  // Get data from Redux
   const user = useSelector(selectUser);
   const entryList = useSelector(selectFilteredEntries);
   const callList = useSelector(selectCallList);
+  const messages = useSelector(selectMessages);
+  const ctr = useSelector(selectMessageCounter);
 
-  const [messages, setMessages] = useState([]);
-  const [ctr, setCtr] = useState(10);
   const [show, setShow] = useState(false);
   const [msg, setMsg] = useState("");
 
-  const loadMessages = useCallback(() => {
-    fetch(`https://secure-earth-82827.herokuapp.com/emessages/${user.id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setMessages(
-          data.filter(
-            (m) => (m.status !== "pending" || m.maybe) && m.deleted !== "E"
-          )
-        );
-      });
-  }, [user.id]);
-
   const deleteMessage = (id, deleted) => {
-    fetch("https://secure-earth-82827.herokuapp.com/messages", {
-      method: "delete",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, deleted, user: "E" }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data) loadMessages();
-      });
+    dispatch(
+      deleteMessageAction({
+        id,
+        deleted,
+        user: "E",
+      })
+    ).then(() => {
+      // Refresh messages after deletion
+      dispatch(fetchEmployeeMessages(user.id));
+    });
   };
 
   const entryIdToName = useCallback(
@@ -61,11 +60,14 @@ const EMessages = () => {
     setMsg(msgText);
   };
 
-  const showMore = () => setCtr((prev) => prev + 10);
+  const showMore = () => dispatch(incrementCounter());
 
   useEffect(() => {
-    loadMessages();
-  }, [loadMessages]);
+    if (user.id) {
+      dispatch(resetCounter()); // Reset counter to 10 when component mounts
+      dispatch(fetchEmployeeMessages(user.id));
+    }
+  }, [dispatch, user.id]);
 
   const sortedMessages = sortDates(messages).slice(0, ctr);
 
