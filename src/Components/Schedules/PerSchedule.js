@@ -14,7 +14,11 @@ import Col from "react-bootstrap/Col";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import moment from "moment";
-import { publishedBaseDate } from "../../utils/date";
+import {
+  publishedBaseDate,
+  isSameDate,
+  findMatchingDate,
+} from "../../utils/date";
 import CalendarHeader from "./Calendar/CalendarHeader";
 import useCalendarNavigation from "../../hooks/useCalendarNavigation";
 import useHolidays from "../../hooks/useHolidays";
@@ -223,28 +227,37 @@ const PerSchedule = ({ today }) => {
       const date = moment(dateContext).date(selectedDay).format("MM/D/YYYY");
       const selectedDocId = activeDocs[docIndex]?.id;
 
-      // Helpers that clarify intent
-      const isAssignedForDateAndType = personalDays.some(
-        (d) => d.date === date && d.id === typeID
+      // Helpers that clarify intent - handle both M/D/YYYY and MM/D/YYYY formats
+      const assignedForDateAndType = personalDays.find(
+        (d) => isSameDate(d.date, date) && d.id === typeID
       );
-      const hasPendingOnDateForType = pending.some(
-        (p) => p.dates?.includes(date) && Number(p.entryid) === typeID
+      const pendingEntryOnDate = pending.find(
+        (p) =>
+          p.dates?.some((pendingDate) => isSameDate(pendingDate, date)) &&
+          Number(p.entryid) === typeID
       );
       const hasPendingForType = pending.some(
         (p) =>
           Number(p.docid) === Number(user.id) && Number(p.entryid) === typeID
       );
       if (user.isadmin) {
-        const method = isAssignedForDateAndType ? "delete" : "post";
-        assignCall(typeID, method, date);
+        if (assignedForDateAndType) {
+          assignCall(typeID, "delete", assignedForDateAndType.date);
+        } else {
+          assignCall(typeID, "post", date);
+        }
         pending.forEach((p) => {
-          if (p.dates?.includes(date)) {
-            deleteCall(p.entryid, date, selectedDocId);
+          // Find the matching date in original format to preserve database consistency
+          const matchingDate = findMatchingDate(date, p.dates);
+          if (matchingDate) {
+            deleteCall(p.entryid, matchingDate, selectedDocId);
           }
         });
       } else {
-        if (hasPendingOnDateForType) {
-          deleteCall(typeID, date);
+        if (pendingEntryOnDate) {
+          // Find the matching date in original format to preserve database consistency
+          const matchingDate = findMatchingDate(date, pendingEntryOnDate.dates);
+          deleteCall(typeID, matchingDate);
         } else if (hasPendingForType) {
           editCall(typeID, date);
         } else {
